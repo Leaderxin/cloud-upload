@@ -1,0 +1,53 @@
+{
+  "name": "vue-clound-upload",
+  "version": "1.0.0",
+  "description": "基于vue+elementui的通用云上传组件，无缝衔接腾讯云，火山云等桶平台，开箱即用",
+  "private": false,
+  "type": "module",
+  "main": "./dist/cloud-upload.umd.js",
+  "module": "./dist/cloud-upload.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/cloud-upload.es.js",
+      "require": "./dist/cloud-upload.umd.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    "cos-js-sdk-v5": "^1.10.1"
+  },
+  "peerDependencies": {
+    "vue": "^2.6.0",
+    "element-ui": "^2.13.2"
+  },
+  "devDependencies": {
+    "cos-js-sdk-v5": "^1.10.1",
+    "element-ui": "^2.13.2",
+    "vite": "^7.1.4",
+    "vue": "^2.6.0",
+    "@vitejs/plugin-vue2": "^2.3.3",
+    "vue-template-compiler": "^2.6.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "vue2",
+    "element-ui",
+    "upload",
+    "tencent cloud",
+    "volcano engine",
+    "component"
+  ],
+  "author": "Leaderxin",
+  "license": "MIT",
+  "volta": {
+    "node": "20.19.4"
+  }
+  
+}

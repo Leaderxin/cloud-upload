@@ -1,0 +1,158 @@
+import COS from "cos-js-sdk-v5";
+class CosHelper {
+  static instance = null;
+  cosClient = null;
+  tempCredential = null;
+
+  static getInstance(getToken) {
+    if (!this.instance) {
+      this.instance = new CosHelper(getToken);
+    }
+    return this.instance;
+  }
+
+  constructor(getToken) {
+    this.initClient(getToken);
+  }
+
+  async initClient(getToken) {
+    await this.getTempCredential(getToken);
+    console.log("version:", COS.version);
+    this.cosClient = new COS({
+      getAuthorization: async (options, callback) => {
+        try {
+          if (!this.tempCredential || this.isCredentialExpired()) {
+            await this.getTempCredential(getToken);
+          }
+          callback({
+            TmpSecretId: this.tempCredential.tmpSecretId,
+            TmpSecretKey: this.tempCredential.tmpSecretKey,
+            SecurityToken: this.tempCredential.sessionToken,
+            StartTime: this.tempCredential.startTime,
+            ExpiredTime: this.tempCredential.expiredTime,
+          });
+        } catch (error) {
+          console.error("获取临时凭证失败:", error);
+        }
+      },
+    });
+  }
+
+  async getTempCredential(getToken) {
+    // 优先从localStorage获取
+    let storeCredential = localStorage.getItem("cosCredential");
+    if (storeCredential) {
+      storeCredential = JSON.parse(storeCredential);
+    }
+    if (storeCredential && !this.isCredentialExpired(storeCredential)) {
+      this.tempCredential = storeCredential;
+      return;
+    }
+    // localStorage无有效凭证则调用接口获取
+    try {
+      const data = getToken();
+      if (data && typeof data == "object") {
+        this.tempCredential = {
+          tmpSecretId: data.credentials.tmpSecretId,
+          tmpSecretKey: data.credentials.tmpSecretKey,
+          sessionToken: data.credentials.sessionToken,
+          startTime: data.startTime,
+          expiredTime: data.expiredTime,
+        };
+        localStorage.setItem(
+          "cosCredential",
+          JSON.stringify(this.tempCredential)
+        );
+      }
+    } catch (error) {
+      throw new Error("获取临时凭证失败: " + error.message);
+    }
+  }
+
+  isCredentialExpired(credential = this.tempCredential) {
+    if (!credential) return true;
+    const now = Math.floor(Date.now() / 1000);
+    return now >= credential.expiredTime - 60; // 提前60秒认为过期
+  }
+
+  // 单文件上传
+  uploadFile({ bucket, region, path, file }) {
+    return new Promise((resolve, reject) => {
+      this.cosClient.uploadFile(
+        {
+          Bucket: bucket,
+          Region: region,
+          Key: path + file.name,
+          Body: file,
+          onProgress: (progressData) => {
+            console.log(`上传进度: ${progressData.percent * 100}%`);
+          },
+        },
+        (err, data) => {
+          if (err) reject(err);
+          else resolve(data);
+        }
+      );
+    });
+  }
+
+  // 批量上传
+  batchUpload({ bucket, region, files }) {
+    return Promise.all(
+      files.map((file) =>
+        this.uploadFile({ bucket, region, key: file.name, file })
+      )
+    );
+  }
+
+  // 分片上传
+  sliceUpload({ bucket, region, key, file, sliceSize = 5 * 1024 * 1024 }) {
+    return new Promise((resolve, reject) => {
+      this.cosClient.sliceUploadFile(
+        {
+          Bucket: bucket,
+          Region: region,
+          Key: key,
+          Body: file,
+          SliceSize: sliceSize,
+          onProgress: (progressData) => {
+            console.log(`分片上传进度: ${progressData.percent * 100}%`);
+          },
+        },
+        (err, data) => {
+          if (err) reject(err);
+          else resolve(data);
+        }
+      );
+    });
+  }
+
+  // 图片加水印
+  async addWatermark({ bucket, region, key, watermarkText }) {
+    const params = {
+      Bucket: bucket,
+      Region: region,
+      Key: key,
+      PicOperations: JSON.stringify({
+        is_pic_info: 1,
+        rules: [
+          {
+            fileid: `watermark_${key}`,
+            rule: `watermark/2/text/${encodeURIComponent(
+              watermarkText
+            )}/fill/IzAwMDAwMA/fontsize/20/dissolve/50/gravity/southeast/dx/20/dy/20`,
+          },
+        ],
+      }),
+    };
+
+    return new Promise((resolve, reject) => {
+      this.cosClient.ciPutObjectFromLocalFile(params, (err, data) => {
+        if (err) reject(err);
+        else resolve(data);
+      });
+    });
+  }
+}
+
+export default CosHelper;
