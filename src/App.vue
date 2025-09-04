@@ -1,10 +1,40 @@
 <template>
   <div id="app">
-    <CloudUpload
-      cloudType="tencent"
-      :cloudConfig="cloudConfig"
-      v-model="fileList"
-    ></CloudUpload>
+    <el-tabs v-model="cloudType">
+      <el-tab-pane label="腾讯云cos" name="tencent">
+        <h3>腾讯云配置项：</h3>
+        <el-form>
+          <el-form-item label="bucket(桶名)">
+            <el-input size="mini" v-model="cloudConfig.bucket"></el-input>
+          </el-form-item>
+          <el-form-item label="region(地域)">
+            <el-input size="mini" v-model="cloudConfig.region"></el-input>
+          </el-form-item>
+          <el-form-item label="path(文件上传目录)">
+            <el-input size="mini" v-model="cloudConfig.path"></el-input>
+          </el-form-item>
+        </el-form>
+      </el-tab-pane>
+      <el-tab-pane label="火山云" name="huoshan">
+        <h3>腾讯云配置项：</h3>
+      </el-tab-pane>
+      <el-tab-pane label="阿里云" name="alibaba">
+        <h3>阿里云配置项：</h3>
+      </el-tab-pane>
+    </el-tabs>
+    <h3>上传示例：</h3>
+    <el-form>
+      <el-form-item label="单个图片，大小限制10Mb">
+        <CloudUpload
+          :multiple="false"
+          :limit="1"
+          accept=".png,.jpg,.jpeg"
+          :cloudType="cloudType"
+          :cloudConfig="cloudConfig"
+          v-model="fileList"
+        ></CloudUpload>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
@@ -18,6 +48,7 @@ export default {
   },
   data() {
     return {
+      cloudType: "tencent1",
       cloudConfig: {
         bucket: "int-delivery-1301141550",
         region: "ap-nanjing",

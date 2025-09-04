@@ -148,12 +148,14 @@ export default {
     };
   },
   created(){
+    debugger
     //检查关键参数传入
     const typeList = ['tencent']
     if(!this.cloudType){
       console.warn('未设置云平台类型cloudType!')
     }
     else if(!typeList.includes(this.cloudType)){
+      debugger
       console.warn(`云平台类型cloudType设置错误，应为${typeList.join('/')}`)
     }
     switch (this.cloudType) {
