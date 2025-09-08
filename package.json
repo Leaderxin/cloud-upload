@@ -20,16 +20,16 @@
     "cos-js-sdk-v5": "^1.10.1"
   },
   "peerDependencies": {
-    "vue": "^2.6.0",
-    "element-ui": "^2.13.2"
+    "element-ui": "^2.13.2",
+    "vue": "^2.6.10"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue2": "^2.3.3",
     "cos-js-sdk-v5": "^1.10.1",
     "element-ui": "^2.13.2",
-    "vite": "^7.1.4",
-    "vue": "^2.6.0",
-    "@vitejs/plugin-vue2": "^2.3.3",
-    "vue-template-compiler": "^2.6.0"
+    "vite": "^6.0.0",
+    "vue": "^2.6.10",
+    "vue-template-compiler": "^2.6.10"
   },
   "scripts": {
     "dev": "vite",
@@ -49,5 +49,4 @@
   "volta": {
     "node": "20.19.4"
   }
-  
 }

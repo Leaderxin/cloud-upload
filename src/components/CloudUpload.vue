@@ -13,45 +13,58 @@
       :before-upload="beforeUpload"
       :http-request="customUpload"
       :list-type="listType"
+      v-bind="$attrs"
+      v-on="$listeners"
     >
-    <i slot="default" class="el-icon-plus"></i>
-     <div slot="file" slot-scope="{file}">
-      <img
-        class="el-upload-list__item-thumbnail"
-        :src="file.url" alt=""
+      <!-- 默认插槽内容 -->
+      <template v-if="!$scopedSlots.default">
+        <i
+          slot="default"
+          class="el-icon-plus"
+          v-if="listType == 'picture-card'"
+        ></i>
+        <el-button size="small" type="primary" v-else>点击上传</el-button>
+      </template>
+      <!-- 暴露所有默认插槽 -->
+      <template v-for="(_, slotName) in $scopedSlots" v-slot.[slotName]="scoped">
+        <slot :name="slotName" v-bind="scoped" />
+      </template>
+      <!-- picture-card文件列表插槽默认内容 -->
+      <template
+        v-if="!$scopedSlots.file && listType == 'picture-card'"
+        slot="file"
+        slot-scope="{ file }"
       >
-      <span class="el-upload-list__item-actions">
-        <span
-          class="el-upload-list__item-preview"
-        >
-          <i class="el-icon-view"></i>
+        <img class="el-upload-list__item-thumbnail" :src="file.url" alt="" />
+        <span class="el-upload-list__item-actions">
+          <span class="el-upload-list__item-preview">
+            <i class="el-icon-view"></i>
+          </span>
+          <span v-if="!disabled" class="el-upload-list__item-delete">
+            <i class="el-icon-download"></i>
+          </span>
+          <span
+            v-if="!disabled"
+            class="el-upload-list__item-delete"
+            @click="handleRemove(file)"
+          >
+            <i class="el-icon-delete"></i>
+          </span>
         </span>
-        <span
-          v-if="!disabled"
-          class="el-upload-list__item-delete"
-        >
-          <i class="el-icon-download"></i>
-        </span>
-        <span
-          v-if="!disabled"
-          class="el-upload-list__item-delete"
-          @click="handleRemove(file)"
-        >
-          <i class="el-icon-delete"></i>
-        </span>
-      </span>
-    </div>
+      </template>
     </el-upload>
   </div>
 </template>
 
 <script>
-import Vue from 'vue'
+import Vue from "vue";
 import CosHelper from "../plugins/tencent";
-import { Upload } from 'element-ui'
-Vue.component('el-upload', Upload)
+import fileHelper from "../utils/fileHelper";
+import { Upload } from "element-ui";
+Vue.component("el-upload", Upload);
 export default {
   name: "CloudUpload",
+  inheritAttrs: false,
   props: {
     /**
      * 是否支持多选文件
@@ -103,8 +116,8 @@ export default {
     /**
      * 单个附件大小限制mb
      */
-    maxSize:{
-      type: Number
+    maxSize: {
+      type: Number,
     },
     /**
      * 使用的云平台类型 tencent腾讯云桶
@@ -120,51 +133,51 @@ export default {
       type: Object,
       required: true,
       default: () => ({
-        bucket:'',
-        region:'',
-        path:'',
-        getTempCredential:()=>{
-          return{
-            TmpSecretId:'',
-            TmpSecretKey:'',
-            SecurityToken:'',
-            StartTime:'',
-            ExpiredTime:''
-          }
-        }
+        bucket: "",
+        region: "",
+        path: "",
+        getTempCredential: () => {
+          return {
+            TmpSecretId: "",
+            TmpSecretKey: "",
+            SecurityToken: "",
+            StartTime: "",
+            ExpiredTime: "",
+          };
+        },
       }),
     },
     /**
      * 自定义v-model
      */
-    value:{
+    value: {
       type: Array,
-      default: () =>{[]}
-    }
+      default: () => {
+        [];
+      },
+    },
   },
   data() {
     return {
       fileList: this.value,
     };
   },
-  created(){
-    debugger
+  created() {
     //检查关键参数传入
-    const typeList = ['tencent']
-    if(!this.cloudType){
-      console.warn('未设置云平台类型cloudType!')
-    }
-    else if(!typeList.includes(this.cloudType)){
-      debugger
-      console.warn(`云平台类型cloudType设置错误，应为${typeList.join('/')}`)
+    const typeList = ["tencent"];
+    if (!this.cloudType) {
+      console.warn("未设置云平台类型cloudType!");
+    } else if (!typeList.includes(this.cloudType)) {
+      console.warn(`云平台类型cloudType设置错误，应为${typeList.join("/")}`);
     }
     switch (this.cloudType) {
-      case 'tencent':
-        CosHelper.getInstance(this.cloudConfig.getTempCredential)
+      case "tencent":
+        CosHelper.getInstance(this.cloudConfig.getTempCredential);
         break;
       default:
         break;
     }
+    console.log("scopedSlots", this.$scopedSlots);
   },
   methods: {
     // 自定义上传方法
@@ -207,13 +220,16 @@ export default {
 
     beforeUpload(file) {
       // 文件类型和大小校验逻辑
-      const isTypeValid = this.accept
-        ? this.accept.split(",").includes(file.type)
-        : true;
+      let isTypeValid = true;
+      if (this.accept) {
+        const list = this.accept
+          .split(",")
+          .map((item) => item.replace(".", ""));
+        isTypeValid = fileHelper.checkFileType(file, list);
+      }
       const isSizeValid = this.maxSize
-        ? file.size / 1024 / 1024 < this.maxSize
+        ? fileHelper.getFileSizeMB(file) < this.maxSize
         : true;
-
       if (!isTypeValid) {
         this.$message.error(`文件类型必须是 ${this.accept} 中的一种!`);
         return false;
@@ -222,7 +238,6 @@ export default {
         this.$message.error(`文件大小不能超过 ${this.maxSize}MB!`);
         return false;
       }
-      this.$emit("before-upload", file);
       return true;
     },
     handleRemove(file, fileList) {
@@ -239,14 +254,12 @@ export default {
       this.$emit("exceed", files, fileList);
     },
   },
-  watch:{
-    value(val){
-      this.fileList = val
+  watch: {
+    value(val) {
+      this.fileList = val;
     },
-    cloudType(val){
-
-    }
-  }
+    cloudType(val) {},
+  },
 };
 </script>
 <style scoped>

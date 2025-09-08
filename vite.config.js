@@ -6,8 +6,8 @@ import vue from '@vitejs/plugin-vue2';
 export default defineConfig({
   plugins: [vue()],
   server: {
-    open: true, // 开发服务器启动时自动在浏览器中打开应用程序:cite[5]:cite[8]
-    port: 9528, // 指定开发服务器端口，默认是 5173:cite[5]:cite[8]
+    open: true, // 开发服务器启动时自动在浏览器中打开应用程序
+    port: 5500, // 指定开发服务器端口
     host: 'localhost' // 指定服务器监听的 IP 地址
   },
   build: {
