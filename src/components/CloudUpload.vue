@@ -1,6 +1,7 @@
 <template>
   <div class="cloud-upload">
     <el-upload
+      ref="innerUpload"
       action="#"
       :file-list="fileList"
       :multiple="multiple"
@@ -10,7 +11,7 @@
       :show-file-list="showFileList"
       :on-exceed="handleExceed"
       :on-remove="handleRemove"
-      :before-upload="beforeUpload"
+      :before-upload="onbeforeUpload"
       :http-request="customUpload"
       :list-type="listType"
       v-bind="$attrs"
@@ -26,7 +27,10 @@
         <el-button size="small" type="primary" v-else>点击上传</el-button>
       </template>
       <!-- 暴露所有默认插槽 -->
-      <template v-for="(_, slotName) in $scopedSlots" v-slot.[slotName]="scoped">
+      <template
+        v-for="(_, slotName) in $scopedSlots"
+        v-slot.[slotName]="scoped"
+      >
         <slot :name="slotName" v-bind="scoped" />
       </template>
       <!-- picture-card文件列表插槽默认内容 -->
@@ -35,18 +39,18 @@
         slot="file"
         slot-scope="{ file }"
       >
-        <img class="el-upload-list__item-thumbnail" :src="file.url" alt="" />
+        <el-image ref="previewImg" fit="contain" class="el-upload-list__item-thumbnail" :src="file.url" :preview-src-list="getPreviewList"></el-image>
         <span class="el-upload-list__item-actions">
           <span class="el-upload-list__item-preview">
-            <i class="el-icon-view"></i>
+            <i class="el-icon-view" @click="()=>handlePreview(file)"></i>
           </span>
           <span v-if="!disabled" class="el-upload-list__item-delete">
-            <i class="el-icon-download"></i>
+            <i class="el-icon-download" @click="()=>handleDown(file)"></i>
           </span>
           <span
             v-if="!disabled"
             class="el-upload-list__item-delete"
-            @click="handleRemove(file)"
+            @click="()=>handleRemove(file)"
           >
             <i class="el-icon-delete"></i>
           </span>
@@ -156,11 +160,34 @@ export default {
         [];
       },
     },
+    beforeUpload: {
+      type: Function,
+      required: false,
+    },
+    onExceed:{
+      type: Function,
+      required: false
+    }
   },
   data() {
     return {
       fileList: this.value,
     };
+  },
+  computed:{
+    getPreviewList(){
+      let result =[]
+      this.fileList.forEach(item => {
+        const url= item.url
+        const index = url.lastIndexOf('/')
+        const filename = url.slice(index).toLocaleLowerCase()
+        const image = ['.png','.jpg','.jpeg','.bmp','.gif']
+        if(image.some(x=>filename.includes(x))){
+          result.push(url)
+        }
+      });
+      return result
+    }
   },
   created() {
     //检查关键参数传入
@@ -177,7 +204,6 @@ export default {
       default:
         break;
     }
-    console.log("scopedSlots", this.$scopedSlots);
   },
   methods: {
     // 自定义上传方法
@@ -202,6 +228,16 @@ export default {
         switch (this.cloudType) {
           case "tencent":
             result = await CosHelper.getInstance().uploadFile(uploadConfig);
+            if (result.statusCode == 200) {
+              this.fileList.push({
+                uid: file.uid,
+                name: file.name,
+                url: result.Location.startsWith("https://")
+                  ? result.Location
+                  : "https://" + result.Location,
+                CosResult: result,
+              });
+            }
             break;
           case "volcengine":
             result = await tencentUpload(uploadConfig);
@@ -218,40 +254,50 @@ export default {
       }
     },
 
-    beforeUpload(file) {
-      // 文件类型和大小校验逻辑
-      let isTypeValid = true;
-      if (this.accept) {
-        const list = this.accept
-          .split(",")
-          .map((item) => item.replace(".", ""));
-        isTypeValid = fileHelper.checkFileType(file, list);
+    onbeforeUpload(file) {
+      if (this.beforeUpload && typeof this.beforeUpload == "function") {
+        return this.beforeUpload();
+      } else {
+        // 文件类型和大小校验逻辑
+        let isTypeValid = true;
+        if (this.accept) {
+          const list = this.accept
+            .split(",")
+            .map((item) => item.replace(".", ""));
+          isTypeValid = fileHelper.checkFileType(file, list);
+        }
+        const isSizeValid = this.maxSize
+          ? fileHelper.getFileSizeMB(file) < this.maxSize
+          : true;
+        if (!isTypeValid) {
+          this.$message.error(`文件类型必须是 ${this.accept} 中的一种!`);
+          return false;
+        }
+        if (!isSizeValid) {
+          this.$message.error(`文件大小不能超过 ${this.maxSize}MB!`);
+          return false;
+        }
+        return true;
       }
-      const isSizeValid = this.maxSize
-        ? fileHelper.getFileSizeMB(file) < this.maxSize
-        : true;
-      if (!isTypeValid) {
-        this.$message.error(`文件类型必须是 ${this.accept} 中的一种!`);
-        return false;
-      }
-      if (!isSizeValid) {
-        this.$message.error(`文件大小不能超过 ${this.maxSize}MB!`);
-        return false;
-      }
-      return true;
     },
     handleRemove(file, fileList) {
-      this.fileList = fileList;
-      this.$emit("remove", file, fileList);
+      this.fileList = this.fileList.filter(x=>x.uid!=file.uid && x.url!=file.url)
+      this.$emit("input", this.fileList);
     },
+    handlePreview(file){
+      this.$refs['previewImg'].clickHandler()
+      console.log(this.$refs['previewImg'].$el.click) 
+    },
+    handleDown(file){
 
+    },
     handleExceed(files, fileList) {
-      this.$message.warning(
-        `当前限制选择 ${this.limit} 个文件，本次选择了 ${
-          files.length
-        } 个文件，共选择了 ${files.length + fileList.length} 个文件`
-      );
-      this.$emit("exceed", files, fileList);
+      if(this.onExceed && typeof(this.onExceed)=='function'){
+        this.onExceed(files,fileList)
+      }
+      else{
+        this.$message.warning(`当前限制最多选择${this.limit}个文件！`)
+      }
     },
   },
   watch: {
