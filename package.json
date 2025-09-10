@@ -1,6 +1,6 @@
 {
   "name": "vue-clound-upload",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "基于vue+elementui的通用云上传组件，无缝衔接腾讯云，火山云等桶平台，开箱即用",
   "private": false,
   "type": "module",
