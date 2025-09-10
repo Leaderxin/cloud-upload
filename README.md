@@ -36,21 +36,19 @@ export default {
     return {
       tencentConfig: {
         //腾讯云cos桶名
-        bucket: "", 
+        bucket: "",
         //腾讯云cos桶所在地域
         region: "",
         //文件上传目录，自定义
         path: "/costest/",
         //临时凭证获取函数，需按照示例结构返回所需参数
         //此临时凭证调用后端接口获取，后端接口调用腾讯云api生成
-        getTempCredential: () => {
+        getTempCredential: async () => {
           return {
             credentials: {
-              tmpSecretId:
-                "",
+              tmpSecretId: "",
               tmpSecretKey: "",
-              sessionToken:
-                "",
+              sessionToken: "",
             },
             requestId: "",
             expiration: "",

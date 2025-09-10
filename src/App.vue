@@ -59,7 +59,7 @@ export default {
         bucket: "int-delivery-1301141550",
         region: "ap-nanjing",
         path: "/costest/",
-        getTempCredential: () => {
+        getTempCredential: async () => {
           return {
             credentials: {
               tmpSecretId:

@@ -50,7 +50,7 @@ class CosHelper {
     }
     // localStorage无有效凭证则调用接口获取
     try {
-      const data = getToken();
+      const data = await getToken();
       if (data && typeof data == "object") {
         this.tempCredential = {
           tmpSecretId: data.credentials.tmpSecretId,
