@@ -1,11 +1,16 @@
 {
   "name": "vue-clound-upload",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "基于vue+elementui的通用云上传组件，无缝衔接腾讯云，火山云等桶平台，开箱即用",
   "private": false,
   "type": "module",
   "main": "./dist/cloud-upload.umd.js",
   "module": "./dist/cloud-upload.es.js",
+  "homepage": "https://github.com/Leaderxin/clound-upload",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Leaderxin/clound-upload.git"
+  },
   "exports": {
     ".": {
       "import": "./dist/cloud-upload.es.js",
