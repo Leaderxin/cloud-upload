@@ -23,7 +23,7 @@ Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 ```vue
 <template>
   <div>
-    <cloud-upload :cloud-config="tencentConfig" cloud-type="tencent" @success="handleSuccess"></cloud-upload>
+    <cloud-upload v-model="fileList" :cloud-config="tencentConfig" cloud-type="tencent" @success="handleSuccess"></cloud-upload>
   </div>
 </script>
 
@@ -34,6 +34,7 @@ export default {
   components: { CloudUpload },
   data() {
     return {
+      fileList:[],//附件列表，上传或者删除后实时同步更新
       tencentConfig: {
         //腾讯云cos桶名
         bucket: "",

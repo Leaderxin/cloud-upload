@@ -1,4 +1,3 @@
-
 /**
  * 文件操作工具类
  */
@@ -9,8 +8,8 @@ class fileHelper {
    * @return {string} 文件后缀
    */
   static getFileExtension(file) {
-    const fileName = typeof file === 'string' ? file : file.name;
-    return fileName.split('.').pop().toLowerCase();
+    const fileName = typeof file === "string" ? file : file.name;
+    return fileName.split(".").pop().toLowerCase();
   }
 
   /**
@@ -29,10 +28,10 @@ class fileHelper {
    */
   static getFileSizeAuto(file) {
     const bytes = file.size;
-    if (bytes < 1024) return bytes + ' B';
-    else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
-    else if (bytes < 1073741824) return (bytes / 1048576).toFixed(2) + ' MB';
-    else return (bytes / 1073741824).toFixed(2) + ' GB';
+    if (bytes < 1024) return bytes + " B";
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + " KB";
+    else if (bytes < 1073741824) return (bytes / 1048576).toFixed(2) + " MB";
+    else return (bytes / 1073741824).toFixed(2) + " GB";
   }
 
   /**
@@ -61,17 +60,27 @@ class fileHelper {
   }
 
   /**
-   * 下载文件
-   * @param {string} dataURL 文件数据URL
-   * @param {string} fileName 下载文件名
+   * 通用文件下载方法
+   * @param {string} url - 文件下载地址
+   * @param {string} [filename] - 可选自定义文件名
    */
-  static downloadFile(dataURL, fileName) {
-    const link = document.createElement('a');
-    link.href = dataURL;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  static downloadFile(url, filename) {
+    // 未传文件名时从URL提取最后部分作为文件名
+    const finalFilename =
+      filename || url.substring(url.lastIndexOf("/") + 1).split("?")[0];
+    fetch(url)
+      .then((response) => response.blob())
+      .then((blob) => {
+        // 创建临时下载链接
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = finalFilename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+      })
+      .catch((error) => console.error("下载失败:", error));
   }
 }
 

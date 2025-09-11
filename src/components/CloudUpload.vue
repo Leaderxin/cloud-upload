@@ -41,11 +41,11 @@
       >
         <el-image
           v-if="getIfImage(file)"
-          ref="previewImg"
+          :preview-src-list="getPreviewList"
+          :ref="getImgRef(file)"
           fit="contain"
           class="el-upload-list__item-thumbnail"
           :src="file.url"
-          :preview-src-list="getPreviewList"
         ></el-image>
         <div v-else class="el-upload-list__item-thumbnail previewIcon">
           <i :class="['iconfont', getFileIcon(file)]"></i>
@@ -204,15 +204,15 @@ export default {
   data() {
     return {
       fileList: this.value,
+      previewUrl: "",
     };
   },
   computed: {
     getPreviewList() {
       let result = [];
       this.fileList.forEach((item) => {
-        const url = item.url;
-        if (this.getIfImage(url)) {
-          result.push(url);
+        if (this.getIfImage(item)) {
+          result.push(item.url);
         }
       });
       return result;
@@ -256,6 +256,9 @@ export default {
         default:
           break;
       }
+    },
+    getImgRef(file) {
+      return `previewImg${this.getPreviewList.findIndex((x) => x == file.url)}`;
     },
     getIfImage(file) {
       let prefix = "";
@@ -422,9 +425,15 @@ export default {
       this.$emit("input", this.fileList);
     },
     handlePreview(file) {
-      this.$refs["previewImg"].clickHandler();
+      const type = this.getFileType(file);
+      if (type == "image") {
+        const ref = this.getImgRef(file);
+        this.$refs[ref].clickHandler();
+      }
     },
-    handleDown(file) {},
+    handleDown(file) {
+      fileHelper.downloadFile(file.url, file.name);
+    },
     handleExceed(files, fileList) {
       if (this.onExceed && typeof this.onExceed == "function") {
         this.onExceed(files, fileList);

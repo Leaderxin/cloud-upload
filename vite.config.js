@@ -12,7 +12,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist', // 输出目录
-    sourcemap: 'hidden',
+    //sourcemap: 'hidden',
     lib: {
       entry: resolve(__dirname, 'src/index.js'), // 组件库的入口文件
       name: 'CloudUpload', // UMD构建时全局变量的名称
