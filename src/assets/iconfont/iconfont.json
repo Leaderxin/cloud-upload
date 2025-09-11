@@ -1,0 +1,72 @@
+{
+  "id": "5018793",
+  "name": "vue-clound-upload",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "1453438",
+      "name": "audio",
+      "font_class": "audio",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "4031008",
+      "name": "ppt",
+      "font_class": "ppt",
+      "unicode": "e650",
+      "unicode_decimal": 58960
+    },
+    {
+      "icon_id": "6376410",
+      "name": "Pdf",
+      "font_class": "Pdf",
+      "unicode": "e733",
+      "unicode_decimal": 59187
+    },
+    {
+      "icon_id": "6733936",
+      "name": "压缩包",
+      "font_class": "yasuobao",
+      "unicode": "e632",
+      "unicode_decimal": 58930
+    },
+    {
+      "icon_id": "8288905",
+      "name": "附件",
+      "font_class": "fujian",
+      "unicode": "e85a",
+      "unicode_decimal": 59482
+    },
+    {
+      "icon_id": "11132427",
+      "name": "video",
+      "font_class": "video",
+      "unicode": "e663",
+      "unicode_decimal": 58979
+    },
+    {
+      "icon_id": "22010643",
+      "name": "MP4",
+      "font_class": "MP4",
+      "unicode": "e679",
+      "unicode_decimal": 59001
+    },
+    {
+      "icon_id": "23183168",
+      "name": "EXCEL",
+      "font_class": "EXCEL",
+      "unicode": "e6a2",
+      "unicode_decimal": 59042
+    },
+    {
+      "icon_id": "23183359",
+      "name": "WORD",
+      "font_class": "WORD",
+      "unicode": "e6a4",
+      "unicode_decimal": 59044
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 5018793 */
+  /* Color fonts */
+  src: 
+       url('iconfont.woff2?t=1757555231674') format('woff2'),
+       url('iconfont.woff?t=1757555231674') format('woff'),
+       url('iconfont.ttf?t=1757555231674') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-audio:before {
+  content: "\e604";
+}
+
+.icon-ppt:before {
+  content: "\e650";
+}
+
+.icon-Pdf:before {
+  content: "\e733";
+}
+
+.icon-yasuobao:before {
+  content: "\e632";
+}
+
+.icon-fujian:before {
+  content: "\e85a";
+}
+
+.icon-video:before {
+  content: "\e663";
+}
+
+.icon-MP4:before {
+  content: "\e679";
+}
+
+.icon-EXCEL:before {
+  content: "\e6a2";
+}
+
+.icon-WORD:before {
+  content: "\e6a4";
+}
+

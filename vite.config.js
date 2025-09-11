@@ -31,6 +31,13 @@ export default defineConfig({
     },
     target:'es2015'
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@import "@/assets/iconfont/iconfont.css";`
+      }
+    }
+  },
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'), // 设置别名，方便引用源文件

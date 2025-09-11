@@ -27,6 +27,8 @@
     "@vitejs/plugin-vue2": "^2.3.3",
     "cos-js-sdk-v5": "^1.10.1",
     "element-ui": "^2.13.2",
+    "sass": "^1.92.1",
+    "sass-loader": "^16.0.5",
     "vite": "^6.0.0",
     "vue": "^2.6.10",
     "vue-template-compiler": "^2.6.10"

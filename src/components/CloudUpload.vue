@@ -39,33 +39,51 @@
         slot="file"
         slot-scope="{ file }"
       >
-        <el-image ref="previewImg" fit="contain" class="el-upload-list__item-thumbnail" :src="file.url" :preview-src-list="getPreviewList"></el-image>
+        <el-image
+          ref="previewImg"
+          fit="contain"
+          class="el-upload-list__item-thumbnail"
+          :src="file.url"
+          :preview-src-list="getPreviewList"
+        ></el-image>
         <span class="el-upload-list__item-actions">
           <span class="el-upload-list__item-preview">
-            <i class="el-icon-view" @click="()=>handlePreview(file)"></i>
+            <i class="el-icon-view" @click="() => handlePreview(file)"></i>
           </span>
           <span v-if="!disabled" class="el-upload-list__item-delete">
-            <i class="el-icon-download" @click="()=>handleDown(file)"></i>
+            <i class="el-icon-download" @click="() => handleDown(file)"></i>
           </span>
           <span
             v-if="!disabled"
             class="el-upload-list__item-delete"
-            @click="()=>handleRemove(file)"
+            @click="() => handleRemove(file)"
           >
             <i class="el-icon-delete"></i>
           </span>
         </span>
+        <el-tooltip
+          class="item"
+          effect="light"
+          :content="file.name"
+          placement="top"
+        >
+          <span class="file-name" @click="() => handleDown(file)">{{
+            file.name
+          }}</span>
+        </el-tooltip>
       </template>
     </el-upload>
   </div>
 </template>
 
 <script>
+import '@/assets/iconfont/iconfont.css'
 import Vue from "vue";
 import CosHelper from "../plugins/tencent";
 import fileHelper from "../utils/fileHelper";
 import { Upload } from "element-ui";
 Vue.component("el-upload", Upload);
+
 export default {
   name: "CloudUpload",
   inheritAttrs: false,
@@ -164,48 +182,51 @@ export default {
       type: Function,
       required: false,
     },
-    onExceed:{
+    onExceed: {
       type: Function,
-      required: false
-    }
+      required: false,
+    },
   },
   data() {
     return {
       fileList: this.value,
     };
   },
-  computed:{
-    getPreviewList(){
-      let result =[]
-      this.fileList.forEach(item => {
-        const url= item.url
-        const index = url.lastIndexOf('/')
-        const filename = url.slice(index).toLocaleLowerCase()
-        const image = ['.png','.jpg','.jpeg','.bmp','.gif']
-        if(image.some(x=>filename.includes(x))){
-          result.push(url)
+  computed: {
+    getPreviewList() {
+      let result = [];
+      this.fileList.forEach((item) => {
+        const url = item.url;
+        const index = url.lastIndexOf("/");
+        const filename = url.slice(index).toLocaleLowerCase();
+        const image = [".png", ".jpg", ".jpeg", ".bmp", ".gif"];
+        if (image.some((x) => filename.includes(x))) {
+          result.push(url);
         }
       });
-      return result
-    }
+      return result;
+    },
   },
   created() {
-    //检查关键参数传入
-    const typeList = ["tencent"];
-    if (!this.cloudType) {
-      console.warn("未设置云平台类型cloudType!");
-    } else if (!typeList.includes(this.cloudType)) {
-      console.warn(`云平台类型cloudType设置错误，应为${typeList.join("/")}`);
-    }
-    switch (this.cloudType) {
-      case "tencent":
-        CosHelper.getInstance(this.cloudConfig.getTempCredential);
-        break;
-      default:
-        break;
-    }
+    this.checkAndInit();
   },
   methods: {
+    checkAndInit() {
+      //检查关键参数传入
+      const typeList = ["tencent"];
+      if (!this.cloudType) {
+        console.warn("未设置云平台类型cloudType!");
+      } else if (!typeList.includes(this.cloudType)) {
+        console.warn(`云平台类型cloudType设置错误，应为${typeList.join("/")}`);
+      }
+      switch (this.cloudType) {
+        case "tencent":
+          CosHelper.getInstance(this.cloudConfig.getTempCredential);
+          break;
+        default:
+          break;
+      }
+    },
     // 自定义上传方法
     async customUpload(options) {
       const { file, onProgress, onSuccess, onError } = options;
@@ -281,22 +302,21 @@ export default {
       }
     },
     handleRemove(file, fileList) {
-      this.fileList = this.fileList.filter(x=>x.uid!=file.uid && x.url!=file.url)
+      this.fileList = this.fileList.filter(
+        (x) => x.uid != file.uid && x.url != file.url
+      );
       this.$emit("input", this.fileList);
     },
-    handlePreview(file){
-      this.$refs['previewImg'].clickHandler()
-      console.log(this.$refs['previewImg'].$el.click) 
+    handlePreview(file) {
+      this.$refs["previewImg"].clickHandler();
+      console.log(this.$refs["previewImg"].$el.click);
     },
-    handleDown(file){
-
-    },
+    handleDown(file) {},
     handleExceed(files, fileList) {
-      if(this.onExceed && typeof(this.onExceed)=='function'){
-        this.onExceed(files,fileList)
-      }
-      else{
-        this.$message.warning(`当前限制最多选择${this.limit}个文件！`)
+      if (this.onExceed && typeof this.onExceed == "function") {
+        this.onExceed(files, fileList);
+      } else {
+        this.$message.warning(`当前限制最多选择${this.limit}个文件！`);
       }
     },
   },
@@ -304,10 +324,26 @@ export default {
     value(val) {
       this.fileList = val;
     },
-    cloudType(val) {},
+    cloudType(val) {
+      this.checkAndInit();
+    },
   },
 };
 </script>
-<style scoped>
-/* 你的样式 */
+<style lang="scss" scoped>
+.cloud-upload {
+  ::v-deep .el-upload-list--picture-card {
+    .el-upload-list__item {
+      overflow: visible;
+      .file-name {
+        display: inline-block; /* 必须设置为块级或inline-block */
+        max-width: 100%; /* 限制最大宽度 */
+        white-space: nowrap; /* 禁止换行 */
+        overflow: hidden; /* 隐藏溢出内容 */
+        text-overflow: ellipsis; /* 显示省略号 */
+        cursor: pointer;
+      }
+    }
+  }
+}
 </style>
