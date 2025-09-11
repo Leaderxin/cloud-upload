@@ -40,14 +40,21 @@
         slot-scope="{ file }"
       >
         <el-image
+          v-if="getIfImage(file)"
           ref="previewImg"
           fit="contain"
           class="el-upload-list__item-thumbnail"
           :src="file.url"
           :preview-src-list="getPreviewList"
         ></el-image>
+        <div v-else class="el-upload-list__item-thumbnail previewIcon">
+          <i :class="['iconfont', getFileIcon(file)]"></i>
+        </div>
         <span class="el-upload-list__item-actions">
-          <span class="el-upload-list__item-preview">
+          <span
+            class="el-upload-list__item-preview"
+            v-if="getPreviewConfig[getFileType(file)]"
+          >
             <i class="el-icon-view" @click="() => handlePreview(file)"></i>
           </span>
           <span v-if="!disabled" class="el-upload-list__item-delete">
@@ -77,7 +84,7 @@
 </template>
 
 <script>
-import '@/assets/iconfont/iconfont.css'
+import "@/assets/iconfont/iconfont.css";
 import Vue from "vue";
 import CosHelper from "../plugins/tencent";
 import fileHelper from "../utils/fileHelper";
@@ -170,6 +177,13 @@ export default {
       }),
     },
     /**
+     * 附件预览/在线查看配置
+     */
+    previewConfig: {
+      type: Object,
+      required: false,
+    },
+    /**
      * 自定义v-model
      */
     value: {
@@ -197,20 +211,36 @@ export default {
       let result = [];
       this.fileList.forEach((item) => {
         const url = item.url;
-        const index = url.lastIndexOf("/");
-        const filename = url.slice(index).toLocaleLowerCase();
-        const image = [".png", ".jpg", ".jpeg", ".bmp", ".gif"];
-        if (image.some((x) => filename.includes(x))) {
+        if (this.getIfImage(url)) {
           result.push(url);
         }
       });
       return result;
+    },
+    getPreviewConfig() {
+      return Object.assign(
+        {
+          image: true, //图片附件默认开启预览
+          video: false, //视频附件默认不开启预览
+          audio: false, //音频附件默认不开启预览
+          word: false, //word
+          excel: false, //excel
+          ppt: false, //ppt
+          txt: false, //txt
+          pdf: false, //pdf
+          rar: false, //压缩包
+        },
+        this.previewConfig
+      );
     },
   },
   created() {
     this.checkAndInit();
   },
   methods: {
+    /**
+     * 检查关键props传入是否规范并初始化上传实例
+     */
     checkAndInit() {
       //检查关键参数传入
       const typeList = ["tencent"];
@@ -226,6 +256,91 @@ export default {
         default:
           break;
       }
+    },
+    getIfImage(file) {
+      let prefix = "";
+      if (file.name && file.name != "") {
+        prefix = fileHelper.getFileExtension(file);
+      } else {
+        if (!file.url) return false;
+        prefix = fileHelper.getFileExtension(file.url);
+      }
+      const images = ["png", "jpg", "jpeg", "bmp", "gif", "webp", "svg"];
+      return images.some((x) => x === prefix);
+    },
+    getFileType(file) {
+      let prefix = "";
+      if (file.name && file.name != "") {
+        prefix = fileHelper.getFileExtension(file);
+      } else {
+        if (!file.url) return "other";
+        prefix = fileHelper.getFileExtension(file.url);
+      }
+      if (this.getIfImage(file)) {
+        return "image";
+      }
+      let result = "";
+      switch (prefix) {
+        case "doc":
+        case "docx":
+          result = "word";
+          break;
+        case "pdf":
+          result = "pdf";
+          break;
+        case "ppt":
+        case "pptx":
+          result = "ppt";
+          break;
+        case "xls":
+        case "xlsx":
+        case "csv":
+          result = "excel";
+          break;
+        case "rar":
+        case "zip":
+        case "7z":
+        case "gzip":
+        case "tar":
+          result = "rar";
+          break;
+        case "mp4":
+        case "webm":
+        case "ogg":
+        case "mpeg":
+          result = "video";
+          break;
+        case "mp3":
+        case "aac":
+        case "wav":
+        case "flac":
+        case "opus":
+          result = "audio";
+          break;
+        case "txt":
+          result = "txt";
+          break;
+        default:
+          result = "other";
+          break;
+      }
+      return result;
+    },
+    getFileIcon(file) {
+      const type = this.getFileType(file);
+      const iconObj = {
+        image: "",
+        video: "icon-video",
+        audio: "icon-audio",
+        rar: "icon-yasuobao",
+        word: "icon-WORD",
+        excel: "icon-EXCEL",
+        ppt: "icon-ppt",
+        txt: "icon-txt",
+        pdf: "icon-Pdf",
+        other: "icon-fujian",
+      };
+      return iconObj[type];
     },
     // 自定义上传方法
     async customUpload(options) {
@@ -274,7 +389,6 @@ export default {
         this.$emit("error", error, file);
       }
     },
-
     onbeforeUpload(file) {
       if (this.beforeUpload && typeof this.beforeUpload == "function") {
         return this.beforeUpload();
@@ -309,7 +423,6 @@ export default {
     },
     handlePreview(file) {
       this.$refs["previewImg"].clickHandler();
-      console.log(this.$refs["previewImg"].$el.click);
     },
     handleDown(file) {},
     handleExceed(files, fileList) {
@@ -335,12 +448,28 @@ export default {
   ::v-deep .el-upload-list--picture-card {
     .el-upload-list__item {
       overflow: visible;
+      .el-upload-list__item-thumbnail {
+        display: block;
+      }
+      .previewIcon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .iconfont {
+          font-size: 40px;
+        }
+      }
       .file-name {
-        display: inline-block; /* 必须设置为块级或inline-block */
-        max-width: 100%; /* 限制最大宽度 */
-        white-space: nowrap; /* 禁止换行 */
-        overflow: hidden; /* 隐藏溢出内容 */
-        text-overflow: ellipsis; /* 显示省略号 */
+        display: inline-block;
+        /* 必须设置为块级或inline-block */
+        max-width: 100%;
+        /* 限制最大宽度 */
+        white-space: nowrap;
+        /* 禁止换行 */
+        overflow: hidden;
+        /* 隐藏溢出内容 */
+        text-overflow: ellipsis;
+        /* 显示省略号 */
         cursor: pointer;
       }
     }

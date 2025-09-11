@@ -27,13 +27,12 @@
       <el-form-item label="图片上传：">
         <CloudUpload
           :multiple="false"
-          :limit="3"
-          accept=".png,.jpg,.jpeg"
           :cloudType="cloudType"
           :cloudConfig="cloudConfig"
           v-model="fileList"
           list-type="picture-card"
         >
+          <!-- accept=".png,.jpg,.jpeg" -->
           <!-- <el-button size="small" type="primary">点击上传1</el-button> 
            <div slot="tip" class="el-upload__tip">
             只能上传jpg/png文件，且不超过500kb
@@ -63,15 +62,15 @@ export default {
           return {
             credentials: {
               tmpSecretId:
-                "AKIDcS8MrIa4tq8LQgfzrVp_j1eWuplnMEZWgmHxef3wfSj3-7DCxssL_R2KuCsY9daJ",
-              tmpSecretKey: "lYYblowV1VvaC4ux5r2fMLeaMFkqkqXjd0ID0YmRCt8=",
+                "AKIDKTeBmYSUuWVzdtOIC88pdQ-yLfDu3t7CHVn1_fsbXuEnYaHGASXR0x6gaUs_PX_J",
+              tmpSecretKey: "Z/Pqq5XA7Ip2+e5W0OHbznIElevV0L1oPIxNFllA5Ys=",
               sessionToken:
-                "uibTMOM75q7B11AIAcNXmG7ETsTJw0Uad5bebec092cfd2b4c4c801d56df9ba0dPNyiU0Fv4DgTi_09Z4a9n8YFrwl1LfT44rTPzSmiXwQLx8UGcyrRutu38zwJ-EavlNOc74aeA5ksnWoXVCMKQ8opze9owjhtiMGRII4BCMXVblvtYKyy8ezi7hGxeM5jaFwGqP_QMGUCVRvdcgrKeirqzKBnLOpI1UlKe0Sqag-HJtWokgV0Wfc2kItTR1_AF1oC50IUGChF6XtfU4T5GtHzZhYo1I9r-tcloaz50xU45jJcG9MvbjDUgWMlKWsdvYjOlwGZycZiFN9jZt2RXxTx4WVNQeeH40pS7egoXGWYeOV8HS_6h-vFWhO8e1osgbNObj3Um8NXgj8awH0aJb03W2I0ugcEJJG_uHUUxoXDkweJOmAd_MnkEXU1c14xR_sCCYff30cWoTPfEXCsaWzItZyhboTrUnjlXPIo4HM5lrFDhpqmpngB7fms6M9tCBlkKNcq8wmlB234cd8QIo4X9KM3EO_iHaOzwwEa0d5sLvWIIJQASHsGZRLIoFwUt-8z1dz2rHRrWnAAFk_BH_ESlzrTZXp3bkuqK3ltyF-l-eVjjWgRaYJQlUvE73ePq5dN9iBs5clW-PhRorI_Vl_psSlVzarrAeZqHD0Nc2d0gcszmJwju7IazD12dlQEcswpsg10Am1GGzLopZQ8eNMB7AzquVC5kwfEYTCVk9o",
+                "uibTMOM75q7B11AIAcNXmG7ETsTJw0Uac05bdbab0d2b3614089e8ec43442d343PNyiU0Fv4DgTi_09Z4a9nw5NTe32TbmYt4eIdxgIYK8pl13dsQN2_JLx8EPfS4o9STHeK0gz-W5hmifkLRKm1j2_1XUgwULV-9PcnkZCch96KjkqoSLK0WaJt67z_t20CqD5T7kVCZ79i6LCZVzErdKZ738z8lYHBjPJepH7pkndHXsUYbKHP2eoPXpzvVcbTX0GGYLO_XbaXAKoihuGS9xevRnNTDVLLeOgyNQSakIUXWo_Da_iBzZvC5Wl7rg9a94MGn0X9jOWKVEK2AdDPMtlkHDmqg1Dg1GwCdJHwsYO0H0UMxDoF5ABTC7_mjb-9SyoWfInn1Sj4-7zlssr4IZl0jIpQz12ape-F7OqrXDPbmjR1jQXhWniOfxFwz1y_iGnunibZRfyEbEkwck6UJRx-ij42Y9NgocDqpxfMIJktaspLr-hwtmNvvXr97zx3zPEuy1UKqdQihzWpUCp4m7s3cmzkJcPJOn7gPHDDrd0GhphK6kDIzpSJu97GTDf4Bxr2fk-_Pc8V6H2PJWdmYDDWgJ6Jc24HCKFlxZAguRClyh52gJWK-Gl3JciMleSFfcum_iNztZED5PhshbQYXZPeTh8KKLw-zeG_9nMTfANViJODqqLhI9O0OZQ5iTdN2QUczNUjajJCS6rx_oO05e9c6Y5NeoZmicytdaS_OE",
             },
-            requestId: "b4c53dbd-4a91-47ed-92d7-83293e8ec1ff",
-            expiration: "2025-09-11T01:56:21Z",
-            startTime: 1757552181,
-            expiredTime: 1757555781,
+            requestId: "5cc0d9ee-97c6-4b19-831a-d5835cc510ce",
+            expiration: "2025-09-11T08:35:23Z",
+            startTime: 1757576123,
+            expiredTime: 1757579723,
           };
         },
       },
