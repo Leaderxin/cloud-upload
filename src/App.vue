@@ -31,6 +31,7 @@
           :cloudConfig="cloudConfig"
           v-model="fileList"
           list-type="picture-card"
+          @success="handleSuccess"
         >
           <!-- accept=".png,.jpg,.jpeg" -->
           <!-- <el-button size="small" type="primary">点击上传1</el-button> 
@@ -62,15 +63,15 @@ export default {
           return {
             credentials: {
               tmpSecretId:
-                "AKIDWoexOvT1oALwKqdUVwiRBYURwGUjpXW0FXewO1mqxJvhuhGP25mRMTFNo1OLamas",
-              tmpSecretKey: "4MwzMvRp8kYzU5uazqyE08XL64FPyFlyzWhohtik7jQ=",
+                "AKIDCVe5OrJ57ufQuJMoO-UUS2uVYLlTStmCy9TGazDd5td1nGxH_tpDEaU2Cpj92mvV",
+              tmpSecretKey: "WhhgIzCIG8yTfnqmHsHB/OugLW+y2ISKP1GNbYPy2Pg=",
               sessionToken:
-                "uibTMOM75q7B11AIAcNXmG7ETsTJw0Uaaf7be19e70dcb2a194fd3866cc2c7ef9PNyiU0Fv4DgTi_09Z4a9n-J3oTXHgSOS6kC3kMj0Q4y3EKjXK11t6OM1AaoyY-_WuAY8KAwU3gAD8IuX8P143QsB_0WlbunayvXcTGabxgZ1TnIfZqQSNideMyW3K6yTzCWQ_Mp7IYw7NcQ44rdGdtXVw0zViuLxPfaBhJlU9DU-eKe020PzGbI8lpls4BImhstfhCdBjmWCzbYwWBAWFSe5R1B4F8gs4fvbRckaa_uLqpzo8DAqqHdDm2RFSVHMJeL084rOoXllSknnpGlVFPCyqWScDKXHxIs6pV24i80OKz1vgTb4LKo55Bkgtoso0kbCGxJGakXYyJM7wMAO6fonkkYi1NZBFA4jd2kyb2RzKFaqJM0PR7AQxPt5KjcGhssUWiSO0yBVXmgwN2AjvwGrjl5R0wfAmSslogjavkWjRrNSeWIKl6KlfIuWnciPuLfxVoMMHacxO8wYzJc6YW3V0djqsD8HXWLpEX1gVjagsAZG0seeLuxMddm-LuAPGDth3L4tmtZbER48QECg0UuwuRoJ25e5BrHoRQDA4SCXsu7erf3GOUSEl5KASZh_1iN9j16MGqpU2hwI_OwaL-gVlw-lkfH6VreL9x7rpttaA3ASEMn4YWFzL7hAiXKSe0G_Tr30XuSa11HPIWdR_f6J7Sno5OjxpO0Uwq6o4xY",
+                "1LLnI9lo7G0exDx5WFwjpm4yiJM5MEYa09d0463aee04bdfd21c12bfe78f505d6Jqbxfes518KqeVic5PGzkjog00tKOnwe7uB3yMBtAfd4VDuqZvZjWzohxjVWWKLAy60Ugh8tGxztjuLn7JsvCnQFiE2rRb47wSSseCImMSXto0GP8zMRMlS7eYrKU7GHtumSseqXMwd3KSNezGxqDhT9h6WNGMi5lsTkPFQQESpJqXpvf9nWtFzid0DKt5BasE6RKIiFvmJj2kMFXlJ9ggzGbNJsWF_RfzywaGRNalJZkym4YKLUezjZ0zZ-czxAxhotWGBc34NCBZ7vaPfFhBOjVNz2J9LFiO3X4HTocl0k7WmeD592pFPkYhMTLNs6Gcz5sEBsetH7ewOV_R_WpWRjBTFp95-OkGFE0K3zJV2nVm-vW40LlHTVrLzGIluK0tyiEFI7-VcI8G2wubzX9jR0qUmzrMkiAh-3vaypLrKN22oxA4XZXJzZ2mPTKRLy9pwUyyqGEi6jrW9pFWByTBVVEdoZYPC4AIEEI_ghc2iBPUQyKWq9zKGspfq-nNbwWNChkjKZu7meUbP17iGCSY3HmS7z5s12OY-EnOazUXtPfDFdS-FrjaqvLdpVTPJ2eIYqVpNYlyRLh-dsSmSuQnDh-BzjvW4in25EN2vapxqwGt7NM85jWt81kAEQB0JSZW-kdnAMFLuGi1gukZBERzNaqWiOc8nTAdE0gn4iyLw",
             },
-            requestId: "c72ce2f8-fdf1-4273-bf09-160caff8713c",
-            expiration: "2025-09-11T09:55:49Z",
-            startTime: 1757580949,
-            expiredTime: 1757584549,
+            requestId: "8aa7c909-c896-447b-bac0-cdcb2a2a2c5d",
+            expiration: "2025-09-12T08:01:36Z",
+            startTime: 1757660496,
+            expiredTime: 1757664096,
           };
         },
       },
@@ -82,6 +83,9 @@ export default {
       console.log("handleBeforeUpload");
 
       return false;
+    },
+    handleSuccess(result, file) {
+      console.log("success:", result, file);
     },
   },
 };

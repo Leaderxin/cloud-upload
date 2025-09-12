@@ -76,7 +76,7 @@ class CosHelper {
   }
 
   // 单文件上传
-  uploadFile({ bucket, region, path, file }) {
+  uploadFile({ bucket, region, path, file ,onProgress }) {
     return new Promise((resolve, reject) => {
       this.cosClient.uploadFile(
         {
@@ -86,6 +86,9 @@ class CosHelper {
           Body: file,
           onProgress: (progressData) => {
             console.log(`上传进度: ${progressData.percent * 100}%`);
+            if(onProgress && typeof(onProgress)=='function'){
+              onProgress(progressData.percent)
+            }
           },
         },
         (err, data) => {

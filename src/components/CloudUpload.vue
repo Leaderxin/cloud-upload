@@ -45,9 +45,16 @@
           :ref="getImgRef(file)"
           fit="contain"
           class="el-upload-list__item-thumbnail"
+          v-loading="getFileLoading(file)"
+          :element-loading-text="getFilePercent(file)"
           :src="file.url"
         ></el-image>
-        <div v-else class="el-upload-list__item-thumbnail previewIcon">
+        <div
+          v-else
+          class="el-upload-list__item-thumbnail previewIcon"
+          v-loading="getFileLoading(file)"
+          :element-loading-text="getFilePercent(file)"
+        >
           <i :class="['iconfont', getFileIcon(file)]"></i>
         </div>
         <span class="el-upload-list__item-actions">
@@ -345,17 +352,41 @@ export default {
       };
       return iconObj[type];
     },
+    getFileLoading(file) {
+      const item = this.$refs.innerUpload.uploadFiles.find(
+        (x) => x.uid == file.uid || x.url == file.url
+      );
+      if (item) {
+        if (item.percentage && item.percentage < 1) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    },
+    getFilePercent(file) {
+      const item = this.$refs.innerUpload.uploadFiles.find(
+        (x) => x.uid == file.uid || x.url == file.url
+      );
+      if (item) {
+        if (item.percentage && item.percentage < 1) {
+          return `附件上传中${Math.round(item.percentage * 1000) / 10}%`;
+        } else {
+          return `上传完成`;
+        }
+      } else {
+        return "";
+      }
+    },
     // 自定义上传方法
     async customUpload(options) {
       const { file, onProgress, onSuccess, onError } = options;
       const uploadConfig = {
         file,
         ...this.cloudConfig,
-        onProgress: (progressEvent) => {
-          // 计算进度并触发事件
-          const percent = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
+        onProgress: (percent) => {
           onProgress({ percent });
           this.$emit("progress", percent, file);
         },
@@ -368,14 +399,16 @@ export default {
           case "tencent":
             result = await CosHelper.getInstance().uploadFile(uploadConfig);
             if (result.statusCode == 200) {
-              this.fileList.push({
-                uid: file.uid,
-                name: file.name,
+              let item = this.$refs.innerUpload.uploadFiles.find(
+                (x) => x.uid == file.uid
+              );
+              const fileresult = Object.assign(item, {
                 url: result.Location.startsWith("https://")
                   ? result.Location
                   : "https://" + result.Location,
-                CosResult: result,
+                cosResult: result,
               });
+              this.fileList.push(fileresult);
             }
             break;
           case "volcengine":
@@ -459,6 +492,10 @@ export default {
       overflow: visible;
       .el-upload-list__item-thumbnail {
         display: block;
+        .el-loading-spinner{
+          margin-top: 0px;
+          transform: translateY(-50%);
+        }
       }
       .previewIcon {
         display: flex;
