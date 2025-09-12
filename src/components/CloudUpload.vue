@@ -19,11 +19,10 @@
     >
       <!-- 默认插槽内容 -->
       <template v-if="!$scopedSlots.default">
-        <i
-          slot="default"
-          class="el-icon-plus"
-          v-if="listType == 'picture-card'"
-        ></i>
+        <div class="default-content" v-if="listType == 'picture-card'">
+          <i slot="default" class="el-icon-upload"></i>
+          <span v-show="!disabled">点击上传</span>
+        </div>
         <el-button size="small" type="primary" v-else>点击上传</el-button>
       </template>
       <!-- 暴露所有默认插槽 -->
@@ -353,7 +352,7 @@ export default {
       return iconObj[type];
     },
     getFileLoading(file) {
-      if(!this.$refs.innerUpload?.uploadFiles) return false
+      if (!this.$refs.innerUpload?.uploadFiles) return false;
       const item = this.$refs.innerUpload.uploadFiles.find(
         (x) => x.uid == file.uid || x.url == file.url
       );
@@ -368,7 +367,7 @@ export default {
       }
     },
     getFilePercent(file) {
-      if(!this.$refs.innerUpload?.uploadFiles) return ''
+      if (!this.$refs.innerUpload?.uploadFiles) return "";
       const item = this.$refs.innerUpload.uploadFiles.find(
         (x) => x.uid == file.uid || x.url == file.url
       );
@@ -489,12 +488,32 @@ export default {
 </script>
 <style lang="scss" scoped>
 .cloud-upload {
+  .default-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    span {
+      display: block;
+      line-height: 18px;
+    }
+    color: #606266;
+    &:hover,
+    &:focus {
+      color: #409eff;
+      i {
+        color: #409eff;
+      }
+    }
+  }
   ::v-deep .el-upload-list--picture-card {
     .el-upload-list__item {
       overflow: visible;
       .el-upload-list__item-thumbnail {
         display: block;
-        .el-loading-spinner{
+        .el-loading-spinner {
           margin-top: 0px;
           transform: translateY(-50%);
         }
