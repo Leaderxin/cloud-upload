@@ -75,7 +75,12 @@ export default {
           };
         },
       },
-      fileList: [],
+      fileList: [
+        {
+          url:'https://int-delivery-1301141550.cos.ap-nanjing.myqcloud.com/costest/uTools-7.2.1.exe?q-sign-algorithm=sha1&q-ak=AKIDMjGEBPM5gKulyQbPTzfEnluFbp6ISLUAb0R9CNzyC1IQclwLgBs6s09UdPjjtMTO&q-sign-time=1757661291;1757664891&q-key-time=1757661291;1757664891&q-header-list=host&q-url-param-list=&q-signature=b5cbc952f655699c7aa14a7c2e510ebe90ad279e&x-cos-security-token=bnA421ptbcKq0QOmCnB5kYGVIIowYaua1e598c04a23dd86641affccec9300a1bWesWpRI_91NM0xVv1LUe5SHObHwDTD45-GhZB_IP8FwTbVyvAiK7rdlEUj2M4cWMRxozRzNmORZI-10Jri9ibL48GZfUhygzLSoxDtYu5zbGDV0ljEyvHa5-M103o8rQh2NKo_0lg2-mYN7crGRgpAxVRdrmCXt639LnqgfnOciA0-9rAcRAVl7L7WBjcgNyGpbPlGcdHiBfEjR4qB6fzFFPPQN1Xd5rlYg1edOwRxIruOY-9AnuhERX18HsZSMoYSnVVDNC4h6hW_jhnekvww',
+          name: 'uTools-7.2.1.exe'
+        }
+      ],
     };
   },
   methods: {

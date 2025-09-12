@@ -353,6 +353,7 @@ export default {
       return iconObj[type];
     },
     getFileLoading(file) {
+      if(!this.$refs.innerUpload?.uploadFiles) return false
       const item = this.$refs.innerUpload.uploadFiles.find(
         (x) => x.uid == file.uid || x.url == file.url
       );
@@ -367,12 +368,13 @@ export default {
       }
     },
     getFilePercent(file) {
+      if(!this.$refs.innerUpload?.uploadFiles) return ''
       const item = this.$refs.innerUpload.uploadFiles.find(
         (x) => x.uid == file.uid || x.url == file.url
       );
       if (item) {
         if (item.percentage && item.percentage < 1) {
-          return `附件上传中${Math.round(item.percentage * 1000) / 10}%`;
+          return `上传中${Math.round(item.percentage * 1000) / 10}%`;
         } else {
           return `上传完成`;
         }
