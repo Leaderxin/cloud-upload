@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/vue-clound-upload.svg?style=flat-square)](https://www.npmjs.com/package/vue-clound-upload)
 [![npm downloads](https://img.shields.io/npm/dt/vue-clound-upload.svg?style=flat-square)](https://www.npmjs.com/package/vue-clound-upload)
 [![license](https://img.shields.io/npm/l/vue-clound-upload.svg?style=flat-square)](https://www.npmjs.com/package/vue-clound-upload)
-[![GitHub stars](https://img.shields.io/github/stars/Leaderxin/vue-cloud-upload.svg?style=social&label=Star)](https://github.com/Leaderxin/vue-cloud-upload)
+[![GitHub stars](https://img.shields.io/github/stars/Leaderxin/vue-cloud-upload.svg?style=social&label=Star)](https://github.com/Leaderxin/clound-upload)
 
 🌩 **Vue Cloud Upload** - 专为 Vue.js 打造的专业级云端文件上传组件
 
@@ -118,14 +118,14 @@ MIT License
 
 ## 支持
 
-如果您觉得这个组件有帮助，请给它一个 ⭐️ [Star](https://github.com/Leaderxin/vue-cloud-upload) 支持一下！
+如果您觉得这个组件有帮助，请给它一个 ⭐️ [Star](https://github.com/Leaderxin/cloud-upload) 支持一下！
 
 ---
 
 **Vue Cloud Upload** - 让文件上传变得更简单！
 
 <p align="center">
-  <a href="https://github.com/Leaderxin/vue-cloud-upload" target="_blank">
+  <a href="https://github.com/Leaderxin/cloud-upload" target="_blank">
     <img src="https://img.shields.io/badge/⭐-Star%20This%20Project-blue?style=for-the-badge" alt="Star This Project">
   </a>
 </p>
