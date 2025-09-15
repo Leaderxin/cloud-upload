@@ -1,8 +1,8 @@
 # Vue Cloud Upload
 
-[![npm version](https://img.shields.io/npm/v/vue-clound-upload.svg?style=flat-square)](https://www.npmjs.com/package/vue-clound-upload)
-[![npm downloads](https://img.shields.io/npm/dt/vue-clound-upload.svg?style=flat-square)](https://www.npmjs.com/package/vue-clound-upload)
-[![license](https://img.shields.io/npm/l/vue-clound-upload.svg?style=flat-square)](https://www.npmjs.com/package/vue-clound-upload)
+[![npm version](https://img.shields.io/npm/v/vue-cloud-upload.svg?style=flat-square)](https://www.npmjs.com/package/vue-cloud-upload)
+[![npm downloads](https://img.shields.io/npm/dt/vue-cloud-upload.svg?style=flat-square)](https://www.npmjs.com/package/vue-cloud-upload)
+[![license](https://img.shields.io/npm/l/vue-cloud-upload.svg?style=flat-square)](https://www.npmjs.com/package/vue-cloud-upload)
 [![GitHub stars](https://img.shields.io/github/stars/Leaderxin/cloud-upload.svg?style=social&label=Star)](https://github.com/Leaderxin/cloud-upload)
 
 🌩 **Vue Cloud Upload** - 专为 Vue.js 打造的专业级云端文件上传组件
@@ -42,7 +42,7 @@
 ## 安装
 
 ```bash
-npm i vue-clound-upload
+npm i vue-cloud-upload
 ```
 
 ## 全局注册
@@ -51,7 +51,7 @@ npm i vue-clound-upload
 import Vue from "vue";
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
-import CloudUpload from "vue-clound-upload";
+import CloudUpload from "vue-cloud-upload";
 
 Vue.use(ElementUI);
 Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
@@ -67,7 +67,7 @@ Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 </script>
 
 <script>
-import CloudUpload from 'vue-clound-upload';
+import CloudUpload from 'vue-cloud-upload';
 
 export default {
   components: { CloudUpload },
