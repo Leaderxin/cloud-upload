@@ -32,6 +32,7 @@
           v-model="fileList"
           list-type="picture-card"
           @success="handleSuccess"
+          size="small"
         >
           <!-- accept=".png,.jpg,.jpeg" -->
           <!-- <el-button size="small" type="primary">点击上传1</el-button> 
@@ -63,23 +64,23 @@ export default {
           return {
             credentials: {
               tmpSecretId:
-                "AKIDCVe5OrJ57ufQuJMoO-UUS2uVYLlTStmCy9TGazDd5td1nGxH_tpDEaU2Cpj92mvV",
-              tmpSecretKey: "WhhgIzCIG8yTfnqmHsHB/OugLW+y2ISKP1GNbYPy2Pg=",
+                "AKID6oZZNMaZQugnYJOMBA4NKdFKTZ2doyzdWxXQhH7gpIB7eET8O3zE0hIU0ySKp0DR",
+              tmpSecretKey: "9B37HAdnUgN4Bjq886neUEjNGqgGT+t5nJhc2nuqUvk=",
               sessionToken:
-                "1LLnI9lo7G0exDx5WFwjpm4yiJM5MEYa09d0463aee04bdfd21c12bfe78f505d6Jqbxfes518KqeVic5PGzkjog00tKOnwe7uB3yMBtAfd4VDuqZvZjWzohxjVWWKLAy60Ugh8tGxztjuLn7JsvCnQFiE2rRb47wSSseCImMSXto0GP8zMRMlS7eYrKU7GHtumSseqXMwd3KSNezGxqDhT9h6WNGMi5lsTkPFQQESpJqXpvf9nWtFzid0DKt5BasE6RKIiFvmJj2kMFXlJ9ggzGbNJsWF_RfzywaGRNalJZkym4YKLUezjZ0zZ-czxAxhotWGBc34NCBZ7vaPfFhBOjVNz2J9LFiO3X4HTocl0k7WmeD592pFPkYhMTLNs6Gcz5sEBsetH7ewOV_R_WpWRjBTFp95-OkGFE0K3zJV2nVm-vW40LlHTVrLzGIluK0tyiEFI7-VcI8G2wubzX9jR0qUmzrMkiAh-3vaypLrKN22oxA4XZXJzZ2mPTKRLy9pwUyyqGEi6jrW9pFWByTBVVEdoZYPC4AIEEI_ghc2iBPUQyKWq9zKGspfq-nNbwWNChkjKZu7meUbP17iGCSY3HmS7z5s12OY-EnOazUXtPfDFdS-FrjaqvLdpVTPJ2eIYqVpNYlyRLh-dsSmSuQnDh-BzjvW4in25EN2vapxqwGt7NM85jWt81kAEQB0JSZW-kdnAMFLuGi1gukZBERzNaqWiOc8nTAdE0gn4iyLw",
+                "PHoOrfKYTVBc7oCj04My010bu3mwtlva4270ebe19da2e86f722882d78d9b49f3hFTIvHqhqvw651GqolriiSntkS45U_hlJqiFb1z3sI9x7PddKU6_ptdWP6ftmFo1u_m7Zm4hCjVDAgggG0GgXzjjePv0q-XRYTL3krPjeQdZ-HEn7H8tcYSpWUKoFrzXi-jdkpcjy-872xxjjH33g67kjNvpwj8ThLmPebUbJLdCBbscfTyHEAdFwD5rLQ6b5XGRZUxKS1w9pIIUCDrBqpcAbkvHI0nEZvjmO4I5dWHRpv2TZG76RUL6HXJ8PUiidNBPLjDEiTDYaGYz5N7gjhsKoXqs597vANMn9c05KQ0MGcB85oWRxfwpHssKzNeQJpz4tTOC4Utx2kP64SURfU8KkimEpxQSOzFFHpbp81VvdQSFsYZB8GXe-cm1bmHnliZpXliM95A4_9B_UHslXUBptSCInZz_n2P-CUuUDx_s-ZHJ2o8hm4R0LCeU_wlgxb7DljM1A3H71Jbkv2_R2bOdRevGojkQaLaRTDTO6qPw0KAFoCKiKarhGf5_iawWE_qewOy0tBPntIyJSv7sNn9ISmP2dJq1lKnkeo590QDyfP_Bm1V0s6Qc28zcXXF6qdpqYjtXa7NVdrvVAfi7q1pYVSU5Evx1bcrr-oILgKh-FpOt5waVsijdAQfpjhwr5JCmdeWzUx2ETBTyj58TtGe0rk-wu-l3PBASarXg7jM",
             },
-            requestId: "8aa7c909-c896-447b-bac0-cdcb2a2a2c5d",
-            expiration: "2025-09-12T08:01:36Z",
-            startTime: 1757660496,
-            expiredTime: 1757664096,
+            requestId: "05056573-0c26-44a0-aaf1-0532e33ecfe0",
+            expiration: "2025-09-15T08:07:59Z",
+            startTime: 1757920079,
+            expiredTime: 1757923679,
           };
         },
       },
       fileList: [
         {
-          url:'https://int-delivery-1301141550.cos.ap-nanjing.myqcloud.com/costest/uTools-7.2.1.exe?q-sign-algorithm=sha1&q-ak=AKIDMjGEBPM5gKulyQbPTzfEnluFbp6ISLUAb0R9CNzyC1IQclwLgBs6s09UdPjjtMTO&q-sign-time=1757661291;1757664891&q-key-time=1757661291;1757664891&q-header-list=host&q-url-param-list=&q-signature=b5cbc952f655699c7aa14a7c2e510ebe90ad279e&x-cos-security-token=bnA421ptbcKq0QOmCnB5kYGVIIowYaua1e598c04a23dd86641affccec9300a1bWesWpRI_91NM0xVv1LUe5SHObHwDTD45-GhZB_IP8FwTbVyvAiK7rdlEUj2M4cWMRxozRzNmORZI-10Jri9ibL48GZfUhygzLSoxDtYu5zbGDV0ljEyvHa5-M103o8rQh2NKo_0lg2-mYN7crGRgpAxVRdrmCXt639LnqgfnOciA0-9rAcRAVl7L7WBjcgNyGpbPlGcdHiBfEjR4qB6fzFFPPQN1Xd5rlYg1edOwRxIruOY-9AnuhERX18HsZSMoYSnVVDNC4h6hW_jhnekvww',
-          name: 'uTools-7.2.1.exe'
-        }
+          url: "https://int-delivery-1301141550.cos.ap-nanjing.myqcloud.com/costest/uTools-7.2.1.exe?q-sign-algorithm=sha1&q-ak=AKIDMjGEBPM5gKulyQbPTzfEnluFbp6ISLUAb0R9CNzyC1IQclwLgBs6s09UdPjjtMTO&q-sign-time=1757661291;1757664891&q-key-time=1757661291;1757664891&q-header-list=host&q-url-param-list=&q-signature=b5cbc952f655699c7aa14a7c2e510ebe90ad279e&x-cos-security-token=bnA421ptbcKq0QOmCnB5kYGVIIowYaua1e598c04a23dd86641affccec9300a1bWesWpRI_91NM0xVv1LUe5SHObHwDTD45-GhZB_IP8FwTbVyvAiK7rdlEUj2M4cWMRxozRzNmORZI-10Jri9ibL48GZfUhygzLSoxDtYu5zbGDV0ljEyvHa5-M103o8rQh2NKo_0lg2-mYN7crGRgpAxVRdrmCXt639LnqgfnOciA0-9rAcRAVl7L7WBjcgNyGpbPlGcdHiBfEjR4qB6fzFFPPQN1Xd5rlYg1edOwRxIruOY-9AnuhERX18HsZSMoYSnVVDNC4h6hW_jhnekvww",
+          name: "uTools-7.2.1.exe",
+        },
       ],
     };
   },

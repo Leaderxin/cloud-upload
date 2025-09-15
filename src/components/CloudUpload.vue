@@ -1,5 +1,5 @@
 <template>
-  <div class="cloud-upload">
+  <div :class="['cloud-upload', 'cloud-upload-' + size]">
     <el-upload
       ref="innerUpload"
       action="#"
@@ -23,7 +23,7 @@
           <i slot="default" class="el-icon-upload"></i>
           <span v-show="!disabled">点击上传</span>
         </div>
-        <el-button size="small" type="primary" v-else>点击上传</el-button>
+        <el-button :size="size" type="primary" v-else>点击上传</el-button>
       </template>
       <!-- 暴露所有默认插槽 -->
       <template
@@ -153,6 +153,13 @@ export default {
      */
     maxSize: {
       type: Number,
+    },
+    /**
+     * 默认ui组件大小 medium / small / mini
+     */
+    size: {
+      type: String,
+      default: "small",
     },
     /**
      * 使用的云平台类型 tencent腾讯云桶
@@ -347,7 +354,7 @@ export default {
         ppt: "icon-ppt",
         txt: "icon-txt",
         pdf: "icon-Pdf",
-        other: "icon-fujian",
+        other: "icon-fujian1",
       };
       return iconObj[type];
     },
@@ -523,7 +530,7 @@ export default {
         justify-content: center;
         align-items: center;
         .iconfont {
-          font-size: 40px;
+          font-size: 50px;
         }
       }
       .file-name {
@@ -540,6 +547,40 @@ export default {
         cursor: pointer;
       }
     }
+  }
+}
+.cloud-upload-small {
+  ::v-deep .el-upload-list--picture-card {
+    .el-upload-list__item {
+      width: 118px;
+      height: 118px;
+      .previewIcon {
+        .iconfont {
+          font-size: 40px;
+        }
+      }
+    }
+  }
+  ::v-deep .el-upload--picture-card {
+    width: 118px;
+    height: 118px;
+  }
+}
+.cloud-upload-mini {
+  ::v-deep .el-upload-list--picture-card {
+    .el-upload-list__item {
+      width: 94px;
+      height: 94px;
+      .previewIcon {
+        .iconfont {
+          font-size: 32px;
+        }
+      }
+    }
+  }
+  ::v-deep .el-upload--picture-card {
+    width: 94px;
+    height: 94px;
   }
 }
 </style>
