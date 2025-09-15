@@ -41,7 +41,7 @@ class fileHelper {
    * @return {boolean} 是否允许
    */
   static checkFileType(file, allowedTypes) {
-    const ext = this.getFileExtension(file);
+    const ext = fileHelper.getFileExtension(file);
     return allowedTypes.includes(ext);
   }
 
@@ -81,6 +81,100 @@ class fileHelper {
         URL.revokeObjectURL(link.href);
       })
       .catch((error) => console.error("下载失败:", error));
+  }
+  /**
+   * 获取文件分类
+   * @param {Object} file - 文件对象
+   */
+  static getFileType(file){
+    debugger
+    let prefix = "";
+      if (file.name && file.name != "") {
+        prefix = fileHelper.getFileExtension(file);
+      } else {
+        if (!file.url) return "other";
+        prefix = fileHelper.getFileExtension(file.url);
+      }
+      if (fileHelper.getIfImage(file)) {
+        return "image";
+      }
+      let result = "";
+      switch (prefix) {
+        case "doc":
+        case "docx":
+          result = "word";
+          break;
+        case "pdf":
+          result = "pdf";
+          break;
+        case "ppt":
+        case "pptx":
+          result = "ppt";
+          break;
+        case "xls":
+        case "xlsx":
+        case "csv":
+          result = "excel";
+          break;
+        case "rar":
+        case "zip":
+        case "7z":
+        case "gzip":
+        case "tar":
+          result = "rar";
+          break;
+        case "mp4":
+        case "webm":
+        case "ogg":
+        case "mpeg":
+          result = "video";
+          break;
+        case "mp3":
+        case "aac":
+        case "wav":
+        case "flac":
+        case "opus":
+          result = "audio";
+          break;
+        case "txt":
+          result = "txt";
+          break;
+        default:
+          result = "other";
+          break;
+      }
+      return result;
+  }
+  /**
+   * 判断文件是否为图片
+   * @param {Object} file - 文件对象
+   */
+  static getIfImage(file){
+    let prefix = "";
+      if (file.name && file.name != "") {
+        prefix = fileHelper.getFileExtension(file);
+      } else {
+        if (!file.url) return false;
+        prefix = fileHelper.getFileExtension(file.url);
+      }
+      const images = ["png", "jpg", "jpeg", "bmp", "gif", "webp", "svg"];
+      return images.some((x) => x === prefix);
+  }
+  /**
+   * 获取文件名
+   * @param {Object} file - 文件对象
+   */
+  static getFileName(file){
+    if(file.name){
+      return file.name
+    }
+    else if(file.url && file.url!=''){
+      const decodedUrl = decodeURIComponent(file.url);
+      return decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1).split("?")[0]
+    }
+    else{
+      return ''
+    }
   }
 }
 

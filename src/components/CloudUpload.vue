@@ -77,15 +77,19 @@
         <el-tooltip
           class="item"
           effect="light"
-          :content="file.name"
+          :content="getFileName(file)"
           placement="top"
         >
           <span class="file-name" @click="() => handleDown(file)">{{
-            file.name
+            getFileName(file)
           }}</span>
         </el-tooltip>
       </template>
     </el-upload>
+    <FilePreview
+      :visible.sync="previewVisible"
+      :file="previewFile"
+    ></FilePreview>
   </div>
 </template>
 
@@ -94,9 +98,13 @@ import "@/assets/iconfont/iconfont.css";
 import Vue from "vue";
 import CosHelper from "../plugins/tencent";
 import fileHelper from "../utils/fileHelper";
-import { Upload } from "element-ui";
+import { Upload, Loading, Image, Tooltip, Dialog } from "element-ui";
+import FilePreview from "./FilePreview.vue";
 Vue.component("el-upload", Upload);
-
+Vue.component("el-image", Image);
+Vue.component("el-tooltip", Tooltip);
+Vue.component("el-dialog", Dialog);
+Vue.use(Loading.directive);
 export default {
   name: "CloudUpload",
   inheritAttrs: false,
@@ -218,6 +226,8 @@ export default {
     return {
       fileList: this.value,
       previewUrl: "",
+      previewVisible: false,
+      previewFile: {},
     };
   },
   computed: {
@@ -239,7 +249,7 @@ export default {
           word: false, //word
           excel: false, //excel
           ppt: false, //ppt
-          txt: false, //txt
+          txt: true, //txt
           pdf: false, //pdf
           rar: false, //压缩包
         },
@@ -273,74 +283,14 @@ export default {
     getImgRef(file) {
       return `previewImg${this.getPreviewList.findIndex((x) => x == file.url)}`;
     },
+    getFileName(val) {
+      return fileHelper.getFileName(val);
+    },
     getIfImage(file) {
-      let prefix = "";
-      if (file.name && file.name != "") {
-        prefix = fileHelper.getFileExtension(file);
-      } else {
-        if (!file.url) return false;
-        prefix = fileHelper.getFileExtension(file.url);
-      }
-      const images = ["png", "jpg", "jpeg", "bmp", "gif", "webp", "svg"];
-      return images.some((x) => x === prefix);
+      return fileHelper.getIfImage(file);
     },
     getFileType(file) {
-      let prefix = "";
-      if (file.name && file.name != "") {
-        prefix = fileHelper.getFileExtension(file);
-      } else {
-        if (!file.url) return "other";
-        prefix = fileHelper.getFileExtension(file.url);
-      }
-      if (this.getIfImage(file)) {
-        return "image";
-      }
-      let result = "";
-      switch (prefix) {
-        case "doc":
-        case "docx":
-          result = "word";
-          break;
-        case "pdf":
-          result = "pdf";
-          break;
-        case "ppt":
-        case "pptx":
-          result = "ppt";
-          break;
-        case "xls":
-        case "xlsx":
-        case "csv":
-          result = "excel";
-          break;
-        case "rar":
-        case "zip":
-        case "7z":
-        case "gzip":
-        case "tar":
-          result = "rar";
-          break;
-        case "mp4":
-        case "webm":
-        case "ogg":
-        case "mpeg":
-          result = "video";
-          break;
-        case "mp3":
-        case "aac":
-        case "wav":
-        case "flac":
-        case "opus":
-          result = "audio";
-          break;
-        case "txt":
-          result = "txt";
-          break;
-        default:
-          result = "other";
-          break;
-      }
-      return result;
+      return fileHelper.getFileType(file);
     },
     getFileIcon(file) {
       const type = this.getFileType(file);
@@ -470,6 +420,9 @@ export default {
       if (type == "image") {
         const ref = this.getImgRef(file);
         this.$refs[ref].clickHandler();
+      } else {
+        this.previewFile = file;
+        this.previewVisible = true;
       }
     },
     handleDown(file) {
@@ -490,6 +443,9 @@ export default {
     cloudType(val) {
       this.checkAndInit();
     },
+  },
+  components: {
+    FilePreview,
   },
 };
 </script>
