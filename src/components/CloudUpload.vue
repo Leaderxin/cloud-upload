@@ -170,6 +170,20 @@ export default {
       default: "small",
     },
     /**
+     * 触发分块上传的阈值 默认10Mb
+     */
+    sliceSize: {
+      type: Number,
+      default: 1024 * 1024 * 10,
+    },
+    /**
+     * 分块大小，默认5MB，非必须
+     */
+    chunkSize: {
+      type: Number,
+      default: 1024 * 1024 * 5,
+    },
+    /**
      * 使用的云平台类型 tencent腾讯云桶
      */
     cloudType: {
@@ -343,6 +357,8 @@ export default {
       const { file, onProgress, onSuccess, onError } = options;
       const uploadConfig = {
         file,
+        chunkSize: this.chunkSize,
+        sliceSize: this.sliceSize,
         ...this.cloudConfig,
         onProgress: (percent) => {
           onProgress({ percent });
@@ -371,15 +387,14 @@ export default {
             break;
           case "volcengine":
             result = await tencentUpload(uploadConfig);
-            //result = await volcengineUpload(uploadConfig);
             break;
           default:
-            throw new Error(`Unsupported cloud type: ${this.cloudType}`);
+            throw new Error(`Unsupported cloudType: ${this.cloudType}`);
         }
         onSuccess(result, file);
         this.$emit("success", result, file);
       } catch (error) {
-        onError(error);
+        onError(error, file);
         this.$emit("error", error, file);
       }
     },
@@ -481,8 +496,8 @@ export default {
           transform: translateY(-50%);
         }
       }
-      .el-upload-list__item-actions{
-        i:hover{
+      .el-upload-list__item-actions {
+        i:hover {
           color: #409eff;
         }
       }

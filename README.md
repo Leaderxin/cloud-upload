@@ -12,7 +12,7 @@
 ## ✨ 核心特性
 
 - 🚀 **开箱即用**：无缝对接腾讯云 COS 存储桶，快速集成到现有项目
-- 🎨 **美观UI**：基于 Element UI 设计语言，提供一致的用户体验
+- 🎨 **美观 UI**：基于 Element UI 设计语言，提供一致的用户体验
 - ⚙️ **高度可定制**：丰富的配置参数，满足各种业务场景需求
 - 👁 **在线预览**：支持图片、TXT 附件直接在线预览
 - 📊 **多格式支持**：全面支持各类文件类型上传与展示
@@ -21,6 +21,7 @@
 
 - ✅ 腾讯云 COS 存储桶无缝对接
 - ✅ 多文件上传支持
+- ✅ 自动分片断点续传
 - ✅ 上传进度实时显示
 - ✅ 文件列表管理
 - ✅ 附件回显功能
@@ -31,13 +32,10 @@
 
 ## 🚧 开发中功能
 
-- 🔄 附件分片上传
-- 🔄 断点续传功能
 - 🔄 视频文件在线预览
 - 🔄 音频文件在线预览
 - 🔄 Office 文档在线预览（Word, Excel, PowerPoint）
 - 🔄 更多云存储平台支持
-
 
 ## 安装
 
@@ -62,7 +60,14 @@ Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 ```vue
 <template>
   <div>
-    <cloud-upload v-model="fileList" :cloud-config="tencentConfig" cloud-type="tencent" @success="handleSuccess"></cloud-upload>
+    <CloudUpload
+      :cloudType="cloudType"
+      :cloudConfig="cloudConfig"
+      v-model="fileList"
+      @success="handleSuccess"
+      @error="handleError"
+    >
+    </CloudUpload>
   </div>
 </script>
 
@@ -102,6 +107,9 @@ export default {
   methods: {
     handleSuccess(result, file) {
       console.log('Upload success:', result.url);
+    },
+    handleError(err){
+      console.log("error:",err);
     }
   }
 };
@@ -129,4 +137,3 @@ export default {
     <img src="https://img.shields.io/badge/⭐-Star%20This%20Project-blue?style=for-the-badge" alt="Star This Project">
   </a>
 </p>
-

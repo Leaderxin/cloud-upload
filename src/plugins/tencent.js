@@ -76,7 +76,7 @@ class CosHelper {
   }
 
   // 单文件上传
-  uploadFile({ bucket, region, path, file ,onProgress }) {
+  uploadFile({ bucket, region, path, file, sliceSize, chunkSize, onProgress }) {
     return new Promise((resolve, reject) => {
       this.cosClient.uploadFile(
         {
@@ -84,10 +84,12 @@ class CosHelper {
           Region: region,
           Key: path + file.name,
           Body: file,
+          SliceSize: sliceSize, // 触发分块上传的阈值，超过5MB使用分块上传，默认 1MB，非必须
+          ChunkSize: chunkSize, // 分块大小，默认 1MB，非必须
           onProgress: (progressData) => {
             console.log(`上传进度: ${progressData.percent * 100}%`);
-            if(onProgress && typeof(onProgress)=='function'){
-              onProgress(progressData.percent)
+            if (onProgress && typeof onProgress == "function") {
+              onProgress(progressData.percent);
             }
           },
         },

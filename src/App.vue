@@ -30,15 +30,9 @@
           :cloudType="cloudType"
           :cloudConfig="cloudConfig"
           v-model="fileList"
-          list-type="picture-card"
           @success="handleSuccess"
-          size="small"
+          @error="handleError"
         >
-          <!-- accept=".png,.jpg,.jpeg" -->
-          <!-- <el-button size="small" type="primary">点击上传1</el-button> 
-           <div slot="tip" class="el-upload__tip">
-            只能上传jpg/png文件，且不超过500kb
-          </div>  -->
         </CloudUpload>
       </el-form-item>
     </el-form>
@@ -64,23 +58,23 @@ export default {
           return {
             credentials: {
               tmpSecretId:
-                "AKIDSIyLDLqbtpbTr5LR6Cz7kEq6R_dI-Ugd2fk9f20mc37-4zwKVaq-5Dx8QEmKcwr2",
-              tmpSecretKey: "dcHrNnlQL5f3fL6TwDalsBjahaCGUbJBJQBFp/K9BAI=",
+                "AKIDpNke5tJ7crXqfAiy4Vu3bMM9gGweAv0nR5AXiHcsbEm0KHmxeI3xNBvV5INFtkBG",
+              tmpSecretKey: "wdYdTr4EZvKyKR9l7z1/IIa0K03GRLr+nJu9TyZ7CFw=",
               sessionToken:
-                "PHoOrfKYTVBc7oCj04My010bu3mwtlva54fd30c2f7b54ec4255397cd0bb82805hFTIvHqhqvw651GqolriieT-YY7vHgTM50TbyM2EuwQK0SxGAM7oBbiGdHgNLoaeJ-OJbWyggzT4pD8bR-qIwdCcHod_DkEF_196TQG9QkWwTaR43er0Q2qGWAru1Qz1T1MsvCWQWZAVV2wv43u1Aq7bvESAE4n1kvYI_qBe1DOCLMGvxp3nfvcFlJQa91zlbqhInOS3QHeDD0ZipUHbVlQNYKgcbXvZBmW7ow6FXIOoGZH3WLznoRLr01WeXtc36hROyeZwuu09p1rvTqRmcvsZbQ3n3tvHccRB9e10j2DOIwXXGm91KEEy9HFgPHIyT7rWnjparE3_z34N7uQbGSgpltQZpjcdgoBNa3UMzg4QBYxrdyqbiuJWPTOV6huJ3Xbkzfp1PEi76OlS38-08tc_GAWs4KphEtadkJCPSrJXfCX4f2OVxmhgHp3juuFAPNCCio7OeIOw9GBIZWvSdmrTKNyXbCkh_WGMR1EhBSc_HjX4od5Nw9PtfE4Y9IwJw8Te20Rk8z6PNxSXc76gG_f1CZIpOnkUlLJWlfkHLfbKt2GerMLth1XtFmYj6eGeK68hzFQLJ-3T_cEspeWIGT5xUCOgIcqeQB0y5Ns_Sd0wYhy5VRQeMn-7S1zGds5mr0WDpQA_ICM7SBdIN7Rw-SbfxM1mMGBUSpNi8eG0nRA",
+                "pewbukajCNG5OFWOyHVReIU24t9E1Ika91974eb9e1bb0229fe4d2093c71f8577TVZNjmGQQx_LYYZ2s1LEM_tmu9H3IQnNoTpOHdOSFq_LYeeMrjI69X6v0fO52VsYJdp4izO4Qn207OGLEA7h3YsTMoQc1d5NukfwnUbnlUiD-XW0m84XmG87fqkYSH_XdFyTZAYCK6Tj9d6nQu5b3uqCTdADh96Rj2p7api8m5RVJFDeDuj7_nE_F7zuIJC11oF-WfyOGMUZQjHwmVRfKR6hYBuX9U3wrLESMrRyTGm0cfyF4H99vKNZdAD_9j6uerOfYgdmyvU9U9wWsa7A1di-_kHgO-7go0RWJy9ZY9qsEd8_9LmpBC571pH0EOpeba2M4zlkMxDM_mO2SKWEGq4hQ5F4uTqJ0D3dtRTEUTJ_3tPnU_v4G5wHpgahEjbo_Gu14V09Cojc77oka41TTiJfL_mCFYLy8qBxz--gx681M2RP7ZZHksNtO71_bpAOfCBf799pBkuOO7dr1wqwjH6lpeLZovNujYAuHX3g1EYJgvkR11nChXswwrw7jjRBEnPZRMPCpEAtxjwy_IgDgks6OQgw6k79ED2xKswTm8jMvL7Bk60hSFKP95otzYuGxfE2ongYWHZKQubq4Z5RldnnZb5eTKcGf3bFis15jaT1P_7m_PTw0cA3h83-1ppDjrkDQPLnLJEX0H0Ne2xhmkSZZiceRc0hQ3H9e7_Bu_Y",
             },
-            requestId: "56289dc5-57f4-4bfe-80d3-afd603e4fad7",
-            expiration: "2025-09-15T10:12:40Z",
-            startTime: 1757927560,
-            expiredTime: 1757931160,
+            requestId: "c6837d8d-0292-45b1-9729-1f795a29395e",
+            expiration: "2025-09-16T08:18:01Z",
+            startTime: 1758007081,
+            expiredTime: 1758010681,
           };
         },
       },
       fileList: [
         {
-          url: 'https://int-delivery-1301141550.cos.ap-nanjing.myqcloud.com/costest/%E6%B5%8B%E8%AF%95txt%E9%A2%84%E8%A7%88.txt',
+          url: "https://int-delivery-1301141550.cos.ap-nanjing.myqcloud.com/costest/%E6%B5%8B%E8%AF%95txt%E9%A2%84%E8%A7%88.txt",
           //name: '测试txt预览.txt'
-        }
+        },
       ],
     };
   },
@@ -92,6 +86,9 @@ export default {
     },
     handleSuccess(result, file) {
       console.log("success:", result, file);
+    },
+    handleError(err) {
+      console.log("error:", err);
     },
   },
 };
