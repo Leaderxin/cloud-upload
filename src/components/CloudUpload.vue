@@ -373,16 +373,18 @@ export default {
           case "tencent":
             result = await CosHelper.getInstance().uploadFile(uploadConfig);
             if (result.statusCode == 200) {
-              let item = this.$refs.innerUpload.uploadFiles.find(
+              const index = this.$refs.innerUpload.uploadFiles.findIndex(
                 (x) => x.uid == file.uid
-              );
+              )
+              let item = this.$refs.innerUpload.uploadFiles[index];
               const fileresult = Object.assign(item, {
                 url: result.Location.startsWith("https://")
                   ? result.Location
                   : "https://" + result.Location,
                 cosResult: result,
               });
-              this.fileList.push(fileresult);
+              this.$refs.innerUpload.uploadFiles.splice(index,1,fileresult)
+              this.fileList = this.$refs.innerUpload.uploadFiles
             }
             break;
           case "volcengine":
@@ -393,6 +395,7 @@ export default {
         }
         onSuccess(result, file);
         this.$emit("success", result, file);
+        this.$emit("input",this.fileList)
       } catch (error) {
         onError(error, file);
         this.$emit("error", error, file);
