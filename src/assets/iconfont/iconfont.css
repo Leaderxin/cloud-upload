@@ -1,14 +1,14 @@
 @font-face {
-  font-family: "iconfont"; /* Project id 5018793 */
+  font-family: "cloud-upload-icon"; /* Project id 5018793 */
   /* Color fonts */
   src: 
-       url('iconfont.woff2?t=1757921355912') format('woff2'),
-       url('iconfont.woff?t=1757921355912') format('woff'),
-       url('iconfont.ttf?t=1757921355912') format('truetype');
+       url('iconfont.woff2?t=1757984989834') format('woff2'),
+       url('iconfont.woff?t=1757984989834') format('woff'),
+       url('iconfont.ttf?t=1757984989834') format('truetype');
 }
 
-.iconfont {
-  font-family: "iconfont" !important;
+.cloud-upload-icon {
+  font-family: "cloud-upload-icon" !important;
   font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;

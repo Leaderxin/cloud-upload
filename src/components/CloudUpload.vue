@@ -54,7 +54,7 @@
           v-loading="getFileLoading(file)"
           :element-loading-text="getFilePercent(file)"
         >
-          <i :class="['iconfont', getFileIcon(file)]"></i>
+          <i :class="['cloud-upload-icon', getFileIcon(file)]"></i>
         </div>
         <span class="el-upload-list__item-actions">
           <span
@@ -485,7 +485,7 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        .iconfont {
+        .cloud-upload-icon {
           font-size: 50px;
         }
       }
@@ -511,7 +511,7 @@ export default {
       width: 118px;
       height: 118px;
       .previewIcon {
-        .iconfont {
+        .cloud-upload-icon {
           font-size: 40px;
         }
       }
@@ -528,7 +528,7 @@ export default {
       width: 94px;
       height: 94px;
       .previewIcon {
-        .iconfont {
+        .cloud-upload-icon {
           font-size: 32px;
         }
       }

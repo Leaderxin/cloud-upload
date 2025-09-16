@@ -52,7 +52,7 @@ import Vue from "vue";
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 import CloudUpload from "vue-cloud-upload";
-
+import "vue-cloud-upload/dist/vue-cloud-upload.css";
 Vue.use(ElementUI);
 Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 ```
@@ -68,7 +68,7 @@ Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 
 <script>
 import CloudUpload from 'vue-cloud-upload';
-
+import "vue-cloud-upload/dist/vue-cloud-upload.css";
 export default {
   components: { CloudUpload },
   data() {

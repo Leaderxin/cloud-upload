@@ -1,7 +1,7 @@
 {
   "id": "5018793",
-  "name": "vue-clound-upload",
-  "font_family": "iconfont",
+  "name": "cloud-upload",
+  "font_family": "cloud-upload-icon",
   "css_prefix_text": "icon-",
   "description": "",
   "glyphs": [

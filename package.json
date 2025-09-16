@@ -1,15 +1,15 @@
 {
   "name": "vue-cloud-upload",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "基于vue+elementui的通用云上传组件，无缝衔接腾讯云，火山云等桶平台，开箱即用",
   "private": false,
   "type": "module",
   "main": "./dist/cloud-upload.umd.js",
   "module": "./dist/cloud-upload.es.js",
-  "homepage": "https://github.com/Leaderxin/clound-upload",
+  "homepage": "https://github.com/Leaderxin/cloud-upload",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Leaderxin/clound-upload.git"
+    "url": "https://github.com/Leaderxin/cloud-upload.git"
   },
   "exports": {
     ".": {
@@ -19,7 +19,12 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+     "*.scss"
+  ],
+  "sideEffects": [
+    "*.scss",
+    "*.css"
   ],
   "dependencies": {
     "cos-js-sdk-v5": "^1.10.1"

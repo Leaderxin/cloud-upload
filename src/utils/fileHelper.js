@@ -87,7 +87,6 @@ class fileHelper {
    * @param {Object} file - 文件对象
    */
   static getFileType(file){
-    debugger
     let prefix = "";
       if (file.name && file.name != "") {
         prefix = fileHelper.getFileExtension(file);
