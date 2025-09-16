@@ -481,6 +481,11 @@ export default {
           transform: translateY(-50%);
         }
       }
+      .el-upload-list__item-actions{
+        i:hover{
+          color: #409eff;
+        }
+      }
       .previewIcon {
         display: flex;
         justify-content: center;

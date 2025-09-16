@@ -112,9 +112,9 @@ export default {
 
 欢迎提交 Issue 和 Pull Request！
 
-## 许可证
+## 商务合作
 
-MIT License
+商务合作请通过邮箱联系：[📧 shazhoulen@outlook.com](mailto:shazhoulen@outlook.com)
 
 ## 支持
 
