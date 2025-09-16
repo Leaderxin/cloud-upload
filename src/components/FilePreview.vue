@@ -6,7 +6,7 @@
     @close="handleClose"
     custom-class="file-preview-dialog"
   >
-    <div class="file-preview-content">
+    <div class="file-preview-content" v-loading="loading">
       <div v-if="fileType == 'txt'" v-html="formattedText"></div>
     </div>
   </el-dialog>
@@ -31,6 +31,7 @@ export default {
       fileName: "",
       fileRaw: null,
       fileContent: "",
+      loading: false
     };
   },
   computed: {
@@ -60,6 +61,7 @@ export default {
       this.currentVisible = val;
     },
     file: async function (val) {
+      this.loading = true
       this.fileName = fileHelper.getFileName(val);
       if (val.raw && val.raw instanceof File) {
         this.fileRaw = val.raw;
@@ -82,6 +84,7 @@ export default {
         default:
           break;
       }
+      this.loading = false
     },
   },
 };
