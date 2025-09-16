@@ -63,7 +63,7 @@
           >
             <i class="el-icon-view" @click="() => handlePreview(file)"></i>
           </span>
-          <span v-if="!disabled" class="el-upload-list__item-delete">
+          <span class="el-upload-list__item-delete">
             <i class="el-icon-download" @click="() => handleDown(file)"></i>
           </span>
           <span
@@ -444,6 +444,7 @@ export default {
       }
     },
     handleDown(file) {
+      this.$message.success('文件开始下载，请稍等！')
       fileHelper.downloadFile(file.url, file.name);
     },
     handleExceed(files, fileList) {

@@ -66,8 +66,14 @@ class fileHelper {
    */
   static downloadFile(url, filename) {
     // 未传文件名时从URL提取最后部分作为文件名
-    const finalFilename =
-      filename || url.substring(url.lastIndexOf("/") + 1).split("?")[0];
+    let finalFilename = ''
+    if(filename){
+      finalFilename = filename
+    }
+    else{
+      const decodedUrl = decodeURIComponent(url);
+      finalFilename = decodedUrl.substring(decodedUrl.lastIndexOf("/") + 1).split("?")[0]
+    }
     fetch(url)
       .then((response) => response.blob())
       .then((blob) => {
