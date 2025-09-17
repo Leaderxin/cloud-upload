@@ -55,7 +55,7 @@ Vue.use(ElementUI);
 Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 ```
 
-## 按需引入
+## 按需引入（建议）
 
 ```vue
 <template>
@@ -81,9 +81,9 @@ export default {
       fileList:[],//附件列表，上传或者删除后实时同步更新
       tencentConfig: {
         //腾讯云cos桶名
-        bucket: "",
+        bucket: "test-tos-125***",
         //腾讯云cos桶所在地域
-        region: "",
+        region: "ap-guangzhou",
         //文件上传目录，自定义
         path: "/costest/",
         //此函数为客户端获取临时凭证使用
