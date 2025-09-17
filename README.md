@@ -128,6 +128,14 @@ export default {
 
 如果您觉得这个组件有帮助，请给它一个 ⭐️ [Star](https://github.com/Leaderxin/cloud-upload) 支持一下！
 
+## 关键词
+
+- vue组件
+- 云上传
+- 附件上传
+- 附件在线预览
+- 腾讯云cos上传
+- elementui封装
 ---
 
 **Vue Cloud Upload** - 让文件上传变得更简单！

@@ -5,6 +5,7 @@
     @open="handleOpen"
     @close="handleClose"
     custom-class="file-preview-dialog"
+    append-to-body
   >
     <div class="file-preview-content" v-loading="loading">
       <div v-if="fileType == 'txt'" v-html="formattedText"></div>
