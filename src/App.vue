@@ -24,7 +24,7 @@
     </el-tabs>
     <h3>上传示例：</h3>
     <el-form>
-      <el-form-item label="图片上传：">
+      <el-form-item label="图片上传：" v-if="ifUpload">
         <CloudUpload
           :multiple="true"
           :cloudType="cloudType"
@@ -36,6 +36,7 @@
         </CloudUpload>
       </el-form-item>
     </el-form>
+    <el-button type="primary" @click="ifUpload = !ifUpload">删除/添加组件</el-button>
   </div>
 </template>
 
@@ -51,24 +52,10 @@ export default {
     return {
       cloudType: "tencent",
       cloudConfig: {
-        bucket: "int-delivery-1301141550",
-        region: "ap-nanjing",
+        bucket: "test-tos-1257156776",
+        region: "ap-guangzhou",
         path: "/costest/",
-        getTempCredential: async () => {
-          return {
-            credentials: {
-              tmpSecretId:
-                "AKIDpNke5tJ7crXqfAiy4Vu3bMM9gGweAv0nR5AXiHcsbEm0KHmxeI3xNBvV5INFtkBG",
-              tmpSecretKey: "wdYdTr4EZvKyKR9l7z1/IIa0K03GRLr+nJu9TyZ7CFw=",
-              sessionToken:
-                "pewbukajCNG5OFWOyHVReIU24t9E1Ika91974eb9e1bb0229fe4d2093c71f8577TVZNjmGQQx_LYYZ2s1LEM_tmu9H3IQnNoTpOHdOSFq_LYeeMrjI69X6v0fO52VsYJdp4izO4Qn207OGLEA7h3YsTMoQc1d5NukfwnUbnlUiD-XW0m84XmG87fqkYSH_XdFyTZAYCK6Tj9d6nQu5b3uqCTdADh96Rj2p7api8m5RVJFDeDuj7_nE_F7zuIJC11oF-WfyOGMUZQjHwmVRfKR6hYBuX9U3wrLESMrRyTGm0cfyF4H99vKNZdAD_9j6uerOfYgdmyvU9U9wWsa7A1di-_kHgO-7go0RWJy9ZY9qsEd8_9LmpBC571pH0EOpeba2M4zlkMxDM_mO2SKWEGq4hQ5F4uTqJ0D3dtRTEUTJ_3tPnU_v4G5wHpgahEjbo_Gu14V09Cojc77oka41TTiJfL_mCFYLy8qBxz--gx681M2RP7ZZHksNtO71_bpAOfCBf799pBkuOO7dr1wqwjH6lpeLZovNujYAuHX3g1EYJgvkR11nChXswwrw7jjRBEnPZRMPCpEAtxjwy_IgDgks6OQgw6k79ED2xKswTm8jMvL7Bk60hSFKP95otzYuGxfE2ongYWHZKQubq4Z5RldnnZb5eTKcGf3bFis15jaT1P_7m_PTw0cA3h83-1ppDjrkDQPLnLJEX0H0Ne2xhmkSZZiceRc0hQ3H9e7_Bu_Y",
-            },
-            requestId: "c6837d8d-0292-45b1-9729-1f795a29395e",
-            expiration: "2025-09-16T08:18:01Z",
-            startTime: 1758007081,
-            expiredTime: 1758010681,
-          };
-        },
+        getTempCredential: this.getTempCredential,
       },
       fileList: [
         {
@@ -76,9 +63,30 @@ export default {
           //name: '测试txt预览.txt'
         },
       ],
+      ifUpload: true,
     };
   },
   methods: {
+    /**
+     * 调用后端接口返回临时凭证
+     */
+    async getTempCredential() {
+      const response = await fetch("http://localhost:3000/sts");
+      const data = response.json();
+      return data;
+      //临时凭证结构应该为如下示例:
+      // {
+      //   "expiredTime": 1758120268,
+      //   "expiration": "2025-09-17T14:44:28Z",
+      //   "credentials": {
+      //     "sessionToken": "OkiB0nVm0t52UXdyKu0acyK1iw6UhbTa2313c4726bdfa2230aa160cc202e5651kLpfeS8UJsc_4wHB1jPrmywvTJ1KsO0nm9PbEbabQi_D7aahjL5lBJM1DVV7cEZ53AlYq__a07bZ6MKxOIy9CXdGCJF-20xzssYRpukx_MQAhrXKo6cdRi-jXuD-YEe4W-YRXhX4c3x41z8Vb5SQfFoh_THpeFYsaZR_1aPzV22C0UDtI0ru1wiRx-Bw2e9pTHMc0pbvNrYMBuGNt_oEJ0P6fjhCVjLa1BA3KAJen7U6lQqR1UsIRElQAnWqEkG0NCJdPa7nA2pt9COrI58dXiBr9sKXgFcPPhUp9xrAY7-Mx7LuJ6XqgegiBjZeumhNSqIIINadmEjAfWyQfndQKHyxbKRK7h4hCvCV297SVQExnKBO9wkt-Ba0gxpUYj0hgfGCKgvLqG68v1NaIufbR61K5-YlwWA82UFL9PfLIuPR5EAdYgt3-OmM03lZpU22qmq1okkAlNB3wl2Mn03lX4Bx_PKtMZdf8cH2gcUftNjXNwxpMsRdt1U1M9dn_1D3rJy6PE_yqAbGWXOTA5D5c8oP9bW2zUuWgqHbCNU6g8Nvn1wb1hIVIf132T0rfoYP",
+      //     "tmpSecretId": "AKID_Duy_4HJP0bS8d3ZG8KsNCMowSm5FxpZr-trO_ayMta5nKI1vr7J3KPOWg_Gu3Bo",
+      //     "tmpSecretKey": "3rn/KVRRTGQw5CVFh4IQoqBBm/1LrdvjyFw7YiqbJk8="
+      //   },
+      //   "requestId": "84fd8060-82a3-4de8-b757-9b22ebabbf7a",
+      //   "startTime": 1758116668
+      // }
+    },
     handleBeforeUpload(file) {
       console.log("handleBeforeUpload");
 

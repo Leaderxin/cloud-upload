@@ -274,6 +274,9 @@ export default {
   created() {
     this.checkAndInit();
   },
+  beforeDestroy(){
+    CosHelper.destroyInstance()
+  },
   methods: {
     /**
      * 检查关键props传入是否规范并初始化上传实例

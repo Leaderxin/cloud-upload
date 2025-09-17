@@ -10,7 +10,12 @@ class CosHelper {
     }
     return this.instance;
   }
-
+  static destroyInstance(){
+    this.instance = null
+    this.cosClient = null
+    this.tempCredential = null
+    localStorage.removeItem('cosCredential')
+  }
   constructor(getToken) {
     this.initClient(getToken);
   }

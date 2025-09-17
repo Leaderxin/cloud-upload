@@ -61,7 +61,7 @@ Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 <template>
   <div>
     <CloudUpload
-      :cloudType="cloudType"
+      cloudType="tencent"
       :cloudConfig="cloudConfig"
       v-model="fileList"
       @success="handleSuccess"
@@ -86,25 +86,32 @@ export default {
         region: "",
         //文件上传目录，自定义
         path: "/costest/",
-        //临时凭证获取函数，需按照示例结构返回所需参数
-        //此临时凭证调用后端接口获取，后端接口调用腾讯云api生成
-        getTempCredential: async () => {
-          return {
-            credentials: {
-              tmpSecretId: "",
-              tmpSecretKey: "",
-              sessionToken: "",
-            },
-            requestId: "",
-            expiration: "",
-            startTime: 1757401037,
-            expiredTime: 1757404637,
-          };
-        },
+        //此函数为客户端获取临时凭证使用
+        getTempCredential: this.getTempCredential,
       }
     };
   },
   methods: {
+    /**
+     * 调用后端接口返回临时凭证
+     */
+    async getTempCredential(){
+      const response = await fetch('http://localhost:3000/sts')
+      const data = response.json();
+      return data
+      //临时凭证结构应该为如下示例:
+      // {
+      //   "expiredTime": 1758120268,
+      //   "expiration": "2025-09-17T14:44:28Z",
+      //   "credentials": {
+      //     "sessionToken": "OkiB0nVm0t52UXdyKu0acyK1iw6UhbTa2313c4726bdfa2230aa160cc202e5651kLpfeS8UJsc_4wHB1jPrmywvTJ1KsO0nm9PbEbabQi_D7aahjL5lBJM1DVV7cEZ53AlYq__a07bZ6MKxOIy9CXdGCJF-20xzssYRpukx_MQAhrXKo6cdRi-jXuD-YEe4W-YRXhX4c3x41z8Vb5SQfFoh_THpeFYsaZR_1aPzV22C0UDtI0ru1wiRx-Bw2e9pTHMc0pbvNrYMBuGNt_oEJ0P6fjhCVjLa1BA3KAJen7U6lQqR1UsIRElQAnWqEkG0NCJdPa7nA2pt9COrI58dXiBr9sKXgFcPPhUp9xrAY7-Mx7LuJ6XqgegiBjZeumhNSqIIINadmEjAfWyQfndQKHyxbKRK7h4hCvCV297SVQExnKBO9wkt-Ba0gxpUYj0hgfGCKgvLqG68v1NaIufbR61K5-YlwWA82UFL9PfLIuPR5EAdYgt3-OmM03lZpU22qmq1okkAlNB3wl2Mn03lX4Bx_PKtMZdf8cH2gcUftNjXNwxpMsRdt1U1M9dn_1D3rJy6PE_yqAbGWXOTA5D5c8oP9bW2zUuWgqHbCNU6g8Nvn1wb1hIVIf132T0rfoYP",
+      //     "tmpSecretId": "AKID_Duy_4HJP0bS8d3ZG8KsNCMowSm5FxpZr-trO_ayMta5nKI1vr7J3KPOWg_Gu3Bo",
+      //     "tmpSecretKey": "3rn/KVRRTGQw5CVFh4IQoqBBm/1LrdvjyFw7YiqbJk8="
+      //   },
+      //   "requestId": "84fd8060-82a3-4de8-b757-9b22ebabbf7a",
+      //   "startTime": 1758116668
+      // }
+    },
     handleSuccess(result, file) {
       console.log('Upload success:', result.url);
     },
