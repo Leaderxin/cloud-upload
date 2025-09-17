@@ -61,7 +61,7 @@ Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 <template>
   <div>
     <CloudUpload
-      :cloudType="cloudType"
+      cloudType="tencent"
       :cloudConfig="cloudConfig"
       v-model="fileList"
       @success="handleSuccess"
