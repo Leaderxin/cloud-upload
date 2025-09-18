@@ -2,9 +2,9 @@
   font-family: "cloud-upload-icon"; /* Project id 5018793 */
   /* Color fonts */
   src: 
-       url('iconfont.woff2?t=1758010073566') format('woff2'),
-       url('iconfont.woff?t=1758010073566') format('woff'),
-       url('iconfont.ttf?t=1758010073566') format('truetype');
+       url('iconfont.woff2?t=1758203708514') format('woff2'),
+       url('iconfont.woff?t=1758203708514') format('woff'),
+       url('iconfont.ttf?t=1758203708514') format('truetype');
 }
 
 .cloud-upload-icon {
@@ -13,6 +13,14 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-quxiaoquanping_o:before {
+  content: "\eb98";
+}
+
+.icon-quanping_o:before {
+  content: "\eb99";
 }
 
 .icon-fujian1:before {

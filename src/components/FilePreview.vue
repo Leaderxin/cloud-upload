@@ -6,9 +6,26 @@
     @close="handleClose"
     custom-class="file-preview-dialog"
     append-to-body
+    :fullscreen="fullscreen"
+    width="75%"
   >
+    <template #title>
+      <div class="dialog-header">
+        <span>{{ fileName }}</span>
+        <svg class="icon" aria-hidden="true" @click="fullscreen = !fullscreen">
+          <use xlink:href="#icon-quxiaoquanping_o" v-if="fullscreen"></use>
+          <use xlink:href="#icon-quanping_o" v-else="fullscreen"></use>
+        </svg>
+      </div>
+    </template>
     <div class="file-preview-content" v-loading="loading">
       <div v-if="fileType == 'txt'" v-html="formattedText"></div>
+      <iframe
+        class="pdf-container"
+        :src="pdfUrl"
+        frameborder="0"
+        v-if="fileType == 'pdf'"
+      ></iframe>
     </div>
   </el-dialog>
 </template>
@@ -31,8 +48,10 @@ export default {
       fileType: "",
       fileName: "",
       fileRaw: null,
+      pdfUrl: "",
       fileContent: "",
-      loading: false
+      loading: false,
+      fullscreen: false,
     };
   },
   computed: {
@@ -53,8 +72,8 @@ export default {
       };
       reader.readAsText(this.fileRaw);
     },
-    getFileType(file) {
-      return "txt";
+    initPdfContent() {
+      this.pdfUrl = URL.createObjectURL(this.fileRaw);
     },
   },
   watch: {
@@ -62,11 +81,12 @@ export default {
       this.currentVisible = val;
     },
     file: async function (val) {
-      this.loading = true
+      this.loading = true;
       this.fileName = fileHelper.getFileName(val);
+      this.fileType = fileHelper.getFileType(val);
       if (val.raw && val.raw instanceof File) {
         this.fileRaw = val.raw;
-      } else {
+      } else if (this.fileType == "txt" || this.fileType == "pdf") {
         try {
           const response = await fetch(val.url);
           const blob = await response.blob();
@@ -76,33 +96,60 @@ export default {
           return;
         }
       }
-      this.fileType = fileHelper.getFileType(val);
       switch (this.fileType) {
         case "txt":
           this.initTxtContent();
           break;
-
+        case "pdf":
+          this.initPdfContent();
         default:
           break;
       }
-      this.loading = false
+      this.loading = false;
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
 .file-preview-dialog {
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -3px;
+    .icon {
+      margin-right: 20px;
+      color: #909399;
+      font-size: 17px;
+      font-weight: 550;
+      cursor: pointer;
+      &:hover {
+        color: #409eff;
+      }
+    }
+  }
   .file-preview-content {
     max-height: 75vh;
     min-height: 40vh;
     overflow: auto;
+    .pdf-container {
+      width: 100%;
+      height: 65vh;
+    }
   }
 }
 </style>
 <style lang="css">
 .file-preview-dialog > .el-dialog__body {
-  padding: 20px ;
+  padding: 20px;
   padding-top: 0px;
 }
 .file-preview-dialog {

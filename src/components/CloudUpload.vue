@@ -95,6 +95,7 @@
 
 <script>
 import "@/assets/iconfont/iconfont.css";
+import "@/assets/iconfont/iconfont.js";
 import Vue from "vue";
 import CosHelper from "../plugins/tencent";
 import fileHelper from "../utils/fileHelper";
@@ -264,7 +265,7 @@ export default {
           excel: false, //excel
           ppt: false, //ppt
           txt: true, //txt
-          pdf: false, //pdf
+          pdf: true, //pdf
           rar: false, //压缩包
         },
         this.previewConfig
