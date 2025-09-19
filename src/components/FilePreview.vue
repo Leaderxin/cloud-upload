@@ -7,7 +7,7 @@
     custom-class="file-preview-dialog"
     append-to-body
     :fullscreen="fullscreen"
-    width="75%"
+    :width="dialogWidth"
   >
     <template #title>
       <div class="dialog-header">
@@ -18,7 +18,13 @@
         </svg>
       </div>
     </template>
-    <div class="file-preview-content" v-loading="loading">
+    <div
+      :class="[
+        'file-preview-content',
+        fileType == 'audio' ? 'preview-audio' : '',
+      ]"
+      v-loading="loading"
+    >
       <div v-if="fileType == 'txt'" v-html="formattedText"></div>
       <iframe
         class="pdf-container"
@@ -26,6 +32,22 @@
         frameborder="0"
         v-if="fileType == 'pdf'"
       ></iframe>
+      <video
+        controls
+        :src="file.url"
+        v-if="fileType == 'video'"
+        autoplay
+        preload="auto"
+        crossorigin
+      ></video>
+      <audio
+        controls
+        :src="file.url"
+        v-if="fileType == 'audio'"
+        autoplay
+        preload="auto"
+        crossorigin
+      ></audio>
     </div>
   </el-dialog>
 </template>
@@ -57,6 +79,13 @@ export default {
   computed: {
     formattedText() {
       return this.fileContent.replace(/\n/g, "<br>");
+    },
+    dialogWidth() {
+      if (this.fileType == "audio") {
+        return "30%";
+      } else {
+        return "75%";
+      }
     },
   },
   methods: {
@@ -137,12 +166,23 @@ export default {
     }
   }
   .file-preview-content {
-    max-height: 75vh;
+    max-height: 88vh;
     min-height: 40vh;
     overflow: auto;
     .pdf-container {
       width: 100%;
       height: 65vh;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  .preview-audio {
+    height: auto;
+    min-height: 30px;
+    audio {
+      width: 100%;
     }
   }
 }

@@ -259,8 +259,8 @@ export default {
       return Object.assign(
         {
           image: true, //图片附件默认开启预览
-          video: false, //视频附件默认不开启预览
-          audio: false, //音频附件默认不开启预览
+          video: true, //视频附件默认不开启预览
+          audio: true, //音频附件默认不开启预览
           word: false, //word
           excel: false, //excel
           ppt: false, //ppt
