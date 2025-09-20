@@ -16,10 +16,10 @@
         </el-form>
       </el-tab-pane>
       <el-tab-pane label="火山云" name="huoshan">
-        <h3>腾讯云配置项：</h3>
+        <h3>火山云配置项：</h3>
       </el-tab-pane>
-      <el-tab-pane label="阿里云" name="alibaba">
-        <h3>阿里云配置项：</h3>
+      <el-tab-pane label="华为云" name="huawei">
+        <h3>华为云配置项：</h3>
       </el-tab-pane>
     </el-tabs>
     <h3>上传示例：</h3>

@@ -49,12 +49,13 @@
     "prepublishOnly": "npm run build"
   },
   "keywords": [
-    "vue2",
-    "element-ui",
+    "vue-upload",
+    "cloud-upload",
+    "vue-upload-component",
     "upload",
+    "cos-js-sdk-v5",
     "tencent cloud",
-    "volcano engine",
-    "component"
+    "volcano engine"
   ],
   "author": "Leaderxin",
   "license": "MIT",
