@@ -228,10 +228,16 @@ export default {
         [];
       },
     },
+    /**
+     * 上传文件之前的钩子，参数为上传的文件，若返回 false 或者返回 Promise 且被 reject，则停止上传。
+     */
     beforeUpload: {
       type: Function,
       required: false,
     },
+    /**
+     * 文件超出个数限制时的钩子
+     */
     onExceed: {
       type: Function,
       required: false,

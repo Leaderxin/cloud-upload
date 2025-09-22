@@ -123,6 +123,9 @@ export default {
 };
 </script>
 ```
+## 使用文档
+
+组件详细使用文档请参考官方文档(https://github.com/Leaderxin/cloud-upload/wiki)
 
 ## 贡献
 
