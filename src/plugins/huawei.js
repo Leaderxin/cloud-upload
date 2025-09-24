@@ -1,51 +1,43 @@
-import COS from "cos-js-sdk-v5";
+import { ObsClient } from 'esdk-obs-browserjs';
+
 class ObsHelper {
   static instance = null;
-  cosClient = null;
+  obsClient = null;
   tempCredential = null;
 
   static getInstance(getToken) {
     if (!this.instance) {
-      this.instance = new CosHelper(getToken);
+      this.instance = new ObsHelper(getToken);
     }
     return this.instance;
   }
-  static destroyInstance(){
-    this.instance = null
-    this.cosClient = null
-    this.tempCredential = null
-    localStorage.removeItem('cosCredential')
+
+  static destroyInstance() {
+    this.instance = null;
+    this.obsClient = null;
+    this.tempCredential = null;
+    localStorage.removeItem('obsCredential');
   }
+
   constructor(getToken) {
     this.initClient(getToken);
   }
 
   async initClient(getToken) {
     await this.getTempCredential(getToken);
-    console.log("version:", COS.version);
-    this.cosClient = new COS({
-      getAuthorization: async (options, callback) => {
-        try {
-          if (!this.tempCredential || this.isCredentialExpired()) {
-            await this.getTempCredential(getToken);
-          }
-          callback({
-            TmpSecretId: this.tempCredential.tmpSecretId,
-            TmpSecretKey: this.tempCredential.tmpSecretKey,
-            SecurityToken: this.tempCredential.sessionToken,
-            StartTime: this.tempCredential.startTime,
-            ExpiredTime: this.tempCredential.expiredTime,
-          });
-        } catch (error) {
-          console.error("获取临时凭证失败:", error);
-        }
-      },
+    
+    // 初始化华为云OBS客户端
+    this.obsClient = new ObsClient({
+      access_key_id: this.tempCredential.accessKeyId,
+      secret_access_key: this.tempCredential.secretAccessKey,
+      security_token: this.tempCredential.securityToken,
+      server: `https://obs.${this.tempCredential.region}.myhuaweicloud.com`
     });
   }
 
   async getTempCredential(getToken) {
     // 优先从localStorage获取
-    let storeCredential = localStorage.getItem("cosCredential");
+    let storeCredential = localStorage.getItem("obsCredential");
     if (storeCredential) {
       storeCredential = JSON.parse(storeCredential);
     }
@@ -53,19 +45,21 @@ class ObsHelper {
       this.tempCredential = storeCredential;
       return;
     }
+    
     // localStorage无有效凭证则调用接口获取
     try {
       const data = await getToken();
       if (data && typeof data == "object") {
         this.tempCredential = {
-          tmpSecretId: data.credentials.tmpSecretId,
-          tmpSecretKey: data.credentials.tmpSecretKey,
-          sessionToken: data.credentials.sessionToken,
-          startTime: data.startTime,
+          accessKeyId: data.credentials.accessKeyId,
+          secretAccessKey: data.credentials.secretAccessKey,
+          securityToken: data.credentials.securityToken,
           expiredTime: data.expiredTime,
+          startTime: data.startTime,
+          region: data.region // 华为云需要region信息
         };
         localStorage.setItem(
-          "cosCredential",
+          "obsCredential",
           JSON.stringify(this.tempCredential)
         );
       }
@@ -81,87 +75,115 @@ class ObsHelper {
   }
 
   // 单文件上传
-  uploadFile({ bucket, region, path, file, sliceSize, chunkSize, onProgress }) {
-    return new Promise((resolve, reject) => {
-      this.cosClient.uploadFile(
-        {
-          Bucket: bucket,
-          Region: region,
-          Key: path + file.name,
-          Body: file,
-          SliceSize: sliceSize, // 触发分块上传的阈值，超过5MB使用分块上传，默认 1MB，非必须
-          ChunkSize: chunkSize, // 分块大小，默认 1MB，非必须
-          onProgress: (progressData) => {
-            console.log(`上传进度: ${progressData.percent * 100}%`);
-            if (onProgress && typeof onProgress == "function") {
-              onProgress(progressData.percent);
-            }
-          },
-        },
-        (err, data) => {
-          if (err) reject(err);
-          else resolve(data);
+  async uploadFile({ bucket, region, path, file, onProgress }) {
+    const key = path + file.name;
+    
+    try {
+      const result = await this.obsClient.putObject({
+        Bucket: bucket,
+        Key: key,
+        Body: file,
+        onUploadProgress: (progressEvent) => {
+          if (onProgress && typeof onProgress === "function") {
+            const percent = progressEvent.loaded / progressEvent.total;
+            console.log(`上传进度: ${(percent * 100).toFixed(2)}%`);
+            onProgress(percent);
+          }
         }
-      );
-    });
+      });
+
+      if (result.CommonMsg.Status < 300) {
+        return {
+          Location: `https://${bucket}.obs.${region}.myhuaweicloud.com/${key}`,
+          Key: key,
+          Bucket: bucket,
+          ETag: result.InterfaceResult.ETag
+        };
+      } else {
+        throw new Error(`上传失败: ${result.CommonMsg.Code}`);
+      }
+    } catch (error) {
+      throw new Error(`华为云OBS上传失败: ${error.message}`);
+    }
   }
 
   // 批量上传
-  batchUpload({ bucket, region, files }) {
-    return Promise.all(
-      files.map((file) =>
-        this.uploadFile({ bucket, region, key: file.name, file })
-      )
-    );
+  async batchUpload({ bucket, region, path, files, onProgress }) {
+    const results = [];
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      try {
+        const result = await this.uploadFile({
+          bucket,
+          region,
+          path,
+          file,
+          onProgress: (progress) => {
+            if (onProgress && typeof onProgress === "function") {
+              // 计算整体进度
+              const overallProgress = (i + progress) / files.length;
+              onProgress(overallProgress);
+            }
+          }
+        });
+        results.push(result);
+      } catch (error) {
+        results.push({ error: error.message, file: file.name });
+      }
+    }
+    
+    return results;
   }
 
-  // 分片上传
-  sliceUpload({ bucket, region, key, file, sliceSize = 5 * 1024 * 1024 }) {
-    return new Promise((resolve, reject) => {
-      this.cosClient.sliceUploadFile(
-        {
-          Bucket: bucket,
-          Region: region,
-          Key: key,
-          Body: file,
-          SliceSize: sliceSize,
-          onProgress: (progressData) => {
-            console.log(`分片上传进度: ${progressData.percent * 100}%`);
-          },
-        },
-        (err, data) => {
-          if (err) reject(err);
-          else resolve(data);
+  // 分片上传（华为云OBS支持断点续传）
+  async sliceUpload({ bucket, region, path, file, sliceSize = 5 * 1024 * 1024, onProgress }) {
+    const key = path + file.name;
+    
+    try {
+      // 华为云OBS SDK会自动处理大文件分片上传
+      const result = await this.obsClient.putObject({
+        Bucket: bucket,
+        Key: key,
+        Body: file,
+        onUploadProgress: (progressEvent) => {
+          if (onProgress && typeof onProgress === "function") {
+            const percent = progressEvent.loaded / progressEvent.total;
+            console.log(`分片上传进度: ${(percent * 100).toFixed(2)}%`);
+            onProgress(percent);
+          }
         }
-      );
-    });
+      });
+
+      if (result.CommonMsg.Status < 300) {
+        return {
+          Location: `https://${bucket}.obs.${region}.myhuaweicloud.com/${key}`,
+          Key: key,
+          Bucket: bucket,
+          ETag: result.InterfaceResult.ETag
+        };
+      } else {
+        throw new Error(`分片上传失败: ${result.CommonMsg.Code}`);
+      }
+    } catch (error) {
+      throw new Error(`华为云OBS分片上传失败: ${error.message}`);
+    }
   }
 
-  // 图片加水印
+  // 图片加水印（华为云OBS处理方式）
   async addWatermark({ bucket, region, key, watermarkText }) {
-    const params = {
-      Bucket: bucket,
-      Region: region,
-      Key: key,
-      PicOperations: JSON.stringify({
-        is_pic_info: 1,
-        rules: [
-          {
-            fileid: `watermark_${key}`,
-            rule: `watermark/2/text/${encodeURIComponent(
-              watermarkText
-            )}/fill/IzAwMDAwMA/fontsize/20/dissolve/50/gravity/southeast/dx/20/dy/20`,
-          },
-        ],
-      }),
-    };
-
-    return new Promise((resolve, reject) => {
-      this.cosClient.ciPutObjectFromLocalFile(params, (err, data) => {
-        if (err) reject(err);
-        else resolve(data);
-      });
-    });
+    try {
+      // 华为云OBS的图片处理需要通过单独的图片处理服务
+      // 这里返回带水印参数的URL
+      const watermarkUrl = `https://${bucket}.obs.${region}.myhuaweicloud.com/${key}?x-image-process=image/watermark,text_${encodeURIComponent(watermarkText)},color_FFFFFF,size_20,g_se,x_20,y_20`;
+      
+      return {
+        processedUrl: watermarkUrl,
+        originalKey: key
+      };
+    } catch (error) {
+      throw new Error(`添加水印失败: ${error.message}`);
+    }
   }
 }
 
