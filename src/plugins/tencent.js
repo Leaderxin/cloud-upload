@@ -1,8 +1,13 @@
-import COS from "cos-js-sdk-v5";
 class CosHelper {
   static instance = null;
+  static externalCOS = null; // 外部传入的COS对象
   cosClient = null;
   tempCredential = null;
+
+  // 设置外部COS对象的静态方法
+  static setExternalCOS(COS) {
+    this.externalCOS = COS;
+  }
 
   static getInstance(getToken) {
     if (!this.instance) {
@@ -10,19 +15,22 @@ class CosHelper {
     }
     return this.instance;
   }
+  
   static destroyInstance(){
     this.instance = null
     this.cosClient = null
     this.tempCredential = null
     localStorage.removeItem('cosCredential')
   }
+  
   constructor(getToken) {
     this.initClient(getToken);
   }
 
   async initClient(getToken) {
+    // 如果有外部传入的COS对象，直接使用
+    let COS = CosHelper.externalCOS;
     await this.getTempCredential(getToken);
-    console.log("version:", COS.version);
     this.cosClient = new COS({
       getAuthorization: async (options, callback) => {
         try {

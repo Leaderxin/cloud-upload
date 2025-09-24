@@ -43,20 +43,32 @@
 ```bash
 npm i vue-cloud-upload
 ```
+根据您使用的对象存储平台，选择安装对应的SDK依赖：
 
-## 全局注册
+### 腾讯云 COS
+```bash
+npm install cos-js-sdk-v5
+```
+
+### 华为云 OBS
+```bash
+npm install esdk-obs-browserjs
+```
+安装相应的SDK后，您可以在组件配置中使用对应平台的参数进行文件上传。
+
+## 全局注册（腾讯云cos）
 
 ```javascript
 import Vue from "vue";
-import ElementUI from "element-ui";
-import "element-ui/lib/theme-chalk/index.css";
-import CloudUpload from "vue-cloud-upload";
+import COS from 'cos-js-sdk-v5';
 import "vue-cloud-upload/dist/vue-cloud-upload.css";
-Vue.use(ElementUI);
+import CloudUpload, { setExternalCOS } from 'vue-cloud-upload';
+// 传入腾讯云COS对象
+setExternalCOS(COS);
 Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 ```
 
-## 按需引入（推荐）
+## 按需引入（推荐做法，腾讯云cos）
 
 ```vue
 <template>
@@ -73,8 +85,11 @@ Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 </script>
 
 <script>
-import CloudUpload from 'vue-cloud-upload';
+import COS from 'cos-js-sdk-v5';
 import "vue-cloud-upload/dist/vue-cloud-upload.css";
+import CloudUpload, { setExternalCOS } from 'vue-cloud-upload';
+//传入腾讯云COS对象
+setExternalCOS(COS);
 export default {
   components: { CloudUpload },
   data() {
@@ -123,21 +138,66 @@ export default {
 };
 </script>
 ```
-## 安装云平台SDK
+## 全局注册（华为云obs）
 
-根据您使用的对象存储平台，选择安装对应的SDK依赖：
-
-### 腾讯云 COS
-```bash
-npm install cos-js-sdk-v5
+```javascript
+import Vue from "vue";
+import { ObsClient } from 'esdk-obs-browserjs';
+import "vue-cloud-upload/dist/vue-cloud-upload.css";
+import CloudUpload, { setExternalOBS } from 'vue-cloud-upload';
+// 传入华为云OBS对象
+setExternalOBS(ObsClient);
+Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 ```
 
-### 华为云 OBS
-```bash
-npm install esdk-obs-browserjs
-```
-安装相应的SDK后，您可以在组件配置中使用对应平台的参数进行文件上传。
+## 按需引入（推荐做法，华为云obs）
 
+```vue
+<template>
+  <div>
+    <CloudUpload
+      cloudType="huawei"
+      :cloudConfig="cloudConfig"
+      v-model="fileList"
+      @success="handleSuccess"
+      @error="handleError"
+    >
+    </CloudUpload>
+  </div>
+</script>
+
+<script>
+import { ObsClient } from 'esdk-obs-browserjs';
+import "vue-cloud-upload/dist/vue-cloud-upload.css";
+import CloudUpload, { setExternalOBS } from 'vue-cloud-upload';
+// 传入华为云OBS对象
+setExternalOBS(ObsClient);
+export default {
+  components: { CloudUpload },
+  data() {
+    return {
+      fileList:[],//附件列表，上传或者删除后实时同步更新
+      tencentConfig: {
+        //华为云obs桶名
+        bucket: "test-tos-125***",
+        //华为云obs桶所在地域
+        region: "ap-guangzhou",
+        //文件上传目录，自定义
+        path: "/costest/",
+      }
+    };
+  },
+  methods: {
+    handleSuccess(result, file) {
+      console.log('Upload success:', result.url);
+    },
+    handleError(err){
+      console.log("error:",err);
+    }
+  }
+};
+</script>
+```
 ## 使用文档
 
 组件详细使用文档请参考[官方文档](https://github.com/Leaderxin/cloud-upload/wiki)

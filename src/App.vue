@@ -41,8 +41,10 @@
 </template>
 
 <script>
+import COS from "cos-js-sdk-v5";
 import CloudUpload from "@/components/CloudUpload.vue";
-
+import CosHelper from "./plugins/tencent";
+CosHelper.setExternalCOS(COS)
 export default {
   name: "App",
   components: {

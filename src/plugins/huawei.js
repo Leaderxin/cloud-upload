@@ -1,9 +1,13 @@
-import { ObsClient } from 'esdk-obs-browserjs';
-
 class ObsHelper {
   static instance = null;
+  static externalOBS = null; // 外部传入的OBS对象
   obsClient = null;
   tempCredential = null;
+
+  // 设置外部OBS对象的静态方法
+  static setExternalOBS(OBS) {
+    this.externalOBS = OBS;
+  }
 
   static getInstance(getToken) {
     if (!this.instance) {
@@ -24,8 +28,9 @@ class ObsHelper {
   }
 
   async initClient(getToken) {
+    // 如果有外部传入的OBS对象，直接使用
+    let ObsClient = ObsHelper.externalOBS;
     await this.getTempCredential(getToken);
-    
     // 初始化华为云OBS客户端
     this.obsClient = new ObsClient({
       access_key_id: this.tempCredential.accessKeyId,

@@ -27,7 +27,7 @@ export default defineConfig({
           vue: 'Vue',
           'element-ui': 'ElementUI',
           'cos-js-sdk-v5': 'COS',
-          'esdk-obs-browserjs': 'OBS'
+          'esdk-obs-browserjs': 'ObsClient'
         }
       }
     },
