@@ -97,10 +97,11 @@
 import "@/assets/iconfont/iconfont.css";
 import "@/assets/iconfont/iconfont.js";
 import Vue from "vue";
-import CosHelper from "../plugins/tencent";
 import fileHelper from "../utils/fileHelper";
 import { Upload, Loading, Image, Tooltip, Dialog } from "element-ui";
 import FilePreview from "./FilePreview.vue";
+let CosHelper = null
+let ObsHelper = null
 Vue.component("el-upload", Upload);
 Vue.component("el-image", Image);
 Vue.component("el-tooltip", Tooltip);
@@ -288,9 +289,9 @@ export default {
     /**
      * 检查关键props传入是否规范并初始化上传实例
      */
-    checkAndInit() {
+    async checkAndInit() {
       //检查关键参数传入
-      const typeList = ["tencent"];
+      const typeList = ["tencent","huawei"];
       if (!this.cloudType) {
         console.warn("未设置云平台类型cloudType!");
       } else if (!typeList.includes(this.cloudType)) {
@@ -298,8 +299,12 @@ export default {
       }
       switch (this.cloudType) {
         case "tencent":
-          CosHelper.getInstance(this.cloudConfig.getTempCredential);
+          CosHelper = (await import("../plugins/tencent")).default
+          CosHelper.getInstance(this.cloudConfig.getTempCredential)
           break;
+        case "huawei":
+          ObsHelper = (await import('../plugins/huawei')).default
+          ObsHelper.getInstance(this.cloudConfig)
         default:
           break;
       }
@@ -398,7 +403,7 @@ export default {
             }
             break;
           case "volcengine":
-            result = await tencentUpload(uploadConfig);
+            result = await CosHelper.getInstance().uploadFile(uploadConfig);
             break;
           default:
             throw new Error(`Unsupported cloudType: ${this.cloudType}`);
