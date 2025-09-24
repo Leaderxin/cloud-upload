@@ -35,6 +35,14 @@
     "cos-js-sdk-v5": "^1.10.1",
     "esdk-obs-browserjs": "^3.25.6"
   },
+  "peerDependenciesMeta": {
+    "cos-js-sdk-v5": {
+      "optional": true
+    },
+    "esdk-obs-browserjs": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@vitejs/plugin-vue2": "^2.3.3",
     "element-ui": "^2.13.2",
