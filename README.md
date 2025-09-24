@@ -56,7 +56,7 @@ Vue.use(ElementUI);
 Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 ```
 
-## 按需引入（建议）
+## 按需引入（推荐）
 
 ```vue
 <template>
@@ -123,6 +123,21 @@ export default {
 };
 </script>
 ```
+## 安装云平台SDK
+
+根据您使用的对象存储平台，选择安装对应的SDK依赖：
+
+### 腾讯云 COS
+```bash
+npm install cos-js-sdk-v5
+```
+
+### 华为云 OBS
+```bash
+npm install esdk-obs-browserjs
+```
+安装相应的SDK后，您可以在组件配置中使用对应平台的参数进行文件上传。
+
 ## 使用文档
 
 组件详细使用文档请参考[官方文档](https://github.com/Leaderxin/cloud-upload/wiki)
