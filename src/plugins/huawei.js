@@ -9,9 +9,9 @@ class ObsHelper {
     this.externalOBS = OBS;
   }
 
-  static getInstance(getToken) {
+  static getInstance(cloudConfig) {
     if (!this.instance) {
-      this.instance = new ObsHelper(getToken);
+      this.instance = new ObsHelper(cloudConfig);
     }
     return this.instance;
   }
@@ -20,17 +20,15 @@ class ObsHelper {
     this.instance = null;
     this.obsClient = null;
     this.tempCredential = null;
-    localStorage.removeItem('obsCredential');
   }
 
-  constructor(getToken) {
-    this.initClient(getToken);
+  constructor(cloudConfig) {
+    this.initClient(cloudConfig);
   }
 
-  async initClient(getToken) {
+  async initClient(cloudConfig) {
     // 如果有外部传入的OBS对象，直接使用
     let ObsClient = ObsHelper.externalOBS;
-    await this.getTempCredential(getToken);
     // 初始化华为云OBS客户端
     this.obsClient = new ObsClient({
       access_key_id: this.tempCredential.accessKeyId,
@@ -38,45 +36,6 @@ class ObsHelper {
       security_token: this.tempCredential.securityToken,
       server: `https://obs.${this.tempCredential.region}.myhuaweicloud.com`
     });
-  }
-
-  async getTempCredential(getToken) {
-    // 优先从localStorage获取
-    let storeCredential = localStorage.getItem("obsCredential");
-    if (storeCredential) {
-      storeCredential = JSON.parse(storeCredential);
-    }
-    if (storeCredential && !this.isCredentialExpired(storeCredential)) {
-      this.tempCredential = storeCredential;
-      return;
-    }
-    
-    // localStorage无有效凭证则调用接口获取
-    try {
-      const data = await getToken();
-      if (data && typeof data == "object") {
-        this.tempCredential = {
-          accessKeyId: data.credentials.accessKeyId,
-          secretAccessKey: data.credentials.secretAccessKey,
-          securityToken: data.credentials.securityToken,
-          expiredTime: data.expiredTime,
-          startTime: data.startTime,
-          region: data.region // 华为云需要region信息
-        };
-        localStorage.setItem(
-          "obsCredential",
-          JSON.stringify(this.tempCredential)
-        );
-      }
-    } catch (error) {
-      throw new Error("获取临时凭证失败: " + error.message);
-    }
-  }
-
-  isCredentialExpired(credential = this.tempCredential) {
-    if (!credential) return true;
-    const now = Math.floor(Date.now() / 1000);
-    return now >= credential.expiredTime - 60; // 提前60秒认为过期
   }
 
   // 单文件上传

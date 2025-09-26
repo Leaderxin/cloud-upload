@@ -15,14 +15,14 @@ class CosHelper {
     }
     return this.instance;
   }
-  
-  static destroyInstance(){
-    this.instance = null
-    this.cosClient = null
-    this.tempCredential = null
-    localStorage.removeItem('cosCredential')
+
+  static destroyInstance() {
+    this.instance = null;
+    this.cosClient = null;
+    this.tempCredential = null;
+    localStorage.removeItem("cosCredential");
   }
-  
+
   constructor(getToken) {
     this.initClient(getToken);
   }
@@ -90,12 +90,15 @@ class CosHelper {
 
   // 单文件上传
   uploadFile({ bucket, region, path, file, sliceSize, chunkSize, onProgress }) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+      const isPublicRead = await this.isBucketPublicRead({ bucket, region });
+      console.log("是否开启共有读：", isPublicRead);
+      const fileKey = path + file.name;
       this.cosClient.uploadFile(
         {
           Bucket: bucket,
           Region: region,
-          Key: path + file.name,
+          Key: fileKey,
           Body: file,
           SliceSize: sliceSize, // 触发分块上传的阈值，超过5MB使用分块上传，默认 1MB，非必须
           ChunkSize: chunkSize, // 分块大小，默认 1MB，非必须
@@ -108,38 +111,34 @@ class CosHelper {
         },
         (err, data) => {
           if (err) reject(err);
-          else resolve(data);
-        }
-      );
-    });
-  }
-
-  // 批量上传
-  batchUpload({ bucket, region, files }) {
-    return Promise.all(
-      files.map((file) =>
-        this.uploadFile({ bucket, region, key: file.name, file })
-      )
-    );
-  }
-
-  // 分片上传
-  sliceUpload({ bucket, region, key, file, sliceSize = 5 * 1024 * 1024 }) {
-    return new Promise((resolve, reject) => {
-      this.cosClient.sliceUploadFile(
-        {
-          Bucket: bucket,
-          Region: region,
-          Key: key,
-          Body: file,
-          SliceSize: sliceSize,
-          onProgress: (progressData) => {
-            console.log(`分片上传进度: ${progressData.percent * 100}%`);
-          },
-        },
-        (err, data) => {
-          if (err) reject(err);
-          else resolve(data);
+          else {
+            if (isPublicRead) {
+              const url = data.Location.startsWith("https://")
+                ? data.Location
+                : "https://" + data.Location;
+              resolve({ url: url, key: fileKey, ...data });
+            } else {
+              this.cosClient.getObjectUrl(
+                {
+                  Bucket: bucket,
+                  Region: region,
+                  Key: fileKey,
+                  Sign: true,
+                },
+                function (err, urlData) {
+                  if (err) {
+                    console.log(err);
+                  } else {
+                    resolve({
+                      url: urlData.Url,
+                      key: fileKey,
+                      ...data,
+                    });
+                  }
+                }
+              );
+            }
+          }
         }
       );
     });
@@ -170,6 +169,40 @@ class CosHelper {
         else resolve(data);
       });
     });
+  }
+
+  // 获取存储桶ACL（访问控制列表）
+  async getBucketAcl({ bucket, region }) {
+    return new Promise((resolve, reject) => {
+      this.cosClient.getBucketAcl(
+        {
+          Bucket: bucket,
+          Region: region,
+        },
+        (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        }
+      );
+    });
+  }
+  // 检查存储桶是否为公有读
+  async isBucketPublicRead({ bucket, region }) {
+    try {
+      const aclData = await this.getBucketAcl({ bucket, region });
+      return aclData.Grants.some(
+        (grant) =>
+          grant.Grantee.URI ===
+            "http://cam.qcloud.com/groups/global/AllUsers" &&
+          grant.Permission === "READ"
+      );
+    } catch (error) {
+      console.error("检查存储桶权限失败:", error);
+      return true;
+    }
   }
 }
 

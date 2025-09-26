@@ -100,8 +100,8 @@ import Vue from "vue";
 import fileHelper from "../utils/fileHelper";
 import { Upload, Loading, Image, Tooltip, Dialog } from "element-ui";
 import FilePreview from "./FilePreview.vue";
-let CosHelper = null
-let ObsHelper = null
+let CosHelper = null;
+let ObsHelper = null;
 Vue.component("el-upload", Upload);
 Vue.component("el-image", Image);
 Vue.component("el-tooltip", Tooltip);
@@ -282,8 +282,8 @@ export default {
   created() {
     this.checkAndInit();
   },
-  beforeDestroy(){
-    CosHelper.destroyInstance()
+  beforeDestroy() {
+    CosHelper.destroyInstance();
   },
   methods: {
     /**
@@ -291,7 +291,7 @@ export default {
      */
     async checkAndInit() {
       //检查关键参数传入
-      const typeList = ["tencent","huawei"];
+      const typeList = ["tencent", "huawei"];
       if (!this.cloudType) {
         console.warn("未设置云平台类型cloudType!");
       } else if (!typeList.includes(this.cloudType)) {
@@ -299,12 +299,12 @@ export default {
       }
       switch (this.cloudType) {
         case "tencent":
-          CosHelper = (await import("../plugins/tencent")).default
-          CosHelper.getInstance(this.cloudConfig.getTempCredential)
+          CosHelper = (await import("../plugins/tencent")).default;
+          CosHelper.getInstance(this.cloudConfig.getTempCredential);
           break;
         case "huawei":
-          ObsHelper = (await import('../plugins/huawei')).default
-          ObsHelper.getInstance(this.cloudConfig)
+          ObsHelper = (await import("../plugins/huawei")).default;
+          ObsHelper.getInstance(this.cloudConfig);
         default:
           break;
       }
@@ -390,16 +390,14 @@ export default {
             if (result.statusCode == 200) {
               const index = this.$refs.innerUpload.uploadFiles.findIndex(
                 (x) => x.uid == file.uid
-              )
+              );
               let item = this.$refs.innerUpload.uploadFiles[index];
               const fileresult = Object.assign(item, {
-                url: result.Location.startsWith("https://")
-                  ? result.Location
-                  : "https://" + result.Location,
+                url: result.url,
                 cosResult: result,
               });
-              this.$refs.innerUpload.uploadFiles.splice(index,1,fileresult)
-              this.fileList = this.$refs.innerUpload.uploadFiles
+              this.$refs.innerUpload.uploadFiles.splice(index, 1, fileresult);
+              this.fileList = this.$refs.innerUpload.uploadFiles;
             }
             break;
           case "volcengine":
@@ -410,7 +408,7 @@ export default {
         }
         onSuccess(result, file);
         this.$emit("success", result, file);
-        this.$emit("input",this.fileList)
+        this.$emit("input", this.fileList);
       } catch (error) {
         onError(error, file);
         this.$emit("error", error, file);
@@ -459,8 +457,11 @@ export default {
       }
     },
     handleDown(file) {
-      this.$message.success('文件开始下载，请稍等！')
-      fileHelper.downloadFile(file.url, file.name);
+      var downloadUrl =
+        file.url +
+        (file.url.indexOf("?") > -1 ? "&" : "?") +
+        "response-content-disposition=attachment"; // 补充强制下载的参数
+      window.open(downloadUrl);
     },
     handleExceed(files, fileList) {
       if (this.onExceed && typeof this.onExceed == "function") {
