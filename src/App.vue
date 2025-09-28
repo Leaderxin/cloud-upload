@@ -15,11 +15,11 @@
           </el-form-item>
         </el-form>
       </el-tab-pane>
-      <el-tab-pane label="火山云" name="huoshan">
-        <h3>火山云配置项：</h3>
-      </el-tab-pane>
       <el-tab-pane label="华为云" name="huawei">
         <h3>华为云配置项：</h3>
+      </el-tab-pane>
+      <el-tab-pane label="火山云" name="huoshan">
+        <h3>火山云配置项：</h3>
       </el-tab-pane>
     </el-tabs>
     <h3>上传示例：</h3>
@@ -36,7 +36,9 @@
         </CloudUpload>
       </el-form-item>
     </el-form>
-    <el-button type="primary" @click="ifUpload = !ifUpload">删除/添加组件</el-button>
+    <el-button type="primary" @click="ifUpload = !ifUpload"
+      >删除/添加组件</el-button
+    >
   </div>
 </template>
 
@@ -44,7 +46,7 @@
 import COS from "cos-js-sdk-v5";
 import CloudUpload from "@/components/CloudUpload.vue";
 import CosHelper from "./plugins/tencent";
-CosHelper.setExternalCOS(COS)
+CosHelper.setExternalCOS(COS);
 export default {
   name: "App",
   components: {

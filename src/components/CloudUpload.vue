@@ -457,11 +457,13 @@ export default {
       }
     },
     handleDown(file) {
-      var downloadUrl =
-        file.url +
-        (file.url.indexOf("?") > -1 ? "&" : "?") +
-        "response-content-disposition=attachment"; // 补充强制下载的参数
-      window.open(downloadUrl);
+      // var downloadUrl =
+      //   file.url +
+      //   (file.url.indexOf("?") > -1 ? "&" : "?") +
+      //   "response-content-disposition=attachment"; // 补充强制下载的参数
+      // window.open(downloadUrl);
+      this.$message.success('文件开始下载，请稍等！')
+      fileHelper.downloadFile(file.url, file.name);
     },
     handleExceed(files, fileList) {
       if (this.onExceed && typeof this.onExceed == "function") {
