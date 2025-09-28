@@ -46,6 +46,7 @@
   "devDependencies": {
     "@vitejs/plugin-vue2": "^2.3.3",
     "element-ui": "^2.13.2",
+    "rollup-plugin-visualizer": "^6.0.3",
     "sass": "^1.92.1",
     "sass-loader": "^16.0.5",
     "vite": "^6.0.0",
