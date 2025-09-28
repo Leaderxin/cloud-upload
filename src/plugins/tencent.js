@@ -89,16 +89,14 @@ class CosHelper {
   }
 
   // 单文件上传
-  uploadFile({ bucket, region, path, file, sliceSize, chunkSize, onProgress }) {
+  uploadFile({ bucket, region, key ,file, sliceSize, chunkSize, onProgress }) {
     return new Promise(async (resolve, reject) => {
       const isPublicRead = await this.isBucketPublicRead({ bucket, region });
-      console.log("是否开启共有读：", isPublicRead);
-      const fileKey = path + file.name;
       this.cosClient.uploadFile(
         {
           Bucket: bucket,
           Region: region,
-          Key: fileKey,
+          Key: key,
           Body: file,
           SliceSize: sliceSize, // 触发分块上传的阈值，超过5MB使用分块上传，默认 1MB，非必须
           ChunkSize: chunkSize, // 分块大小，默认 1MB，非必须
@@ -116,13 +114,13 @@ class CosHelper {
               const url = data.Location.startsWith("https://")
                 ? data.Location
                 : "https://" + data.Location;
-              resolve({ url: url, key: fileKey, ...data });
+              resolve({ url: url, key: key, name:file.name ,...data });
             } else {
               this.cosClient.getObjectUrl(
                 {
                   Bucket: bucket,
                   Region: region,
-                  Key: fileKey,
+                  Key: key,
                   Sign: true,
                 },
                 function (err, urlData) {
@@ -131,7 +129,8 @@ class CosHelper {
                   } else {
                     resolve({
                       url: urlData.Url,
-                      key: fileKey,
+                      key: key,
+                      name:file.name,
                       ...data,
                     });
                   }

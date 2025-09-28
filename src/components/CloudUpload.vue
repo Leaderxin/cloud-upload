@@ -100,6 +100,7 @@ import Vue from "vue";
 import fileHelper from "../utils/fileHelper";
 import { Upload, Loading, Image, Tooltip, Dialog } from "element-ui";
 import FilePreview from "./FilePreview.vue";
+import { nanoid } from "nanoid";
 let CosHelper = null;
 let ObsHelper = null;
 Vue.component("el-upload", Upload);
@@ -144,6 +145,17 @@ export default {
     listType: {
       type: String,
       default: "picture-card",
+      validator: (value) => {
+        const params = ["text", "picture", "picture-card"];
+        if (!params.includes(value)) {
+          console.error(
+            `listType参数必须是以下值之一: ${params.join(", ")}\n` +
+              `当前值: "${value}"将回退到默认值"picture-card"`
+          );
+          return false;
+        }
+        return true;
+      },
     },
     /**
      * 是否禁用
@@ -170,6 +182,17 @@ export default {
     size: {
       type: String,
       default: "small",
+      validator: (value) => {
+        const params = ["medium", "small", "mini"];
+        if (!params.includes(value)) {
+          console.error(
+            `listType参数必须是以下值之一: ${params.join(", ")}\n` +
+              `当前值: "${value}"将回退到默认值"small"`
+          );
+          return false;
+        }
+        return true;
+      },
     },
     /**
      * 触发分块上传的阈值 默认10Mb
@@ -186,11 +209,40 @@ export default {
       default: 1024 * 1024 * 5,
     },
     /**
+     * 对象存储桶中文件的key配置
+     */
+    fileKey: {
+      type: String,
+      default: "uuid+name",
+      validator: (value) => {
+        const params = ["uuid", "name", "uuid+name"];
+        if (!params.includes(value)) {
+          console.error(
+            `listType参数必须是以下值之一: ${params.join(", ")}\n` +
+              `当前值: "${value}"将回退到默认值"uuid+name"`
+          );
+          return false;
+        }
+        return true;
+      },
+    },
+    /**
      * 使用的云平台类型 tencent腾讯云桶
      */
     cloudType: {
       type: String,
       default: "tencent",
+      validator: (value) => {
+        const params = ["tencent", "huawei"];
+        if (!params.includes(value)) {
+          console.error(
+            `listType参数必须是以下值之一: ${params.join(", ")}\n` +
+              `当前值: "${value}"将回退到默认值"tencent"`
+          );
+          return false;
+        }
+        return true;
+      },
     },
     /**
      * 云平台配置参数，包含桶名，地域，上传目录，凭证获取等
@@ -370,8 +422,10 @@ export default {
     // 自定义上传方法
     async customUpload(options) {
       const { file, onProgress, onSuccess, onError } = options;
+      let key = this.generateKey(file.name);
       const uploadConfig = {
         file,
+        key,
         chunkSize: this.chunkSize,
         sliceSize: this.sliceSize,
         ...this.cloudConfig,
@@ -413,6 +467,24 @@ export default {
         onError(error, file);
         this.$emit("error", error, file);
       }
+    },
+    generateKey(name) {
+      let fileKey = "";
+      switch (this.fileKey) {
+        case "name":
+          fileKey = `${this.cloudConfig.path}${name}`;
+          break;
+        case "uuid":
+          const extention = fileHelper.getFileExtension(name);
+          fileKey = `${this.cloudConfig.path}${nanoid()}.${extention}`;
+          break;
+        case "uuid+name":
+          fileKey = `${this.cloudConfig.path}${nanoid()}/${name}`;
+          break;
+        default:
+          break;
+      }
+      return fileKey;
     },
     onbeforeUpload(file) {
       if (this.beforeUpload && typeof this.beforeUpload == "function") {
@@ -462,7 +534,7 @@ export default {
       //   (file.url.indexOf("?") > -1 ? "&" : "?") +
       //   "response-content-disposition=attachment"; // 补充强制下载的参数
       // window.open(downloadUrl);
-      this.$message.success('文件开始下载，请稍等！')
+      this.$message.success("文件开始下载，请稍等！");
       fileHelper.downloadFile(file.url, file.name);
     },
     handleExceed(files, fileList) {

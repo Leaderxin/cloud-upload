@@ -1,6 +1,6 @@
 {
   "name": "vue-cloud-upload",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "基于vue+elementui的通用云上传组件，无缝衔接腾讯云，火山云等桶平台，开箱即用",
   "private": false,
   "type": "module",
@@ -20,20 +20,20 @@
   "files": [
     "dist",
     "README.md",
-     "*.scss"
+    "*.scss"
   ],
   "sideEffects": [
     "*.scss",
     "*.css"
   ],
   "dependencies": {
-    
+    "nanoid": "^5.1.6"
   },
   "peerDependencies": {
-    "element-ui": "^2.13.2",
-    "vue": "^2.6.10",
     "cos-js-sdk-v5": "^1.10.1",
-    "esdk-obs-browserjs": "^3.25.6"
+    "element-ui": "^2.13.2",
+    "esdk-obs-browserjs": "^3.25.6",
+    "vue": "^2.6.10"
   },
   "peerDependenciesMeta": {
     "cos-js-sdk-v5": {
