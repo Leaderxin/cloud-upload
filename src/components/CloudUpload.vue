@@ -11,6 +11,7 @@
       :show-file-list="showFileList"
       :on-exceed="handleExceed"
       :on-remove="handleRemove"
+      :on-preview="handlePreview"
       :before-upload="onbeforeUpload"
       :http-request="customUpload"
       :list-type="listType"
@@ -341,7 +342,7 @@ export default {
     /**
      * 检查关键props传入是否规范并初始化上传实例
      */
-    async checkAndInit() {
+    async checkAndInit(cloudConfig) {
       //检查关键参数传入
       const typeList = ["tencent", "huawei"];
       if (!this.cloudType) {
@@ -352,11 +353,13 @@ export default {
       switch (this.cloudType) {
         case "tencent":
           CosHelper = (await import("../plugins/tencent")).default;
-          CosHelper.getInstance(this.cloudConfig.getTempCredential);
+          CosHelper.getInstance(
+            cloudConfig?.getTempCredential || this.cloudConfig.getTempCredential
+          );
           break;
         case "huawei":
           ObsHelper = (await import("../plugins/huawei")).default;
-          ObsHelper.getInstance(this.cloudConfig);
+          ObsHelper.getInstance(cloudConfig || this.cloudConfig);
         default:
           break;
       }
@@ -448,14 +451,25 @@ export default {
               let item = this.$refs.innerUpload.uploadFiles[index];
               const fileresult = Object.assign(item, {
                 url: result.url,
-                cosResult: result,
+                response: result,
               });
               this.$refs.innerUpload.uploadFiles.splice(index, 1, fileresult);
               this.fileList = this.$refs.innerUpload.uploadFiles;
             }
             break;
-          case "volcengine":
-            result = await CosHelper.getInstance().uploadFile(uploadConfig);
+          case "huawei":
+            result = await ObsHelper.getInstance().uploadFile(uploadConfig);
+            if (result.CommonMsg.Status == 200) {
+              const index = this.$refs.innerUpload.uploadFiles.findIndex(
+                (x) => x.uid == file.uid
+              );
+              let item = this.$refs.innerUpload.uploadFiles[index];
+              const fileresult = Object.assign(item, {
+                response: result,
+              });
+              this.$refs.innerUpload.uploadFiles.splice(index, 1, fileresult);
+              this.fileList = this.$refs.innerUpload.uploadFiles;
+            }
             break;
           default:
             throw new Error(`Unsupported cloudType: ${this.cloudType}`);
@@ -519,13 +533,17 @@ export default {
       this.$emit("input", this.fileList);
     },
     handlePreview(file) {
-      const type = this.getFileType(file);
-      if (type == "image") {
-        const ref = this.getImgRef(file);
-        this.$refs[ref].clickHandler();
+      if (this.onPreview && typeof this.onPreview == "function") {
+        this.onPreview(file);
       } else {
-        this.previewFile = file;
-        this.previewVisible = true;
+        const type = this.getFileType(file);
+        if (type == "image") {
+          const ref = this.getImgRef(file);
+          this.$refs[ref].clickHandler();
+        } else {
+          this.previewFile = file;
+          this.previewVisible = true;
+        }
       }
     },
     handleDown(file) {
@@ -551,6 +569,13 @@ export default {
     },
     cloudType(val) {
       this.checkAndInit();
+    },
+    cloudConfig: {
+      deep: true,
+      //immediate: true,
+      handler(val) {
+        this.checkAndInit(val);
+      },
     },
   },
   components: {

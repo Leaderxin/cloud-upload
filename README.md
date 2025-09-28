@@ -95,7 +95,7 @@ export default {
   data() {
     return {
       fileList:[],//附件列表，上传或者删除后实时同步更新
-      tencentConfig: {
+      cloudConfig: {
         //腾讯云cos桶名
         bucket: "test-tos-125***",
         //腾讯云cos桶所在地域
@@ -177,13 +177,16 @@ export default {
   data() {
     return {
       fileList:[],//附件列表，上传或者删除后实时同步更新
-      tencentConfig: {
+      cloudConfig: {
         //华为云obs桶名
-        bucket: "test-tos-125***",
-        //华为云obs桶所在地域
-        region: "ap-guangzhou",
+        bucket: "cloudupload",
+        //华为云终端节点
+        server: "https://obs.cn-south-1.myhuaweicloud.com",
         //文件上传目录，自定义
         path: "/costest/",
+        //华为云 key secret
+        accessKeyId: "",
+        secretAccessKey: "",
       }
     };
   },

@@ -101,7 +101,6 @@ class CosHelper {
           SliceSize: sliceSize, // 触发分块上传的阈值，超过5MB使用分块上传，默认 1MB，非必须
           ChunkSize: chunkSize, // 分块大小，默认 1MB，非必须
           onProgress: (progressData) => {
-            console.log(`上传进度: ${progressData.percent * 100}%`);
             if (onProgress && typeof onProgress == "function") {
               onProgress(progressData.percent);
             }

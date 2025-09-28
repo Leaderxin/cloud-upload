@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <el-tabs v-model="cloudType">
+    <el-tabs v-model="cloudType" @tab-click="handleTypeChange">
       <el-tab-pane label="腾讯云cos" name="tencent">
         <h3>腾讯云配置项：</h3>
         <el-form>
@@ -17,6 +17,17 @@
       </el-tab-pane>
       <el-tab-pane label="华为云" name="huawei">
         <h3>华为云配置项：</h3>
+        <el-form>
+          <el-form-item label="bucket(桶名)">
+            <el-input size="mini" v-model="obsConfig.bucket"></el-input>
+          </el-form-item>
+          <el-form-item label="server(终端节点)">
+            <el-input size="mini" v-model="obsConfig.server"></el-input>
+          </el-form-item>
+          <el-form-item label="path(文件上传目录)">
+            <el-input size="mini" v-model="obsConfig.path"></el-input>
+          </el-form-item>
+        </el-form>
       </el-tab-pane>
       <el-tab-pane label="火山云" name="huoshan">
         <h3>火山云配置项：</h3>
@@ -28,7 +39,7 @@
         <CloudUpload
           :multiple="true"
           :cloudType="cloudType"
-          :cloudConfig="cloudConfig"
+          :cloudConfig="cloudType == 'tencent' ? cloudConfig : obsConfig"
           v-model="fileList"
           @success="handleSuccess"
           @error="handleError"
@@ -44,9 +55,12 @@
 
 <script>
 import COS from "cos-js-sdk-v5";
+import ObsClient from "esdk-obs-browserjs";
 import CloudUpload from "@/components/CloudUpload.vue";
 import CosHelper from "./plugins/tencent";
+import ObsHelper from "./plugins/huawei";
 CosHelper.setExternalCOS(COS);
+ObsHelper.setExternalOBS(ObsClient);
 export default {
   name: "App",
   components: {
@@ -61,6 +75,13 @@ export default {
         path: "/costest/",
         getTempCredential: this.getTempCredential,
       },
+      obsConfig: {
+        bucket: "cloudupload",
+        server: "https://obs.cn-south-1.myhuaweicloud.com",
+        path: "/costest/",
+        accessKeyId: "",
+        secretAccessKey: "",
+      },
       fileList: [
         {
           url: "https://int-delivery-1301141550.cos.ap-nanjing.myqcloud.com/costest/%E6%B5%8B%E8%AF%95txt%E9%A2%84%E8%A7%88.txt",
@@ -71,12 +92,17 @@ export default {
     };
   },
   methods: {
+    handleTypeChange(tab) {
+      if (this.cloudType == "huawei") {
+        this.getObsSecrect();
+      }
+    },
     /**
      * 调用后端接口返回临时凭证
      */
     async getTempCredential() {
       const response = await fetch("http://localhost:3000/sts");
-      const data = response.json();
+      const data = await response.json();
       return data;
       //临时凭证结构应该为如下示例:
       // {
@@ -90,6 +116,12 @@ export default {
       //   "requestId": "84fd8060-82a3-4de8-b757-9b22ebabbf7a",
       //   "startTime": 1758116668
       // }
+    },
+    async getObsSecrect() {
+      const response = await fetch("http://localhost:3000/obs");
+      const data = await response.json();
+      this.obsConfig.accessKeyId = data.accessKeyId;
+      this.obsConfig.secretAccessKey = data.secretAccessKey;
     },
     handleBeforeUpload(file) {
       console.log("handleBeforeUpload");

@@ -10,7 +10,12 @@ class ObsHelper {
   }
 
   static getInstance(cloudConfig) {
-    if (!this.instance) {
+    if (
+      !this.instance &&
+      cloudConfig.accessKeyId &&
+      cloudConfig.secretAccessKey &&
+      cloudConfig.server
+    ) {
       this.instance = new ObsHelper(cloudConfig);
     }
     return this.instance;
@@ -38,29 +43,23 @@ class ObsHelper {
   }
 
   // 单文件上传
-  async uploadFile({ bucket, region, path, file, onProgress }) {
-    const key = path + file.name;
-
+  async uploadFile({ bucket, key, file, sliceSize, chunkSize, onProgress }) {
     try {
       const result = await this.obsClient.putObject({
         Bucket: bucket,
         Key: key,
-        Body: file,
-        onUploadProgress: (progressEvent) => {
+        SourceFile: file,
+        ProgressCallback: (transferredAmount, totalAmount, totalSeconds) => {
           if (onProgress && typeof onProgress === "function") {
-            const percent = progressEvent.loaded / progressEvent.total;
-            console.log(`上传进度: ${(percent * 100).toFixed(2)}%`);
-            onProgress(percent);
+            onProgress(transferredAmount / totalAmount);
           }
         },
       });
-
       if (result.CommonMsg.Status < 300) {
         return {
-          Location: `https://${bucket}.obs.${region}.myhuaweicloud.com/${key}`,
-          Key: key,
-          Bucket: bucket,
-          ETag: result.InterfaceResult.ETag,
+          key: key,
+          name: file.name,
+          ...result,
         };
       } else {
         throw new Error(`上传失败: ${result.CommonMsg.Code}`);
@@ -69,77 +68,6 @@ class ObsHelper {
       throw new Error(`华为云OBS上传失败: ${error.message}`);
     }
   }
-
-  // 批量上传
-  async batchUpload({ bucket, region, path, files, onProgress }) {
-    const results = [];
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      try {
-        const result = await this.uploadFile({
-          bucket,
-          region,
-          path,
-          file,
-          onProgress: (progress) => {
-            if (onProgress && typeof onProgress === "function") {
-              // 计算整体进度
-              const overallProgress = (i + progress) / files.length;
-              onProgress(overallProgress);
-            }
-          },
-        });
-        results.push(result);
-      } catch (error) {
-        results.push({ error: error.message, file: file.name });
-      }
-    }
-
-    return results;
-  }
-
-  // 分片上传（华为云OBS支持断点续传）
-  async sliceUpload({
-    bucket,
-    region,
-    path,
-    file,
-    sliceSize = 5 * 1024 * 1024,
-    onProgress,
-  }) {
-    const key = path + file.name;
-
-    try {
-      // 华为云OBS SDK会自动处理大文件分片上传
-      const result = await this.obsClient.putObject({
-        Bucket: bucket,
-        Key: key,
-        Body: file,
-        onUploadProgress: (progressEvent) => {
-          if (onProgress && typeof onProgress === "function") {
-            const percent = progressEvent.loaded / progressEvent.total;
-            console.log(`分片上传进度: ${(percent * 100).toFixed(2)}%`);
-            onProgress(percent);
-          }
-        },
-      });
-
-      if (result.CommonMsg.Status < 300) {
-        return {
-          Location: `https://${bucket}.obs.${region}.myhuaweicloud.com/${key}`,
-          Key: key,
-          Bucket: bucket,
-          ETag: result.InterfaceResult.ETag,
-        };
-      } else {
-        throw new Error(`分片上传失败: ${result.CommonMsg.Code}`);
-      }
-    } catch (error) {
-      throw new Error(`华为云OBS分片上传失败: ${error.message}`);
-    }
-  }
-
   // 图片加水印（华为云OBS处理方式）
   async addWatermark({ bucket, region, key, watermarkText }) {
     try {
