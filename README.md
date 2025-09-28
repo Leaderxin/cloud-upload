@@ -7,7 +7,7 @@
 
 🌩 **Vue Cloud Upload** - 专为 Vue.js 打造的专业级云端文件上传组件
 
-一款功能强大、高度可定制的云上传解决方案，完美集成腾讯云 COS，提供优雅的 UI 界面和丰富的功能特性，让文件上传变得简单而高效！
+一款功能强大、高度可定制的云上传解决方案，完美集成腾讯云COS和华为云OBS，提供优雅的 UI 界面和丰富的功能特性，让文件上传变得简单而高效！
 
 ## ✨ 核心特性
 
@@ -143,7 +143,7 @@ export default {
 
 ```javascript
 import Vue from "vue";
-import { ObsClient } from 'esdk-obs-browserjs';
+import ObsClient from 'esdk-obs-browserjs';
 import "vue-cloud-upload/dist/vue-cloud-upload.css";
 import CloudUpload, { setExternalOBS } from 'vue-cloud-upload';
 // 传入华为云OBS对象
@@ -168,7 +168,7 @@ Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 </script>
 
 <script>
-import { ObsClient } from 'esdk-obs-browserjs';
+import ObsClient from 'esdk-obs-browserjs';
 import "vue-cloud-upload/dist/vue-cloud-upload.css";
 import CloudUpload, { setExternalOBS } from 'vue-cloud-upload';
 // 传入华为云OBS对象
