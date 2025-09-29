@@ -22,7 +22,7 @@
 - ✅ 腾讯云COS桶无缝对接
 - ✅ 华为云OBS桶无缝对接
 - ✅ 多文件上传支持
-- ✅ 自动分片断点续传(腾讯云已实现)
+- ✅ 自动分片断点续传
 - ✅ 上传进度实时显示
 - ✅ 文件列表管理
 - ✅ 附件回显功能
@@ -101,8 +101,8 @@ export default {
         bucket: "test-tos-125***",
         //腾讯云cos桶所在地域
         region: "ap-guangzhou",
-        //文件上传目录，自定义
-        path: "/costest/",
+        //文件上传目录，自定义，以/结尾
+        path: "costest/",
         //此函数为客户端获取临时凭证使用
         getTempCredential: this.getTempCredential,
       }
@@ -183,8 +183,8 @@ export default {
         bucket: "cloudupload",
         //华为云终端节点
         server: "https://obs.cn-south-1.myhuaweicloud.com",
-        //文件上传目录，自定义
-        path: "/costest/",
+        //文件上传目录，自定义，以/结尾
+        path: "costest/",
         //华为云 key secret
         accessKeyId: "",
         secretAccessKey: "",

@@ -72,13 +72,13 @@ export default {
       cloudConfig: {
         bucket: "test-tos-1257156776",
         region: "ap-guangzhou",
-        path: "/costest/",
+        path: "costest/",
         getTempCredential: this.getTempCredential,
       },
       obsConfig: {
         bucket: "cloudupload",
         server: "https://obs.cn-south-1.myhuaweicloud.com",
-        path: "/costest/",
+        path: "costest/",
         accessKeyId: "",
         secretAccessKey: "",
       },
