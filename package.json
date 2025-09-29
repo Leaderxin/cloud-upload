@@ -1,6 +1,6 @@
 {
   "name": "vue-cloud-upload",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "基于vue+elementui的通用云上传组件，无缝衔接腾讯云，华为云，火山云等桶平台，开箱即用",
   "private": false,
   "type": "module",
@@ -69,7 +69,7 @@
     "esdk-obs-browserjs"
   ],
   "author": "Leaderxin",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "volta": {
     "node": "20.19.4"
   }
