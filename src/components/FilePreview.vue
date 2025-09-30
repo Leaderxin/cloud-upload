@@ -12,7 +12,13 @@
     <template #title>
       <div class="dialog-header">
         <span>{{ fileName }}</span>
-        <i :class="['icon',fullscreen?'el-icon-copy-document':'el-icon-full-screen']" @click="fullscreen = !fullscreen"></i>
+        <i
+          :class="[
+            'preview-header-icon',
+            fullscreen ? 'el-icon-copy-document' : 'el-icon-full-screen',
+          ]"
+          @click="fullscreen = !fullscreen"
+        ></i>
       </div>
     </template>
     <div
@@ -30,9 +36,10 @@
         v-if="fileType == 'pdf'"
       ></iframe>
       <video
+        ref="cloud-upload-video"
         controls
         :src="file.url"
-        v-if="fileType == 'video'"
+        v-if="fileType == 'video' && currentVisible"
         autoplay
         preload="auto"
         crossorigin
@@ -40,7 +47,7 @@
       <audio
         controls
         :src="file.url"
-        v-if="fileType == 'audio'"
+        v-if="fileType == 'audio' && currentVisible"
         autoplay
         preload="auto"
         crossorigin
@@ -128,6 +135,8 @@ export default {
           break;
         case "pdf":
           this.initPdfContent();
+          break;
+        case "video":
         default:
           break;
       }
@@ -138,15 +147,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .file-preview-dialog {
   .dialog-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: -3px;
-    .icon {
-      margin-right: 20px;
+    .preview-header-icon {
+      margin-right: 24px;
       color: #909399;
       font-size: 17px;
       font-weight: 550;
@@ -156,6 +163,7 @@ export default {
       }
     }
   }
+
   .file-preview-content {
     max-height: 88vh;
     min-height: 40vh;
@@ -166,7 +174,7 @@ export default {
     }
     video {
       width: 100%;
-      height: 100%;
+      height: 99%;
     }
   }
   .preview-audio {
@@ -182,6 +190,16 @@ export default {
 .file-preview-dialog > .el-dialog__body {
   padding: 20px;
   padding-top: 0px;
+}
+.file-preview-dialog > .el-dialog__header{
+  padding: 15px;
+  line-height: 1;
+}
+.file-preview-dialog > .el-dialog__header > .el-dialog__headerbtn{
+  font-size: 20px;
+  top: 13px;
+  right: 15px;
+  line-height: 1;
 }
 .file-preview-dialog {
   display: flex;

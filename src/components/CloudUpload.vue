@@ -60,7 +60,7 @@
         <span class="el-upload-list__item-actions">
           <span
             class="el-upload-list__item-preview"
-            v-if="getPreviewConfig[getFileType(file)]"
+            v-if="getPreviewConfig[getFileType(file)] && file.status=='success'"
           >
             <i class="el-icon-view" @click="() => handlePreview(file)"></i>
           </span>
@@ -430,6 +430,8 @@ export default {
         sliceSize: this.sliceSize,
         ...this.cloudConfig,
         onProgress: (percent) => {
+          console.log('当前进度:',percent);
+          
           onProgress({ percent });
           this.$emit("progress", percent, file);
         },
