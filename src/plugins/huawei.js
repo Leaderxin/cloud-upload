@@ -161,7 +161,22 @@ class ObsHelper {
           },
         });
         if (result.CommonMsg.Status < 300) {
+          const down_result = await this.obsClient.getObject({
+            Bucket: bucket,
+            Key: key,
+            SaveByType: "file",
+          });
+          let url = "";
+          if (
+            down_result.CommonMsg.Status < 300 &&
+            down_result.InterfaceResult
+          ) {
+            url = down_result.InterfaceResult.Content.SignedUrl;
+          } else {
+            throw new Error(`附件url获取失败: ${down_result.CommonMsg.Code}`);
+          }
           return {
+            url,
             key: key,
             name: file.name,
             ...result,
