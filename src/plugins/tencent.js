@@ -3,15 +3,23 @@ class CosHelper {
   static externalCOS = null; // 外部传入的COS对象
   cosClient = null;
   tempCredential = null;
+  secretId = null;
+  secretKey = null;
 
   // 设置外部COS对象的静态方法
   static setExternalCOS(COS) {
     this.externalCOS = COS;
   }
 
-  static getInstance(getToken) {
+  static getInstance(config) {
     if (!this.instance) {
-      this.instance = new CosHelper(getToken);
+      if (
+        config &&
+        ((config.secretId && config.secretKey) ||
+          (config.getTempCredential &&
+            typeof config.getTempCredential == "function"))
+      )
+        this.instance = new CosHelper(config);
     }
     return this.instance;
   }
@@ -23,32 +31,48 @@ class CosHelper {
     localStorage.removeItem("cosCredential");
   }
 
-  constructor(getToken) {
-    this.initClient(getToken);
+  constructor(config) {
+    // 检查是否提供了永久密钥
+    if (config && config.secretId && config.secretKey) {
+      this.secretId = config.secretId;
+      this.secretKey = config.secretKey;
+    }
+    this.initClient(config);
   }
 
-  async initClient(getToken) {
+  async initClient(config) {
     // 如果有外部传入的COS对象，直接使用
     let COS = CosHelper.externalCOS;
-    await this.getTempCredential(getToken);
-    this.cosClient = new COS({
-      getAuthorization: async (options, callback) => {
-        try {
-          if (!this.tempCredential || this.isCredentialExpired()) {
-            await this.getTempCredential(getToken);
+    // 判断是使用永久密钥还是临时凭证
+    if (this.secretId && this.secretKey) {
+      // 使用永久密钥创建COS客户端
+      this.cosClient = new COS({
+        SecretId: this.secretId,
+        SecretKey: this.secretKey,
+      });
+    } else {
+      // 使用临时凭证方式
+      const getToken = config.getTempCredential;
+      await this.getTempCredential(getToken);
+      this.cosClient = new COS({
+        getAuthorization: async (options, callback) => {
+          try {
+            if (!this.tempCredential || this.isCredentialExpired()) {
+              await this.getTempCredential(getToken);
+            }
+            callback({
+              TmpSecretId: this.tempCredential.tmpSecretId,
+              TmpSecretKey: this.tempCredential.tmpSecretKey,
+              SecurityToken: this.tempCredential.sessionToken,
+              StartTime: this.tempCredential.startTime,
+              ExpiredTime: this.tempCredential.expiredTime,
+            });
+          } catch (error) {
+            console.error("获取临时凭证失败:", error);
           }
-          callback({
-            TmpSecretId: this.tempCredential.tmpSecretId,
-            TmpSecretKey: this.tempCredential.tmpSecretKey,
-            SecurityToken: this.tempCredential.sessionToken,
-            StartTime: this.tempCredential.startTime,
-            ExpiredTime: this.tempCredential.expiredTime,
-          });
-        } catch (error) {
-          console.error("获取临时凭证失败:", error);
-        }
-      },
-    });
+        },
+      });
+    }
   }
 
   async getTempCredential(getToken) {
@@ -89,7 +113,7 @@ class CosHelper {
   }
 
   // 单文件上传
-  uploadFile({ bucket, region, key ,file, sliceSize, chunkSize, onProgress }) {
+  uploadFile({ bucket, region, key, file, sliceSize, chunkSize, onProgress }) {
     return new Promise(async (resolve, reject) => {
       const isPublicRead = await this.isBucketPublicRead({ bucket, region });
       this.cosClient.uploadFile(
@@ -113,7 +137,7 @@ class CosHelper {
               const url = data.Location.startsWith("https://")
                 ? data.Location
                 : "https://" + data.Location;
-              resolve({ url: url, key: key, name:file.name ,...data });
+              resolve({ url: url, key: key, name: file.name, ...data });
             } else {
               this.cosClient.getObjectUrl(
                 {
@@ -129,7 +153,7 @@ class CosHelper {
                     resolve({
                       url: urlData.Url,
                       key: key,
-                      name:file.name,
+                      name: file.name,
                       ...data,
                     });
                   }

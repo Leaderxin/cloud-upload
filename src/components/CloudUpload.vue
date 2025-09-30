@@ -333,7 +333,7 @@ export default {
     },
   },
   created() {
-    this.checkAndInit();
+    this.checkAndInit(this.cloudConfig);
   },
   beforeDestroy() {
     CosHelper.destroyInstance();
@@ -353,13 +353,11 @@ export default {
       switch (this.cloudType) {
         case "tencent":
           CosHelper = (await import("../plugins/tencent")).default;
-          CosHelper.getInstance(
-            cloudConfig?.getTempCredential || this.cloudConfig.getTempCredential
-          );
+          CosHelper.getInstance(cloudConfig);
           break;
         case "huawei":
           ObsHelper = (await import("../plugins/huawei")).default;
-          ObsHelper.getInstance(cloudConfig || this.cloudConfig);
+          ObsHelper.getInstance(cloudConfig);
         default:
           break;
       }
@@ -568,7 +566,7 @@ export default {
       this.fileList = val;
     },
     cloudType(val) {
-      this.checkAndInit();
+      this.checkAndInit(this.cloudConfig);
     },
     cloudConfig: {
       deep: true,
