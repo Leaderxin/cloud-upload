@@ -12,10 +12,7 @@
     <template #title>
       <div class="dialog-header">
         <span>{{ fileName }}</span>
-        <svg class="icon" aria-hidden="true" @click="fullscreen = !fullscreen">
-          <use xlink:href="#icon-quxiaoquanping_o" v-if="fullscreen"></use>
-          <use xlink:href="#icon-quanping_o" v-else="fullscreen"></use>
-        </svg>
+        <i :class="['icon',fullscreen?'el-icon-copy-document':'el-icon-full-screen']" @click="fullscreen = !fullscreen"></i>
       </div>
     </template>
     <div
@@ -141,13 +138,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.icon {
-  width: 1em;
-  height: 1em;
-  vertical-align: -0.15em;
-  fill: currentColor;
-  overflow: hidden;
-}
+
 .file-preview-dialog {
   .dialog-header {
     display: flex;

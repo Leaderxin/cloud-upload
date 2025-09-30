@@ -96,7 +96,6 @@
 
 <script>
 import "@/assets/iconfont/iconfont.css";
-import "@/assets/iconfont/iconfont.js";
 import Vue from "vue";
 import fileHelper from "../utils/fileHelper";
 import { Upload, Loading, Image, Tooltip, Dialog } from "element-ui";

@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     vue(),
     visualizer({
-      open: false,
+      open: true,
       gzipSize: true,
       brotliSize: true,
     }),
