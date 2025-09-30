@@ -1,16 +1,19 @@
 // src/index.js
 import CloudUpload from "./components/CloudUpload.vue";
-import ObsHelper from "./plugins/huawei";
-import CosHelper from "./plugins/tencent";
 
-// 定义设置外部COS对象的函数
+// 只导出设置函数，不直接导入插件
 export function setExternalCOS(COS) {
-  CosHelper.setExternalCOS(COS);
+  // 延迟加载并设置
+  import("./plugins/tencent").then(module => {
+    module.default.setExternalCOS(COS);
+  });
 }
 
-// 定义设置外部OBS对象的函数
 export function setExternalOBS(OBS) {
-  ObsHelper.setExternalOBS(OBS);
+  // 延迟加载并设置
+  import("./plugins/huawei").then(module => {
+    module.default.setExternalOBS(OBS);
+  });
 }
 
 // 定义 install 函数，用于 Vue.use() 注册

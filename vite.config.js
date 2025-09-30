@@ -10,6 +10,7 @@ export default defineConfig({
       open: true,
       gzipSize: true,
       brotliSize: true,
+      filename: "stats.html",
     }),
   ],
   server: {
