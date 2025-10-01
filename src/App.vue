@@ -79,8 +79,9 @@ export default {
         bucket: "cloudupload",
         server: "https://obs.cn-south-1.myhuaweicloud.com",
         path: "costest/",
-        accessKeyId: "",
-        secretAccessKey: "",
+        getTempCredential: this.getObsCredential
+        // accessKeyId: "",
+        // secretAccessKey: "",
       },
       fileList: [
         {
@@ -94,8 +95,12 @@ export default {
   methods: {
     handleTypeChange(tab) {
       if (this.cloudType == "huawei") {
-        this.getObsSecrect();
+        //this.getObsSecrect();
       }
+    },
+    async getObsCredential(){
+      const response = await fetch("http://localhost:3000/obs/temporary");
+      return await response.json();
     },
     /**
      * 调用后端接口返回临时凭证

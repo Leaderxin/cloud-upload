@@ -97,10 +97,10 @@ class ObsHelper {
       const data = await getToken();
       if (data && typeof data == "object") {
         this.tempCredential = {
-          accessKeyId: data.credentials.accessKeyId,
-          secretAccessKey: data.credentials.secretAccessKey,
-          securityToken: data.credentials.securityToken,
-          expiredTime: data.expiredTime,
+          accessKeyId: data.credential.access,
+          secretAccessKey: data.credential.secret,
+          securityToken: data.credential.securitytoken,
+          expiredTime: data.credential.expires_at,
         };
         localStorage.setItem(
           "obsCredential",
@@ -114,8 +114,9 @@ class ObsHelper {
 
   isCredentialExpired(credential = this.tempCredential) {
     if (!credential) return true;
-    const now = Math.floor(Date.now() / 1000);
-    return now >= credential.expiredTime - 60; // 提前60秒认为过期
+    const now = Date.now(); // 当前时间毫秒数
+    const expireTime = Date.parse(credential.expiredTime); // 过期时间毫秒数
+    return now >= expireTime - 60 * 1000; // 提前60秒认为过期
   }
 
   // 确保使用有效的凭证
