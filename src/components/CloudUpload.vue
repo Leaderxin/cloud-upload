@@ -1,5 +1,11 @@
 <template>
-  <div :class="['cloud-upload', 'cloud-upload-' + size]">
+  <div
+    :class="[
+      'cloud-upload',
+      'cloud-upload-' + size,
+      disabled && fileList.length > 0 ? 'cloud-upload-disabled' : '',
+    ]"
+  >
     <el-upload
       ref="innerUpload"
       action="#"
@@ -17,14 +23,23 @@
       :list-type="listType"
       v-bind="$attrs"
       v-on="$listeners"
+      :disabled="disabled"
     >
       <!-- 默认插槽内容 -->
       <template v-if="!$scopedSlots.default">
         <div class="default-content" v-if="listType == 'picture-card'">
-          <i slot="default" class="el-icon-upload"></i>
-          <span v-show="!disabled">点击上传</span>
+          <template v-if="fileList.length > 0">
+            <i slot="default" class="el-icon-upload"></i>
+            <span>点击上传</span>
+          </template>
+          <template v-else>
+            <i slot="default" class="el-icon-folder-opened"></i>
+            <span>暂无文件</span>
+          </template>
         </div>
-        <el-button :size="size" type="primary" v-else>点击上传</el-button>
+        <el-button :size="size" type="primary" :disabled="disabled" v-else
+          >点击上传</el-button
+        >
       </template>
       <!-- 暴露所有默认插槽 -->
       <template
@@ -60,7 +75,9 @@
         <span class="el-upload-list__item-actions">
           <span
             class="el-upload-list__item-preview"
-            v-if="getPreviewConfig[getFileType(file)] && file.status=='success'"
+            v-if="
+              getPreviewConfig[getFileType(file)] && file.status == 'success'
+            "
           >
             <i class="el-icon-view" @click="() => handlePreview(file)"></i>
           </span>
@@ -430,8 +447,8 @@ export default {
         sliceSize: this.sliceSize,
         ...this.cloudConfig,
         onProgress: (percent) => {
-          console.log('当前进度:',percent);
-          
+          console.log("当前进度:", percent);
+
           onProgress({ percent });
           this.$emit("progress", percent, file);
         },
@@ -676,6 +693,11 @@ export default {
   ::v-deep .el-upload--picture-card {
     width: 94px;
     height: 94px;
+  }
+}
+.cloud-upload-disabled {
+  ::v-deep .el-upload--picture-card {
+    display: none;
   }
 }
 </style>
