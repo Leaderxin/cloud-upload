@@ -352,7 +352,8 @@ export default {
     this.checkAndInit(this.cloudConfig);
   },
   beforeDestroy() {
-    CosHelper.destroyInstance();
+    if (CosHelper) CosHelper.destroyInstance();
+    if (ObsHelper) ObsHelper.destroyInstance();
   },
   methods: {
     /**
