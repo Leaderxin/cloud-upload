@@ -120,6 +120,7 @@ import FilePreview from "./FilePreview.vue";
 import { nanoid } from "nanoid";
 let CosHelper = null;
 let ObsHelper = null;
+let OssHelper = null;
 Vue.component("el-upload", Upload);
 Vue.component("el-image", Image);
 Vue.component("el-tooltip", Tooltip);
@@ -250,7 +251,7 @@ export default {
       type: String,
       default: "tencent",
       validator: (value) => {
-        const params = ["tencent", "huawei"];
+        const params = ["tencent", "huawei", "aliyun"];
         if (!params.includes(value)) {
           console.error(
             `listType参数必须是以下值之一: ${params.join(", ")}\n` +
@@ -267,20 +268,6 @@ export default {
     cloudConfig: {
       type: Object,
       required: true,
-      default: () => ({
-        bucket: "",
-        region: "",
-        path: "",
-        getTempCredential: () => {
-          return {
-            TmpSecretId: "",
-            TmpSecretKey: "",
-            SecurityToken: "",
-            StartTime: "",
-            ExpiredTime: "",
-          };
-        },
-      }),
     },
     /**
      * 附件预览/在线查看配置
@@ -354,6 +341,7 @@ export default {
   beforeDestroy() {
     if (CosHelper) CosHelper.destroyInstance();
     if (ObsHelper) ObsHelper.destroyInstance();
+    if (OssHelper) OssHelper.destroyInstance();
   },
   methods: {
     /**
@@ -361,7 +349,7 @@ export default {
      */
     async checkAndInit(cloudConfig) {
       //检查关键参数传入
-      const typeList = ["tencent", "huawei"];
+      const typeList = ["tencent", "huawei", "aliyun"];
       if (!this.cloudType) {
         console.warn("未设置云平台类型cloudType!");
       } else if (!typeList.includes(this.cloudType)) {
@@ -375,6 +363,11 @@ export default {
         case "huawei":
           ObsHelper = (await import("../plugins/huawei")).default;
           ObsHelper.getInstance(cloudConfig);
+          break;
+        case "aliyun":
+          OssHelper = (await import("../plugins/aliyun")).default;
+          OssHelper.getInstance(cloudConfig);
+          break;
         default:
           break;
       }
@@ -488,6 +481,20 @@ export default {
               this.$refs.innerUpload.uploadFiles.splice(index, 1, fileresult);
               this.fileList = this.$refs.innerUpload.uploadFiles;
             }
+          case "aliyun":
+            result = await OssHelper.getInstance().uploadFile(uploadConfig);
+            if (result.url) {
+              const index = this.$refs.innerUpload.uploadFiles.findIndex(
+                (x) => x.uid == file.uid
+              );
+              let item = this.$refs.innerUpload.uploadFiles[index];
+              const fileresult = Object.assign(item, {
+                url: result.url,
+                result,
+              });
+              this.$refs.innerUpload.uploadFiles.splice(index, 1, fileresult);
+              this.fileList = this.$refs.innerUpload.uploadFiles;
+            }
             break;
           default:
             throw new Error(`Unsupported cloudType: ${this.cloudType}`);
@@ -590,7 +597,6 @@ export default {
     },
     cloudConfig: {
       deep: true,
-      //immediate: true,
       handler(val) {
         this.checkAndInit(val);
       },

@@ -29,8 +29,19 @@
           </el-form-item>
         </el-form>
       </el-tab-pane>
-      <el-tab-pane label="阿里云oss" name="huoshan">
+      <el-tab-pane label="阿里云oss" name="aliyun">
         <h3>阿里云配置项：</h3>
+        <el-form>
+          <el-form-item label="bucket(桶名)">
+            <el-input size="mini" v-model="ossConfig.bucket"></el-input>
+          </el-form-item>
+          <el-form-item label="region(地域)">
+            <el-input size="mini" v-model="ossConfig.region"></el-input>
+          </el-form-item>
+          <el-form-item label="path(文件上传目录)">
+            <el-input size="mini" v-model="ossConfig.path"></el-input>
+          </el-form-item>
+        </el-form>
       </el-tab-pane>
     </el-tabs>
     <h3>上传示例：</h3>
@@ -39,7 +50,7 @@
         <CloudUpload
           :multiple="true"
           :cloudType="cloudType"
-          :cloudConfig="cloudType == 'tencent' ? cloudConfig : obsConfig"
+          :cloudConfig="currentConfig"
           v-model="fileList"
           @success="handleSuccess"
           @error="handleError"
@@ -56,11 +67,14 @@
 <script>
 import COS from "cos-js-sdk-v5";
 import ObsClient from "esdk-obs-browserjs";
+import OSS from "ali-oss";
 import CloudUpload from "@/components/CloudUpload.vue";
 import CosHelper from "./plugins/tencent";
 import ObsHelper from "./plugins/huawei";
+import OssHelper from "./plugins/aliyun";
 CosHelper.setExternalCOS(COS);
 ObsHelper.setExternalOBS(ObsClient);
+OssHelper.setExternalOSS(OSS);
 export default {
   name: "App",
   components: {
@@ -83,6 +97,12 @@ export default {
         // accessKeyId: "",
         // secretAccessKey: "",
       },
+      ossConfig:{
+        bucket: "vue-cloud-upload",
+        region: "cn-wuhan-lr",
+        path: "costest/",
+        getTempCredential: this.getOssCredential,
+      },
       fileList: [
         {
           url: "https://int-delivery-1301141550.cos.ap-nanjing.myqcloud.com/costest/%E6%B5%8B%E8%AF%95txt%E9%A2%84%E8%A7%88.txt",
@@ -92,11 +112,29 @@ export default {
       ifUpload: true,
     };
   },
+  computed:{
+    currentConfig(){
+      switch (this.cloudType) {
+        case 'tencent':
+          return this.cloudConfig
+        case 'huawei':
+          return this.obsConfig
+        case 'aliyun':
+          return this.ossConfig
+        default:
+          break;
+      }
+    }
+  },
   methods: {
     handleTypeChange(tab) {
       if (this.cloudType == "huawei") {
         //this.getObsSecrect();
       }
+    },
+    async getOssCredential(){
+      const response = await fetch("http://localhost:3000/oss");
+      return await response.json();
     },
     async getObsCredential() {
       const response = await fetch("http://localhost:3000/obs/temporary");

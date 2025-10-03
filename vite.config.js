@@ -28,7 +28,13 @@ export default defineConfig({
     },
     rollupOptions: {
       // 确保外部化处理那些你不想打包进库的依赖
-      external: ["vue", "element-ui", "cos-js-sdk-v5", "esdk-obs-browserjs"],
+      external: [
+        "vue",
+        "element-ui",
+        "cos-js-sdk-v5",
+        "esdk-obs-browserjs",
+        "ali-oss",
+      ],
       output: {
         // 在 UMD 构建模式下为这些外部化的依赖提供一个全局变量
         globals: {
@@ -36,6 +42,7 @@ export default defineConfig({
           "element-ui": "ElementUI",
           "cos-js-sdk-v5": "COS",
           "esdk-obs-browserjs": "ObsClient",
+          "ali-oss": "OSS",
         },
       },
     },
