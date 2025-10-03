@@ -62,6 +62,8 @@ class OssHelper {
     if (this.accessKeyId && this.accessKeySecret && !config.getTempCredential) {
       // 使用永久密钥创建OSS客户端
       this.ossClient = new OSS({
+        secure: true,
+        authorizationV4: true,
         region: this.region,
         accessKeyId: this.accessKeyId,
         accessKeySecret: this.accessKeySecret,
@@ -71,11 +73,14 @@ class OssHelper {
       // 使用临时凭证方式
       await this.getTempCredential(config.getTempCredential);
       this.ossClient = new OSS({
+        secure: true,
+        authorizationV4: true,
         region: this.region,
         accessKeyId: this.tempCredential.accessKeyId,
         accessKeySecret: this.tempCredential.accessKeySecret,
         stsToken: this.tempCredential.stsToken,
         bucket: this.bucket,
+        //refreshSTSToken: ()=>
       });
     } else {
       throw new Error(
