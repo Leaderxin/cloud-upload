@@ -134,6 +134,7 @@ class OssHelper {
         accessKeySecret: this.tempCredential.accessKeySecret,
         stsToken: this.tempCredential.stsToken,
         bucket: bucket,
+        authorizationV4: true,
       });
     }
   }

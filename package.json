@@ -43,6 +43,9 @@
     },
     "esdk-obs-browserjs": {
       "optional": true
+    },
+    "ali-oss":{
+      "optional": true
     }
   },
   "devDependencies": {
