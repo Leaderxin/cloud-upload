@@ -6,8 +6,6 @@ class OssHelper {
   accessKeyId = null;
   accessKeySecret = null;
   stsToken = null;
-  region = null;
-  bucket = null;
 
   // 设置外部OSS对象的静态方法
   static setExternalOSS(OSS) {
@@ -39,12 +37,6 @@ class OssHelper {
   constructor(config) {
     // 保存配置信息
     if (config) {
-      if (config.region) {
-        this.region = config.region;
-      }
-      if (config.bucket) {
-        this.bucket = config.bucket;
-      }
       // 检查是否提供了永久密钥
       if (config.accessKeyId && config.accessKeySecret) {
         this.accessKeyId = config.accessKeyId;
@@ -64,10 +56,10 @@ class OssHelper {
       this.ossClient = new OSS({
         secure: true,
         authorizationV4: true,
-        region: this.region,
+        region: config.region,
         accessKeyId: this.accessKeyId,
         accessKeySecret: this.accessKeySecret,
-        bucket: this.bucket,
+        bucket: config.bucket,
       });
     } else if (config.getTempCredential) {
       // 使用临时凭证方式
@@ -75,12 +67,13 @@ class OssHelper {
       this.ossClient = new OSS({
         secure: true,
         authorizationV4: true,
-        region: this.region,
+        region: config.region,
         accessKeyId: this.tempCredential.accessKeyId,
         accessKeySecret: this.tempCredential.accessKeySecret,
         stsToken: this.tempCredential.stsToken,
-        bucket: this.bucket,
-        //refreshSTSToken: ()=>
+        bucket: config.bucket,
+        refreshSTSToken: config.getTempCredential,
+        refreshSTSTokenInterval: 850 * 1000,
       });
     } else {
       throw new Error(
@@ -127,7 +120,7 @@ class OssHelper {
   }
 
   // 确保使用有效的凭证
-  async ensureValidCredential(getTempCredential) {
+  async ensureValidCredential({bucket,region,getTempCredential}) {
     if (
       getTempCredential &&
       (!this.tempCredential || this.isCredentialExpired())
@@ -136,11 +129,11 @@ class OssHelper {
       // 重新初始化客户端
       let OSS = OssHelper.externalOSS || window.OSS;
       this.ossClient = new OSS({
-        region: this.region,
+        region: region,
         accessKeyId: this.tempCredential.accessKeyId,
         accessKeySecret: this.tempCredential.accessKeySecret,
         stsToken: this.tempCredential.stsToken,
-        bucket: this.bucket,
+        bucket: bucket,
       });
     }
   }
@@ -148,19 +141,19 @@ class OssHelper {
   // 单文件上传
   async uploadFile({
     bucket,
+    region,
     key,
     file,
-    sliceSize = 1024 * 1024, // 1MB
-    chunkSize = 1024 * 1024, // 1MB
+    sliceSize, 
+    chunkSize,
     onProgress,
     getTempCredential,
   }) {
     // 确保使用有效的凭证
-    await this.ensureValidCredential(getTempCredential);
+    await this.ensureValidCredential({bucket,region,getTempCredential});
     try {
       // 小文件直接上传
       if (file.size < sliceSize) {
-        debugger
         const result = await this.ossClient.put(key, file, {
           progress: (p) => {
             if (onProgress && typeof onProgress === "function") {
@@ -178,24 +171,19 @@ class OssHelper {
       } else {
         // 大文件分片上传
         const result = await this.ossClient.multipartUpload(key, file, {
-          progress: (p, checkpoint) => {
+          progress: (p, cpt) => {
             if (onProgress && typeof onProgress === "function") {
               onProgress(p);
             }
           },
-          meta: {
-            year: 2025,
-            people: "aliyun",
-          },
           parallel: 4, // 并行上传的分片数
           partSize: chunkSize, // 分片大小
         });
-
         // 获取文件的签名URL
-        const url = this.ossClient.signatureUrl(key, {
-          expires: 3600, // 1小时有效期
-        });
-
+        // const url = this.ossClient.signatureUrl(key, {
+        //   expires: 3600, // 1小时有效期
+        // });
+        const url = `https://${bucket}.${region}.aliyuncs.com/${key}`;
         return {
           url: url,
           key: key,

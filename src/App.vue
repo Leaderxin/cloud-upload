@@ -99,7 +99,7 @@ export default {
       },
       ossConfig:{
         bucket: "vue-cloud-upload",
-        region: "cn-wuhan-lr",
+        region: "oss-cn-wuhan-lr",
         path: "costest/",
         getTempCredential: this.getOssCredential,
       },
