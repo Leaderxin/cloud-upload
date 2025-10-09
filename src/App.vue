@@ -54,6 +54,7 @@
           v-model="fileList"
           @success="handleSuccess"
           @error="handleError"
+          disabled
         >
         </CloudUpload>
       </el-form-item>
@@ -104,10 +105,10 @@ export default {
         getTempCredential: this.getOssCredential,
       },
       fileList: [
-        {
-          url: "https://int-delivery-1301141550.cos.ap-nanjing.myqcloud.com/costest/%E6%B5%8B%E8%AF%95txt%E9%A2%84%E8%A7%88.txt",
-          //name: '测试txt预览.txt'
-        },
+        // {
+        //   url: "https://int-delivery-1301141550.cos.ap-nanjing.myqcloud.com/costest/%E6%B5%8B%E8%AF%95txt%E9%A2%84%E8%A7%88.txt",
+        //   //name: '测试txt预览.txt'
+        // },
       ],
       ifUpload: true,
     };

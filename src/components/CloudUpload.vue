@@ -28,11 +28,11 @@
       <!-- 默认插槽内容 -->
       <template v-if="!$scopedSlots.default">
         <div class="default-content" v-if="listType == 'picture-card'">
-          <template v-if="fileList.length > 0">
+          <template v-if="!disabled">
             <i slot="default" class="el-icon-upload"></i>
             <span>点击上传</span>
           </template>
-          <template v-else>
+          <template v-else-if="fileList.length==0">
             <i slot="default" class="el-icon-folder-opened"></i>
             <span>暂无文件</span>
           </template>
