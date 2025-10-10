@@ -54,7 +54,6 @@
           v-model="fileList"
           @success="handleSuccess"
           @error="handleError"
-          disabled
         >
         </CloudUpload>
       </el-form-item>
@@ -103,6 +102,7 @@ export default {
         region: "oss-cn-wuhan-lr",
         path: "costest/",
         getTempCredential: this.getOssCredential,
+        refreshSTSTokenInterval: 85000
       },
       fileList: [
         // {
@@ -135,7 +135,13 @@ export default {
     },
     async getOssCredential(){
       const response = await fetch("http://localhost:3000/oss");
-      return await response.json();
+      const data = await response.json()
+      const result = {
+        accessKeyId: data.AccessKeyId,
+        accessKeySecret: data.AccessKeySecret,
+        stsToken: data.SecurityToken
+      }
+      return result;
     },
     async getObsCredential() {
       const response = await fetch("http://localhost:3000/obs/temporary");
