@@ -7,11 +7,11 @@
 
 🌩 **Vue Cloud Upload** - 专为 Vue.js 打造的专业级云端文件上传组件
 
-一款功能强大、高度可定制的云上传解决方案，完美集成腾讯云COS和华为云OBS，提供优雅的 UI 界面和丰富的功能特性，让文件上传变得简单而高效！
+一款功能强大、高度可定制的云上传解决方案，完美集成腾讯云COS、华为云OBS和阿里云OSS，提供优雅的UI界面和丰富的功能特性，让文件上传变得简单而高效！
 
 ## ✨ 核心特性
 
-- 🚀 **开箱即用**：无缝对接腾讯云COS桶，华为云OBS桶，快速集成到现有项目
+- 🚀 **开箱即用**：无缝对接腾讯云COS桶、华为云OBS桶和阿里云OSS桶，快速集成到现有项目
 - 🎨 **美观 UI**：基于 Element UI 设计语言，提供一致的用户体验
 - ⚙️ **高度可定制**：丰富的配置参数，满足各种业务场景需求
 - 👁 **在线预览**：支持图片、TXT、PDF、视频、音频附件直接在线预览/播放
@@ -21,6 +21,7 @@
 
 - ✅ 腾讯云COS桶无缝对接
 - ✅ 华为云OBS桶无缝对接
+- ✅ 阿里云OSS桶无缝对接
 - ✅ 多文件上传支持
 - ✅ 自动分片断点续传
 - ✅ 上传进度实时显示
@@ -55,11 +56,16 @@ npm install cos-js-sdk-v5
 ```bash
 npm install esdk-obs-browserjs
 ```
+
+### 阿里云 OSS
+```bash
+npm install ali-oss
+```
 安装相应的SDK后，您可以在组件配置中使用对应平台的参数进行文件上传。
 
-## 全局注册（腾讯云cos）
+## 全局注册(腾讯云cos)
 
-```javascript
+```vue
 import Vue from "vue";
 import COS from 'cos-js-sdk-v5';
 import "vue-cloud-upload/dist/vue-cloud-upload.css";
@@ -69,7 +75,7 @@ setExternalCOS(COS);
 Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 ```
 
-## 按需引入（推荐做法，腾讯云cos）
+## 按需引入(推荐做法，腾讯云cos)
 
 ```vue
 <template>
@@ -139,9 +145,9 @@ export default {
 };
 </script>
 ```
-## 全局注册（华为云obs）
+## 全局注册(华为云obs)
 
-```javascript
+```vue
 import Vue from "vue";
 import ObsClient from 'esdk-obs-browserjs';
 import "vue-cloud-upload/dist/vue-cloud-upload.css";
@@ -151,7 +157,7 @@ setExternalOBS(ObsClient);
 Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 ```
 
-## 按需引入（推荐做法，华为云obs）
+## 按需引入(推荐做法，华为云obs)
 
 ```vue
 <template>
@@ -216,6 +222,81 @@ export default {
 };
 </script>
 ```
+
+## 全局注册(阿里云oss)
+
+```javascript
+import Vue from "vue";
+import OSS from "ali-oss";
+import "vue-cloud-upload/dist/vue-cloud-upload.css";
+import CloudUpload, { setExternalOSS } from 'vue-cloud-upload';
+// 传入阿里云OSS对象
+setExternalOSS(OSS);
+Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
+```
+## 按需引入(推荐做法，阿里云oss)
+
+```vue
+<template>
+  <div>
+    <CloudUpload
+      cloudType="aliyun"
+      :cloudConfig="cloudConfig"
+      v-model="fileList"
+      @success="handleSuccess"
+      @error="handleError"
+    >
+    </CloudUpload>
+  </div>
+</script>
+
+<script>
+import OSS from "ali-oss";
+import "vue-cloud-upload/dist/vue-cloud-upload.css";
+import CloudUpload, { setExternalOSS } from 'vue-cloud-upload';
+// 传入阿里云OSS对象
+setExternalOSS(OSS);
+export default {
+  components: { CloudUpload },
+  data() {
+    return {
+      fileList:[],//附件列表，上传或者删除后实时同步更新
+      cloudConfig: {
+        //阿里云oss桶名
+        bucket: "cloudupload",
+        //桶所属地域
+        region: "oss-cn-wuhan-lr",
+        //文件上传目录，自定义，以/结尾
+        path: "costest/",
+        //临时凭证获取函数
+        getTempCredential: this.getOssCredential,
+      }
+    };
+  },
+  methods: {
+    handleSuccess(result, file) {
+      console.log('Upload success:', result.url);
+    },
+    handleError(err){
+      console.log("error:",err);
+    },
+    //调用后端接口获取临时凭证
+    async getOssCredential(){
+      const response = await fetch("http://localhost:3000/oss");
+      const data = await response.json()
+      //临时凭证获取函数应返回如下三个字段
+      const result = {
+        accessKeyId: data.AccessKeyId,
+        accessKeySecret: data.AccessKeySecret,
+        stsToken: data.SecurityToken
+      }
+      return result;
+    },   
+  }
+};
+</script>
+```
+
 ## 使用文档
 
 组件详细使用文档请参考[官方文档](https://github.com/Leaderxin/cloud-upload/wiki)
