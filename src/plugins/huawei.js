@@ -32,8 +32,26 @@ class ObsHelper {
     this.instance = null;
     this.obsClient = null;
     this.tempCredential = null;
-    localStorage.removeItem("obsCpDatas");
     localStorage.removeItem("obsCredential");
+    // 清理超过10天的断点记录
+    try {
+      const localData = localStorage.getItem("obsCpDatas");
+      if (localData) {
+        let obsCpDatas = JSON.parse(localData);
+        const tenDaysAgo = Date.now() - (10 * 24 * 60 * 60 * 1000); // 10天前的时间戳
+        obsCpDatas = obsCpDatas.filter(item => {
+          // 如果没有创建时间，则认为是旧记录，需要清理
+          if (!item.createTime) {
+            return false;
+          }
+          // 保留创建时间在10天内的记录
+          return item.createTime > tenDaysAgo;
+        });
+        localStorage.setItem("obsCpDatas", JSON.stringify(obsCpDatas));
+      }
+    } catch (error) {
+      console.error("清理过期断点记录失败:", error);
+    }
   }
 
   constructor(config) {
@@ -243,7 +261,6 @@ class ObsHelper {
             },
             ResumeCallback: function (resumeHook, uploadCheckpoint) {
               // 记录断点
-              console.log("记录断点:", uploadCheckpoint);
               cp = uploadCheckpoint;
               if (ifExist) {
                 obsCpDatas[index].cp = cp;
@@ -251,6 +268,7 @@ class ObsHelper {
                 obsCpDatas.push({
                   key: uniqkey,
                   cp,
+                  createTime: Date.now(), // 添加创建时间记录
                 });
                 localStorage.setItem("obsCpDatas", JSON.stringify(obsCpDatas));
               }
