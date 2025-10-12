@@ -38,8 +38,8 @@ class ObsHelper {
       const localData = localStorage.getItem("obsCpDatas");
       if (localData) {
         let obsCpDatas = JSON.parse(localData);
-        const tenDaysAgo = Date.now() - (10 * 24 * 60 * 60 * 1000); // 10天前的时间戳
-        obsCpDatas = obsCpDatas.filter(item => {
+        const tenDaysAgo = Date.now() - 10 * 24 * 60 * 60 * 1000; // 10天前的时间戳
+        obsCpDatas = obsCpDatas.filter((item) => {
           // 如果没有创建时间，则认为是旧记录，需要清理
           if (!item.createTime) {
             return false;
@@ -291,8 +291,23 @@ class ObsHelper {
           const index = obsCpDatas.findIndex((x) => x.key == uniqkey);
           obsCpDatas.splice(index, 1);
           localStorage.setItem("obsCpDatas", JSON.stringify(obsCpDatas));
+          const down_result = await this.obsClient.getObject({
+            Bucket: bucket,
+            Key: result.InterfaceResult.Key,
+            SaveByType: "file",
+          });
+          let url = "";
+          if (
+            down_result.CommonMsg.Status < 300 &&
+            down_result.InterfaceResult
+          ) {
+            url = down_result.InterfaceResult.Content.SignedUrl;
+          } else {
+            throw new Error(`附件url获取失败: ${down_result.CommonMsg.Code}`);
+          }
           return {
-            key: key,
+            url,
+            key: result.InterfaceResult.Key,
             name: file.name,
             ...result,
           };

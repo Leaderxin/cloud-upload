@@ -32,7 +32,7 @@
             <i slot="default" class="el-icon-upload"></i>
             <span>点击上传</span>
           </template>
-          <template v-else-if="fileList.length==0">
+          <template v-else-if="fileList.length == 0">
             <i slot="default" class="el-icon-folder-opened"></i>
             <span>暂无文件</span>
           </template>
@@ -481,6 +481,7 @@ export default {
               this.$refs.innerUpload.uploadFiles.splice(index, 1, fileresult);
               this.fileList = this.$refs.innerUpload.uploadFiles;
             }
+            break;
           case "aliyun":
             result = await OssHelper.getInstance().uploadFile(uploadConfig);
             if (result.url) {

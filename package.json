@@ -1,6 +1,6 @@
 {
   "name": "vue-cloud-upload",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "基于vue+elementui的通用云上传组件，无缝衔接腾讯云，华为云，阿里云等对象存储平台，开箱即用",
   "private": false,
   "type": "module",
