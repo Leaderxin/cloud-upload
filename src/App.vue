@@ -3,7 +3,7 @@
     <el-tabs v-model="cloudType" @tab-click="handleTypeChange">
       <el-tab-pane label="腾讯云cos" name="tencent">
         <h3>腾讯云配置项：</h3>
-        <el-form>
+        <el-form size="mini">
           <el-form-item label="bucket(桶名)">
             <el-input size="mini" v-model="cloudConfig.bucket"></el-input>
           </el-form-item>
@@ -17,7 +17,7 @@
       </el-tab-pane>
       <el-tab-pane label="华为云obs" name="huawei">
         <h3>华为云配置项：</h3>
-        <el-form>
+        <el-form size="mini">
           <el-form-item label="bucket(桶名)">
             <el-input size="mini" v-model="obsConfig.bucket"></el-input>
           </el-form-item>
@@ -31,7 +31,7 @@
       </el-tab-pane>
       <el-tab-pane label="阿里云oss" name="aliyun">
         <h3>阿里云配置项：</h3>
-        <el-form>
+        <el-form size="mini">
           <el-form-item label="bucket(桶名)">
             <el-input size="mini" v-model="ossConfig.bucket"></el-input>
           </el-form-item>
@@ -44,14 +44,79 @@
         </el-form>
       </el-tab-pane>
     </el-tabs>
+    <h3>组件配置：</h3>
+    <el-collapse v-model="activeName" accordion>
+      <el-collapse-item title="详细配置" name="1">
+        <el-form size="mini">
+          <el-form-item label="是否禁用：">
+            <el-switch v-model="propObj.disabled"> </el-switch>
+          </el-form-item>
+          <el-form-item label="是否开启多文件上传：">
+            <el-switch v-model="propObj.multiple"> </el-switch>
+          </el-form-item>
+          <el-form-item label="是否开启拖拽上传：">
+            <el-switch v-model="propObj.drag"> </el-switch>
+          </el-form-item>
+          <el-form-item label="是否显示上传列表：">
+            <el-switch v-model="propObj.showFileList"> </el-switch>
+          </el-form-item>
+          <el-form-item label="限制文件类型：">
+            <el-input v-model="propObj.accept"></el-input>
+          </el-form-item>
+          <el-form-item label="最大允许上传个数：">
+            <el-input type="number" v-model="propObj.limit"></el-input>
+          </el-form-item>
+          <el-form-item label="单个附件大小限制(mb)：">
+            <el-input type="number" v-model="propObj.maxSize"></el-input>
+          </el-form-item>
+          <el-form-item label="触发分块上传的阈值(mb)：">
+            <el-input
+              type="number"
+              @change="handleSliceChange"
+              @input="handleSliceChange"
+              v-model="sliceMb"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="分块大小(mb)：">
+            <el-input
+              type="number"
+              @change="handleChunkChange"
+              @input="handleChunkChange"
+              v-model="chunkMb"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="展示形式listType：">
+            <el-radio-group v-model="propObj.listType">
+              <el-radio label="text">text</el-radio>
+              <el-radio label="picture">picture</el-radio>
+              <el-radio label="picture-card">picture-card</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="组件size：">
+            <el-radio-group v-model="propObj.size">
+              <el-radio label="medium">medium</el-radio>
+              <el-radio label="small">small</el-radio>
+              <el-radio label="mini">mini</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="存储桶key规则配置：">
+            <el-radio-group v-model="propObj.fileKey">
+              <el-radio label="uuid">uuid</el-radio>
+              <el-radio label="name">name</el-radio>
+              <el-radio label="uuid+name">uuid+name</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-form>
+      </el-collapse-item>
+    </el-collapse>
     <h3>上传示例：</h3>
     <el-form>
       <el-form-item label="图片上传：" v-if="ifUpload">
         <CloudUpload
-          :multiple="true"
           :cloudType="cloudType"
           :cloudConfig="currentConfig"
           v-model="fileList"
+          v-bind="propObj"
           @success="handleSuccess"
           @error="handleError"
         >
@@ -97,12 +162,12 @@ export default {
         // accessKeyId: "",
         // secretAccessKey: "",
       },
-      ossConfig:{
+      ossConfig: {
         bucket: "vue-cloud-upload",
         region: "oss-cn-wuhan-lr",
         path: "costest/",
         getTempCredential: this.getOssCredential,
-        refreshSTSTokenInterval: 85000
+        refreshSTSTokenInterval: 85000,
       },
       fileList: [
         // {
@@ -111,36 +176,59 @@ export default {
         // },
       ],
       ifUpload: true,
+      propObj: {
+        multiple: false,
+        disabled: false,
+        drag: true,
+        showFileList: true,
+        accept: "",
+        limit: "",
+        maxSize: "",
+        sliceSize: 1024 * 1024 * 10,
+        chunkSize: 1024 * 1024 * 5,
+        listType: "picture-card",
+        size: "small",
+        fileKey: "uuid+name",
+      },
+      activeName: "",
+      sliceMb:10,
+      chunkMb:5
     };
   },
-  computed:{
-    currentConfig(){
+  computed: {
+    currentConfig() {
       switch (this.cloudType) {
-        case 'tencent':
-          return this.cloudConfig
-        case 'huawei':
-          return this.obsConfig
-        case 'aliyun':
-          return this.ossConfig
+        case "tencent":
+          return this.cloudConfig;
+        case "huawei":
+          return this.obsConfig;
+        case "aliyun":
+          return this.ossConfig;
         default:
           break;
       }
-    }
+    },
   },
   methods: {
+    handleSliceChange(val) {
+      this.propObj.sliceSize = 1024 * 1024 * val;
+    },
+    handleChunkChange(val) {
+      this.propObj.chunkSize = 1024 * 1024 * val;
+    },
     handleTypeChange(tab) {
       if (this.cloudType == "huawei") {
         //this.getObsSecrect();
       }
     },
-    async getOssCredential(){
+    async getOssCredential() {
       const response = await fetch("http://localhost:3000/oss");
-      const data = await response.json()
+      const data = await response.json();
       const result = {
         accessKeyId: data.AccessKeyId,
         accessKeySecret: data.AccessKeySecret,
-        stsToken: data.SecurityToken
-      }
+        stsToken: data.SecurityToken,
+      };
       return result;
     },
     async getObsCredential() {
