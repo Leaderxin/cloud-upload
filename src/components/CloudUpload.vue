@@ -630,6 +630,15 @@ export default {
       }
     }
   }
+  ::v-deep .el-upload-dragger{
+    width: 100%;
+    height: 100%;
+    .el-icon-upload{
+      font-size: 28px;
+      line-height: 1;
+      margin: 0;
+    }
+  }
   ::v-deep .el-upload-list--picture-card {
     .el-upload-list__item {
       overflow: visible;
