@@ -117,8 +117,10 @@
           :cloudConfig="currentConfig"
           v-model="fileList"
           v-bind="propObj"
+          @remove="handleRemove"
           @success="handleSuccess"
           @error="handleError"
+          :on-change="handleChange"
         >
         </CloudUpload>
       </el-form-item>
@@ -155,7 +157,7 @@ export default {
         getTempCredential: this.getTempCredential,
       },
       obsConfig: {
-        bucket: "cloudupload",
+        bucket: "cloud-upload-costest",
         server: "https://obs.cn-south-1.myhuaweicloud.com",
         path: "costest/",
         getTempCredential: this.getObsCredential,
@@ -191,8 +193,8 @@ export default {
         fileKey: "uuid+name",
       },
       activeName: "",
-      sliceMb:10,
-      chunkMb:5
+      sliceMb: 10,
+      chunkMb: 5,
     };
   },
   computed: {
@@ -210,6 +212,19 @@ export default {
     },
   },
   methods: {
+    onBeforeUpload(file){
+      console.log('before-upload',file);
+      return false
+    },
+    handleChange(file, fileList) {
+      console.log("on-change事件：", file, fileList);
+    },
+    handleRemove(file) {
+      console.log("remove事件：", file);
+    },
+    handlePreview(file) {
+      console.log("on-preview事件：", file);
+    },
     handleSliceChange(val) {
       this.propObj.sliceSize = 1024 * 1024 * val;
     },

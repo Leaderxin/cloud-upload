@@ -18,7 +18,9 @@
       :on-exceed="handleExceed"
       :on-remove="handleRemove"
       :on-preview="handlePreview"
+      :on-change="onChange"
       :before-upload="onbeforeUpload"
+      :before-remove="beforeRemove"
       :http-request="customUpload"
       :list-type="listType"
       v-bind="$attrs"
@@ -293,9 +295,30 @@ export default {
       required: false,
     },
     /**
+     * 删除文件之前的钩子，参数为上传的文件和文件列表，若返回 false 或者返回 Promise 且被 reject，则停止删除
+     */
+    beforeRemove:{
+      type: Function,
+      required: false,
+    },
+    /**
      * 文件超出个数限制时的钩子
      */
     onExceed: {
+      type: Function,
+      required: false,
+    },
+    /**
+     * 点击文件列表中已上传的文件时的钩子
+     */
+    onPreview: {
+      type: Function,
+      required: false,
+    },
+    /**
+     * 文件状态改变时的钩子，添加文件、上传成功和上传失败时都会被调用
+     */
+    onChange: {
       type: Function,
       required: false,
     },
@@ -528,7 +551,7 @@ export default {
     },
     onbeforeUpload(file) {
       if (this.beforeUpload && typeof this.beforeUpload == "function") {
-        return this.beforeUpload();
+        return this.beforeUpload(file);
       } else {
         // 文件类型和大小校验逻辑
         let isTypeValid = true;
@@ -557,6 +580,7 @@ export default {
         (x) => x.uid != file.uid && x.url != file.url
       );
       this.$emit("input", this.fileList);
+      this.$emit("remove", file);
     },
     handlePreview(file) {
       if (this.onPreview && typeof this.onPreview == "function") {
@@ -617,51 +641,65 @@ export default {
     align-items: center;
     justify-content: center;
     flex-direction: column;
+
     span {
       display: block;
       line-height: 18px;
     }
+
     color: #606266;
+
     &:hover,
     &:focus {
       color: #409eff;
+
       i {
         color: #409eff;
       }
     }
   }
-  ::v-deep .el-upload-dragger{
+
+  ::v-deep .el-upload-dragger {
     width: 100%;
     height: 100%;
-    .el-icon-upload{
+    border: none;
+
+    .el-icon-upload {
       font-size: 28px;
       line-height: 1;
       margin: 0;
     }
   }
+
   ::v-deep .el-upload-list--picture-card {
     .el-upload-list__item {
       overflow: visible;
+
       .el-upload-list__item-thumbnail {
         display: block;
+
         .el-loading-spinner {
           margin-top: 0px;
           transform: translateY(-50%);
         }
       }
+
       .el-upload-list__item-actions {
         i:hover {
           color: #409eff;
         }
       }
+
       .previewIcon {
         display: flex;
         justify-content: center;
         align-items: center;
+
         .cloud-upload-icon {
           font-size: 50px;
         }
       }
+
       .file-name {
         display: inline-block;
         /* 必须设置为块级或inline-block */
@@ -678,11 +716,13 @@ export default {
     }
   }
 }
+
 .cloud-upload-small {
   ::v-deep .el-upload-list--picture-card {
     .el-upload-list__item {
       width: 118px;
       height: 118px;
+
       .previewIcon {
         .cloud-upload-icon {
           font-size: 40px;
@@ -690,16 +730,19 @@ export default {
       }
     }
   }
+
   ::v-deep .el-upload--picture-card {
     width: 118px;
     height: 118px;
   }
 }
+
 .cloud-upload-mini {
   ::v-deep .el-upload-list--picture-card {
     .el-upload-list__item {
       width: 94px;
       height: 94px;
+
       .previewIcon {
         .cloud-upload-icon {
           font-size: 32px;
@@ -707,11 +750,13 @@ export default {
       }
     }
   }
+
   ::v-deep .el-upload--picture-card {
     width: 94px;
     height: 94px;
   }
 }
+
 .cloud-upload-disabled {
   ::v-deep .el-upload--picture-card {
     display: none;
