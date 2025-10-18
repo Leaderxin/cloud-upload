@@ -50,7 +50,7 @@ class OssHelper {
   async initClient(config) {
     const res = await config.getTempCredential();
     const keys = ["accessKeyId", "accessKeySecret", "stsToken"];
-    const isvalid = true;
+    let isvalid = true;
     keys.forEach((key) => {
       if (!res.hasOwnProperty(key)) {
         console.error(`getTempCredential函数未返回字段${key}`);
@@ -111,7 +111,7 @@ class OssHelper {
           result = await this.ossClient.multipartUpload(cptData.name, file, {
             checkpoint: cpt,
             progress: (p, abortCheckpoint) => {
-              this.setCptData(uniqkey, abortCheckpoint);
+              this.setCptData(uniqkey, key ,abortCheckpoint);
               if (onProgress && typeof onProgress === "function") {
                 onProgress(p);
               }

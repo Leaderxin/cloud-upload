@@ -29,6 +29,25 @@ class CosHelper {
     this.cosClient = null;
     this.tempCredential = null;
     localStorage.removeItem("cosCredential");
+    // 清理超过10天的断点记录
+    try {
+      const localData = localStorage.getItem("cosCacheDatas");
+      if (localData) {
+        let cosCacheDatas = JSON.parse(localData);
+        const tenDaysAgo = Date.now() - 10 * 24 * 60 * 60 * 1000; // 10天前的时间戳
+        cosCacheDatas = cosCacheDatas.filter((item) => {
+          // 如果没有创建时间，则认为是旧记录，需要清理
+          if (!item.createTime) {
+            return false;
+          }
+          // 保留创建时间在10天内的记录
+          return item.createTime > tenDaysAgo;
+        });
+        localStorage.setItem("cosCacheDatas", JSON.stringify(cosCacheDatas));
+      }
+    } catch (error) {
+      console.error("清理过期断点记录失败:", error);
+    }
   }
 
   constructor(config) {
@@ -116,11 +135,24 @@ class CosHelper {
   uploadFile({ bucket, region, key, file, sliceSize, chunkSize, onProgress }) {
     return new Promise(async (resolve, reject) => {
       const isPublicRead = await this.isBucketPublicRead({ bucket, region });
+      const uniqkey = `${file.name}-${file.size}-${file.lastModified}`;
+      let fileKey =''
+      if(file.size < sliceSize){
+        fileKey = key
+      }
+      else{
+        const cosData = this.getCosDataByKey(uniqkey)
+        if(cosData) fileKey = cosData.name
+        else{
+          fileKey = key
+          this.setCosData(uniqkey,key)
+        }
+      }
       this.cosClient.uploadFile(
         {
           Bucket: bucket,
           Region: region,
-          Key: key,
+          Key: fileKey,
           Body: file,
           SliceSize: sliceSize, // 触发分块上传的阈值，超过5MB使用分块上传，默认 1MB，非必须
           ChunkSize: chunkSize, // 分块大小，默认 1MB，非必须
@@ -133,17 +165,18 @@ class CosHelper {
         (err, data) => {
           if (err) reject(err);
           else {
+            this.delCosData(uniqkey)
             if (isPublicRead) {
               const url = data.Location.startsWith("https://")
                 ? data.Location
                 : "https://" + data.Location;
-              resolve({ url: url, key: key, name: file.name, ...data });
+              resolve({ url: url, key: fileKey, name: file.name, ...data });
             } else {
               this.cosClient.getObjectUrl(
                 {
                   Bucket: bucket,
                   Region: region,
-                  Key: key,
+                  Key: fileKey,
                   Sign: true,
                 },
                 function (err, urlData) {
@@ -152,7 +185,7 @@ class CosHelper {
                   } else {
                     resolve({
                       url: urlData.Url,
-                      key: key,
+                      key: fileKey,
                       name: file.name,
                       ...data,
                     });
@@ -165,7 +198,49 @@ class CosHelper {
       );
     });
   }
-
+  getCosDataByKey(key) {
+    let cosCacheDatas = [];
+    const localData = localStorage.getItem("cosCacheDatas");
+    if (localData) {
+      cosCacheDatas = JSON.parse(localData);
+    }
+    const index = cosCacheDatas.findIndex((x) => x.key == key);
+    if (index >= 0) {
+      return cosCacheDatas[index];
+    } else {
+      return null;
+    }
+  }
+  setCosData(key,name) {
+    let cosCacheDatas = [];
+    const localData = localStorage.getItem("cosCacheDatas");
+    if (localData) {
+      cosCacheDatas = JSON.parse(localData);
+    }
+    const index = cosCacheDatas.findIndex((x) => x.key == key);
+    if (index >= 0) {
+      cosCacheDatas[index].name = name;
+    } else {
+      cosCacheDatas.push({
+        key,
+        name,
+        createTime: Date.now(),
+      });
+    }
+    localStorage.setItem("cosCacheDatas", JSON.stringify(cosCacheDatas));
+  }
+  delCosData(key) {
+    let cosCacheDatas = [];
+    const localData = localStorage.getItem("cosCacheDatas");
+    if (localData) {
+      cosCacheDatas = JSON.parse(localData);
+    }
+    const index = cosCacheDatas.findIndex((x) => x.key == key);
+    if (index >= 0) {
+      cosCacheDatas.splice(index, 1);
+      localStorage.setItem("cosCacheDatas", JSON.stringify(cosCacheDatas));
+    }
+  }
   // 图片加水印
   async addWatermark({ bucket, region, key, watermarkText }) {
     const params = {
