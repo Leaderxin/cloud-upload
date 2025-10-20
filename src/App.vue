@@ -195,7 +195,7 @@ export default {
       fileList: [
         {
           //name: "企微实车确认.png",
-          key: "costest/HU-p6D3nT-dWCeazWZpft/企微实车确认.png",
+          key: "costest/IGRyOSjmuOTU3pi6T56SH/企微实车确认.png",
         },
         // {
         //   url: "https://int-delivery-1301141550.cos.ap-nanjing.myqcloud.com/costest/%E6%B5%8B%E8%AF%95txt%E9%A2%84%E8%A7%88.txt",

@@ -430,7 +430,6 @@ export default {
       return iconObj[type];
     },
     getFileLoading(file) {
-      debugger
       if (!file.url) return true;
       if (!this.$refs.innerUpload?.uploadFiles) return false;
       const item = this.$refs.innerUpload.uploadFiles.find(
@@ -640,6 +639,18 @@ export default {
                 ...this.cloudConfig,
               });
               file.url = url;
+              // 同步更新Element UI上传组件内部的uploadFiles数组
+              if (this.$refs.innerUpload && this.$refs.innerUpload.uploadFiles) {
+                const index = this.$refs.innerUpload.uploadFiles.findIndex(
+                  (x) => x.uid == file.uid || (x.key && x.key == file.key)
+                );
+                if (index >= 0) {
+                  const item = this.$refs.innerUpload.uploadFiles[index];
+                  item.url = url;
+                  // 触发视图更新
+                  this.$refs.innerUpload.uploadFiles.splice(index, 1, item);
+                }
+              }
               break;
             case "huawei":
               if (ObsHelper) {
@@ -648,6 +659,18 @@ export default {
                   ...this.cloudConfig,
                 });
                 file.url = url;
+                // 同步更新Element UI上传组件内部的uploadFiles数组
+                if (this.$refs.innerUpload && this.$refs.innerUpload.uploadFiles) {
+                  const index = this.$refs.innerUpload.uploadFiles.findIndex(
+                    (x) => x.uid == file.uid || (x.key && x.key == file.key)
+                  );
+                  if (index >= 0) {
+                    const item = this.$refs.innerUpload.uploadFiles[index];
+                    item.url = url;
+                    // 触发视图更新
+                    this.$refs.innerUpload.uploadFiles.splice(index, 1, item);
+                  }
+                }
               }
               break;
             case "aliyun":
@@ -657,6 +680,18 @@ export default {
                   ...this.cloudConfig,
                 });
                 file.url = url;
+                // 同步更新Element UI上传组件内部的uploadFiles数组
+                if (this.$refs.innerUpload && this.$refs.innerUpload.uploadFiles) {
+                  const index = this.$refs.innerUpload.uploadFiles.findIndex(
+                    (x) => x.uid == file.uid || (x.key && x.key == file.key)
+                  );
+                  if (index >= 0) {
+                    const item = this.$refs.innerUpload.uploadFiles[index];
+                    item.url = url;
+                    // 触发视图更新
+                    this.$refs.innerUpload.uploadFiles.splice(index, 1, item);
+                  }
+                }
               }
               break;
             default:
