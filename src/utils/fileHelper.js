@@ -159,9 +159,12 @@ class fileHelper {
     let prefix = "";
     if (file.name && file.name != "") {
       prefix = fileHelper.getFileExtension(file);
-    } else {
-      if (!file.url) return false;
+    } else if (file.url) {
       prefix = fileHelper.getFileExtension(file.url);
+    } else if (file.key) {
+      prefix = fileHelper.getFileExtension(file.key);
+    } else {
+      return false;
     }
     const images = ["png", "jpg", "jpeg", "bmp", "gif", "webp", "svg"];
     return images.some((x) => x === prefix);
@@ -178,6 +181,8 @@ class fileHelper {
       return decodedUrl
         .substring(decodedUrl.lastIndexOf("/") + 1)
         .split("?")[0];
+    } else if (file.key && file.key != "") {
+      return file.key.substring(file.key.lastIndexOf("/") + 1).split("?")[0];
     } else {
       return "";
     }

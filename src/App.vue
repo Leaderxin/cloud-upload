@@ -142,8 +142,10 @@
           :on-change="handleChange"
           listType="text"
         >
-         <el-button size="small" type="primary">点击上传</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+          <el-button size="small" type="primary">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">
+            只能上传jpg/png文件，且不超过500kb
+          </div>
         </CloudUpload>
       </el-form-item>
     </el-form>
@@ -191,6 +193,10 @@ export default {
         refreshSTSTokenInterval: 85000,
       },
       fileList: [
+        {
+          //name: "企微实车确认.png",
+          key: "costest/HU-p6D3nT-dWCeazWZpft/企微实车确认.png",
+        },
         // {
         //   url: "https://int-delivery-1301141550.cos.ap-nanjing.myqcloud.com/costest/%E6%B5%8B%E8%AF%95txt%E9%A2%84%E8%A7%88.txt",
         //   //name: '测试txt预览.txt'
@@ -230,10 +236,13 @@ export default {
       }
     },
   },
+  mounted(){
+    
+  },
   methods: {
-    onBeforeUpload(file){
-      console.log('before-upload',file);
-      return false
+    onBeforeUpload(file) {
+      console.log("before-upload", file);
+      return false;
     },
     handleChange(file, fileList) {
       console.log("on-change事件：", file, fileList);

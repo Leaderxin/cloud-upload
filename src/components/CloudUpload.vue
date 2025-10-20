@@ -297,7 +297,7 @@ export default {
     /**
      * 删除文件之前的钩子，参数为上传的文件和文件列表，若返回 false 或者返回 Promise 且被 reject，则停止删除
      */
-    beforeRemove:{
+    beforeRemove: {
       type: Function,
       required: false,
     },
@@ -424,6 +424,7 @@ export default {
       return iconObj[type];
     },
     getFileLoading(file) {
+      if (!file.url) return true;
       if (!this.$refs.innerUpload?.uploadFiles) return false;
       const item = this.$refs.innerUpload.uploadFiles.find(
         (x) => x.uid == file.uid || x.url == file.url
@@ -446,8 +447,10 @@ export default {
       if (item) {
         if (item.percentage && item.percentage < 1) {
           return `上传中${Math.round(item.percentage * 1000) / 10}%`;
-        } else {
+        } else if (item.percentage == 1) {
           return `上传完成`;
+        } else {
+          return "上传中";
         }
       } else {
         return "";
@@ -615,11 +618,48 @@ export default {
         this.$message.warning(`当前限制最多选择${this.limit}个文件！`);
       }
     },
+    async getFileUrls() {
+      for (let i = 0; i < this.fileList.length; i++) {
+        let file = this.fileList[i];
+        if (!file.url || file.url == "") {
+          if (!file.key || file.key == "") {
+            console.error("v-model传入文件key为空，无法获取文件地址！");
+            return;
+          }
+          switch (this.cloudType) {
+            case "tencent":
+              const url = await CosHelper.getInstance().getFileUrlByKey({
+                key: file.key,
+                ...this.cloudConfig,
+              });
+              file.url = url;
+              break;
+            case "huawei":
+              if (ObsHelper) {
+                const url = await ObsHelper.getInstance().getFileUrlByKey({
+                  key: file.key,
+                  ...this.cloudConfig,
+                });
+                file.url = url;
+              }
+              break;
+            case "aliyun":
+              if (OssHelper) {
+                const url = await OssHelper.getInstance().getFileUrlByKey({
+                  key: file.key,
+                  ...this.cloudConfig,
+                });
+                file.url = url;
+              }
+              break;
+            default:
+              break;
+          }
+        }
+      }
+    },
   },
   watch: {
-    value(val) {
-      this.fileList = val;
-    },
     cloudType(val) {
       this.checkAndInit(this.cloudConfig);
     },
@@ -627,6 +667,14 @@ export default {
       deep: true,
       handler(val) {
         this.checkAndInit(val);
+      },
+    },
+    value: {
+      immediate: true,
+      async handler(val) {
+        this.fileList = val;
+        // await this.checkAndInit(this.cloudConfig);
+        // this.getFileUrls();
       },
     },
   },
