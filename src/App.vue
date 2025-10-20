@@ -125,9 +125,28 @@
         </CloudUpload>
       </el-form-item>
     </el-form>
-    <el-button type="primary" @click="ifUpload = !ifUpload"
+    <!-- <el-button type="primary" @click="ifUpload = !ifUpload"
       >删除/添加组件</el-button
-    >
+    > -->
+    <h3>插槽示例：</h3>
+    <el-form>
+      <el-form-item label="附件上传：" v-if="ifUpload">
+        <CloudUpload
+          :cloudType="cloudType"
+          :cloudConfig="currentConfig"
+          v-model="fileList"
+          v-bind="propObj"
+          @remove="handleRemove"
+          @success="handleSuccess"
+          @error="handleError"
+          :on-change="handleChange"
+          listType="text"
+        >
+         <el-button size="small" type="primary">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+        </CloudUpload>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
@@ -161,8 +180,8 @@ export default {
         server: "https://obs.cn-south-1.myhuaweicloud.com",
         path: "costest/",
         getTempCredential: this.getObsCredential,
-        // accessKeyId: "",
-        // secretAccessKey: "",
+        // accessKeyId: "HPUAX7SA337IATJNDCIV",
+        // secretAccessKey: "bHDX3nnlblHttKWWM68uc4LUoVrufGip3kGl3tEJ",
       },
       ossConfig: {
         bucket: "vue-cloud-upload",

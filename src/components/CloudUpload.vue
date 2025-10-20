@@ -484,6 +484,7 @@ export default {
               let item = this.$refs.innerUpload.uploadFiles[index];
               const fileresult = Object.assign(item, {
                 url: result.url,
+                key: result.key,
                 result,
               });
               this.$refs.innerUpload.uploadFiles.splice(index, 1, fileresult);
@@ -499,6 +500,7 @@ export default {
               let item = this.$refs.innerUpload.uploadFiles[index];
               const fileresult = Object.assign(item, {
                 url: result.url,
+                key: result.key,
                 result,
               });
               this.$refs.innerUpload.uploadFiles.splice(index, 1, fileresult);
@@ -514,6 +516,7 @@ export default {
               let item = this.$refs.innerUpload.uploadFiles[index];
               const fileresult = Object.assign(item, {
                 url: result.url,
+                key: result.key,
                 result,
               });
               this.$refs.innerUpload.uploadFiles.splice(index, 1, fileresult);
