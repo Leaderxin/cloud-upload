@@ -382,14 +382,20 @@ export default {
         case "tencent":
           CosHelper = (await import("../plugins/tencent")).default;
           CosHelper.getInstance(cloudConfig);
+          // 等待腾讯云初始化完成
+          await CosHelper.waitForInitialization();
           break;
         case "huawei":
           ObsHelper = (await import("../plugins/huawei")).default;
           ObsHelper.getInstance(cloudConfig);
+          // 等待华为云初始化完成
+          await ObsHelper.waitForInitialization();
           break;
         case "aliyun":
           OssHelper = (await import("../plugins/aliyun")).default;
           OssHelper.getInstance(cloudConfig);
+          // 等待阿里云初始化完成
+          await OssHelper.waitForInitialization();
           break;
         default:
           break;
@@ -424,6 +430,7 @@ export default {
       return iconObj[type];
     },
     getFileLoading(file) {
+      debugger
       if (!file.url) return true;
       if (!this.$refs.innerUpload?.uploadFiles) return false;
       const item = this.$refs.innerUpload.uploadFiles.find(
@@ -673,8 +680,14 @@ export default {
       immediate: true,
       async handler(val) {
         this.fileList = val;
-        // await this.checkAndInit(this.cloudConfig);
-        // this.getFileUrls();
+        if (
+          this.fileList.some(
+            (x) => (!x.url || x.url == "") && x.key && x.key != ""
+          )
+        ) {
+          await this.checkAndInit(this.cloudConfig);
+          this.getFileUrls();
+        }
       },
     },
   },

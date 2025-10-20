@@ -2,6 +2,7 @@ class OssHelper {
   static instance = null;
   static externalOSS = null; // 外部传入的OSS对象
   ossClient = null;
+  initPromise = null; // 添加初始化Promise
   // 设置外部OSS对象的静态方法
   static setExternalOSS(OSS) {
     this.externalOSS = OSS;
@@ -42,9 +43,22 @@ class OssHelper {
       console.error("清理过期断点记录失败:", error);
     }
   }
+  
+  // 添加等待初始化完成的方法
+  static async waitForInitialization() {
+    if (this.instance && this.instance.initPromise) {
+      await this.instance.initPromise;
+    }
+  }
+  
+  // 添加确保初始化完成的方法（兼容之前的代码）
+  static async ensureInitialized() {
+    await this.waitForInitialization();
+  }
 
   constructor(config) {
-    this.initClient(config);
+    // 初始化Promise
+    this.initPromise = this.initClient(config);
   }
 
   async initClient(config) {

@@ -5,6 +5,7 @@ class CosHelper {
   tempCredential = null;
   secretId = null;
   secretKey = null;
+  initPromise = null; // 添加初始化Promise
 
   // 设置外部COS对象的静态方法
   static setExternalCOS(COS) {
@@ -22,6 +23,13 @@ class CosHelper {
         this.instance = new CosHelper(config);
     }
     return this.instance;
+  }
+  
+  // 添加等待初始化完成的方法
+  static async waitForInitialization() {
+    if (this.instance && this.instance.initPromise) {
+      await this.instance.initPromise;
+    }
   }
 
   static destroyInstance() {
@@ -56,7 +64,8 @@ class CosHelper {
       this.secretId = config.secretId;
       this.secretKey = config.secretKey;
     }
-    this.initClient(config);
+    // 初始化Promise
+    this.initPromise = this.initClient(config);
   }
 
   async initClient(config) {
@@ -196,6 +205,27 @@ class CosHelper {
           }
         }
       );
+    });
+  }
+  // 通过文件key获取地址
+  getFileUrlByKey({ bucket, region, key }) {
+    return new Promise(async (resolve, reject) => {
+      let isPublicRead = await this.isBucketPublicRead({ bucket, region });
+      try {
+        let param = {
+          Bucket: bucket,
+          Region: region,
+          Key: key,
+          Sign: true,
+        };
+        if (isPublicRead) {
+          param.Sign = false;
+        }
+        const url = await this.cosClient.getObjectUrl(param);
+        resolve(url);
+      } catch (error) {
+        reject("获取文件地址失败！");
+      }
     });
   }
   getCosDataByKey(key) {

@@ -5,8 +5,8 @@ class ObsHelper {
   tempCredential = null;
   accessKeyId = null;
   secretAccessKey = null;
-  securityToken = null;
   server = null;
+  initPromise = null; // 添加初始化Promise
 
   // 设置外部OBS对象的静态方法
   static setExternalOBS(OBS) {
@@ -53,6 +53,18 @@ class ObsHelper {
       console.error("清理过期断点记录失败:", error);
     }
   }
+  
+  // 添加等待初始化完成的方法
+  static async waitForInitialization() {
+    if (this.instance && this.instance.initPromise) {
+      await this.instance.initPromise;
+    }
+  }
+  
+  // 添加确保初始化完成的方法（兼容之前的代码）
+  static async ensureInitialized() {
+    await this.waitForInitialization();
+  }
 
   constructor(config) {
     // 保存服务器配置
@@ -65,7 +77,8 @@ class ObsHelper {
       this.accessKeyId = config.accessKeyId;
       this.secretAccessKey = config.secretAccessKey;
     }
-    this.initClient(config);
+    // 初始化Promise
+    this.initPromise = this.initClient(config);
   }
 
   async initClient(config) {
