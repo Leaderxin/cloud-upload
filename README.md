@@ -82,7 +82,7 @@ setExternalCOS(COS);
 Vue.use(CloudUpload); // 或 Vue.component(CloudUpload.name, CloudUpload);
 ```
 
-## 按需引入
+## 按需引入(推荐做法)
 
 ```vue
 <template>
