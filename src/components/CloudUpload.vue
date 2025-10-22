@@ -335,7 +335,7 @@ export default {
     getPreviewList() {
       let result = [];
       this.fileList.forEach((item) => {
-        if (this.getIfImage(item)) {
+        if (this.getIfImage(item) && item.url) {
           result.push(item.url);
         }
       });
@@ -456,7 +456,7 @@ export default {
         } else if (item.percentage == 1) {
           return `上传完成`;
         } else {
-          return "上传中";
+          return "加载中";
         }
       } else {
         return "";
@@ -639,18 +639,7 @@ export default {
                 ...this.cloudConfig,
               });
               file.url = url;
-              // 同步更新Element UI上传组件内部的uploadFiles数组
-              if (this.$refs.innerUpload && this.$refs.innerUpload.uploadFiles) {
-                const index = this.$refs.innerUpload.uploadFiles.findIndex(
-                  (x) => x.uid == file.uid || (x.key && x.key == file.key)
-                );
-                if (index >= 0) {
-                  const item = this.$refs.innerUpload.uploadFiles[index];
-                  item.url = url;
-                  // 触发视图更新
-                  this.$refs.innerUpload.uploadFiles.splice(index, 1, item);
-                }
-              }
+              this.fileList.splice(i, 1, file);
               break;
             case "huawei":
               if (ObsHelper) {
@@ -659,18 +648,7 @@ export default {
                   ...this.cloudConfig,
                 });
                 file.url = url;
-                // 同步更新Element UI上传组件内部的uploadFiles数组
-                if (this.$refs.innerUpload && this.$refs.innerUpload.uploadFiles) {
-                  const index = this.$refs.innerUpload.uploadFiles.findIndex(
-                    (x) => x.uid == file.uid || (x.key && x.key == file.key)
-                  );
-                  if (index >= 0) {
-                    const item = this.$refs.innerUpload.uploadFiles[index];
-                    item.url = url;
-                    // 触发视图更新
-                    this.$refs.innerUpload.uploadFiles.splice(index, 1, item);
-                  }
-                }
+                this.fileList.splice(i, 1, file);
               }
               break;
             case "aliyun":
@@ -680,18 +658,7 @@ export default {
                   ...this.cloudConfig,
                 });
                 file.url = url;
-                // 同步更新Element UI上传组件内部的uploadFiles数组
-                if (this.$refs.innerUpload && this.$refs.innerUpload.uploadFiles) {
-                  const index = this.$refs.innerUpload.uploadFiles.findIndex(
-                    (x) => x.uid == file.uid || (x.key && x.key == file.key)
-                  );
-                  if (index >= 0) {
-                    const item = this.$refs.innerUpload.uploadFiles[index];
-                    item.url = url;
-                    // 触发视图更新
-                    this.$refs.innerUpload.uploadFiles.splice(index, 1, item);
-                  }
-                }
+                this.fileList.splice(i, 1, file);
               }
               break;
             default:
