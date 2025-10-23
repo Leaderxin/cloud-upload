@@ -193,14 +193,7 @@ export default {
         refreshSTSTokenInterval: 85000,
       },
       fileList: [
-        {
-          //name: "企微实车确认.png",
-          key: "costest/IGRyOSjmuOTU3pi6T56SH/企微实车确认.png",
-        },
-        // {
-        //   url: "https://int-delivery-1301141550.cos.ap-nanjing.myqcloud.com/costest/%E6%B5%8B%E8%AF%95txt%E9%A2%84%E8%A7%88.txt",
-        //   //name: '测试txt预览.txt'
-        // },
+        
       ],
       ifUpload: true,
       propObj: {
@@ -209,7 +202,7 @@ export default {
         drag: true,
         showFileList: true,
         accept: "",
-        limit: "",
+        limit: 3,
         maxSize: "",
         sliceSize: 1024 * 1024 * 10,
         chunkSize: 1024 * 1024 * 5,

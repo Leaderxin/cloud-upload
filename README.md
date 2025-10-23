@@ -40,6 +40,14 @@
 - 🔄 Office 文档在线预览（Word, Excel, PowerPoint）
 - 🔄 更多云存储平台支持
 
+## 功能演示
+
+<p align="center">
+  <video src="docs/images/demo.mp4" controls style="max-width: 100%; height: auto;">
+    您的浏览器不支持视频播放，请升级浏览器或<a href="docs/images/demo.mp4">点击下载视频</a>查看。
+  </video>
+</p>
+
 ## 安装
 
 ```bash
