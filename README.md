@@ -42,11 +42,34 @@
 
 ## 功能演示
 
-<p align="center">
-  <video src="docs/images/demo.mp4" controls style="max-width: 100%; height: auto;">
-    您的浏览器不支持视频播放，请升级浏览器或<a href="docs/images/demo.mp4">点击下载视频</a>查看。
-  </video>
-</p>
+<div align="center">
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; margin: 0 auto;">
+    <div style="text-align: center;">
+      <img src="docs/images/各类型文件上传.png" alt="各类文件上传" style="width: 100%; height: auto; border-radius: 8px;">
+      <p style="margin-top: 10px; font-size: 14px; color: #666;">各类文件上传</p>
+    </div>
+    <div style="text-align: center;">
+      <img src="docs/images/上传进度.png" alt="上传进度展示" style="width: 100%; height: auto; border-radius: 8px;">
+      <p style="margin-top: 10px; font-size: 14px; color: #666;">上传进度展示</p>
+    </div>
+    <div style="text-align: center;">
+      <img src="docs/images/参数配置.png" alt="丰富的参数配置" style="width: 100%; height: auto; border-radius: 8px;">
+      <p style="margin-top: 10px; font-size: 14px; color: #666;">丰富的参数配置</p>
+    </div>
+    <div style="text-align: center;">
+      <img src="docs/images/视频预览.png" alt="视频预览" style="width: 100%; height: auto; border-radius: 8px;">
+      <p style="margin-top: 10px; font-size: 14px; color: #666;">视频预览</p>
+    </div>
+    <div style="text-align: center;">
+      <img src="docs/images/图片预览.png" alt="图片预览" style="width: 100%; height: auto; border-radius: 8px;">
+      <p style="margin-top: 10px; font-size: 14px; color: #666;">图片预览</p>
+    </div>
+    <div style="text-align: center;">
+      <img src="docs/images/pdf预览.png" alt="pdf预览" style="width: 100%; height: auto; border-radius: 8px;">
+      <p style="margin-top: 10px; font-size: 14px; color: #666;">pdf预览</p>
+    </div>
+  </div>
+</div>
 
 ## 安装
 
