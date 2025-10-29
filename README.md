@@ -43,30 +43,30 @@
 ## 功能演示
 
 <div align="center">
-  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; margin: 0 auto;">
-    <div style="text-align: center;">
+  <div style="font-size: 0; text-align: center;">
+    <div style="display: inline-block; width: 33%; padding: 10px; box-sizing: border-box; vertical-align: top; font-size: 14px;">
       <img src="docs/images/各类型文件上传.png" alt="各类文件上传" style="width: 100%; height: auto; border-radius: 8px;">
-      <p style="margin-top: 10px; font-size: 14px; color: #666;">各类文件上传</p>
+      <p style="margin-top: 10px; color: #666;">各类文件上传</p>
     </div>
-    <div style="text-align: center;">
+    <div style="display: inline-block; width: 33%; padding: 10px; box-sizing: border-box; vertical-align: top; font-size: 14px;">
       <img src="docs/images/上传进度.png" alt="上传进度展示" style="width: 100%; height: auto; border-radius: 8px;">
-      <p style="margin-top: 10px; font-size: 14px; color: #666;">上传进度展示</p>
+      <p style="margin-top: 10px; color: #666;">上传进度展示</p>
     </div>
-    <div style="text-align: center;">
+    <div style="display: inline-block; width: 33%; padding: 10px; box-sizing: border-box; vertical-align: top; font-size: 14px;">
       <img src="docs/images/参数配置.png" alt="丰富的参数配置" style="width: 100%; height: auto; border-radius: 8px;">
-      <p style="margin-top: 10px; font-size: 14px; color: #666;">丰富的参数配置</p>
+      <p style="margin-top: 10px; color: #666;">丰富的参数配置</p>
     </div>
-    <div style="text-align: center;">
+    <div style="display: inline-block; width: 33%; padding: 10px; box-sizing: border-box; vertical-align: top; font-size: 14px;">
       <img src="docs/images/视频预览.png" alt="视频预览" style="width: 100%; height: auto; border-radius: 8px;">
-      <p style="margin-top: 10px; font-size: 14px; color: #666;">视频预览</p>
+      <p style="margin-top: 10px; color: #666;">视频预览</p>
     </div>
-    <div style="text-align: center;">
+    <div style="display: inline-block; width: 33%; padding: 10px; box-sizing: border-box; vertical-align: top; font-size: 14px;">
       <img src="docs/images/图片预览.png" alt="图片预览" style="width: 100%; height: auto; border-radius: 8px;">
-      <p style="margin-top: 10px; font-size: 14px; color: #666;">图片预览</p>
+      <p style="margin-top: 10px; color: #666;">图片预览</p>
     </div>
-    <div style="text-align: center;">
+    <div style="display: inline-block; width: 33%; padding: 10px; box-sizing: border-box; vertical-align: top; font-size: 14px;">
       <img src="docs/images/pdf预览.png" alt="pdf预览" style="width: 100%; height: auto; border-radius: 8px;">
-      <p style="margin-top: 10px; font-size: 14px; color: #666;">pdf预览</p>
+      <p style="margin-top: 10px; color: #666;">pdf预览</p>
     </div>
   </div>
 </div>
