@@ -615,7 +615,8 @@ export default {
       //   "response-content-disposition=attachment"; // 补充强制下载的参数
       // window.open(downloadUrl);
       this.$message.success("文件开始下载，请稍等！");
-      fileHelper.downloadFile(file.url, file.name);
+      const name = fileHelper.getFileName(file)
+      fileHelper.downloadFile(file.url, name);
     },
     handleExceed(files, fileList) {
       if (this.onExceed && typeof this.onExceed == "function") {

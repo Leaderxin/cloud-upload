@@ -53,14 +53,14 @@ class ObsHelper {
       console.error("清理过期断点记录失败:", error);
     }
   }
-  
+
   // 添加等待初始化完成的方法
   static async waitForInitialization() {
     if (this.instance && this.instance.initPromise) {
       await this.instance.initPromise;
     }
   }
-  
+
   // 添加确保初始化完成的方法（兼容之前的代码）
   static async ensureInitialized() {
     await this.waitForInitialization();
@@ -331,6 +331,27 @@ class ObsHelper {
         throw new Error(`华为云OBS上传失败: ${error.message}`);
       }
     }
+  }
+  // 通过文件key获取地址
+  getFileUrlByKey({ bucket, region, key }) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let param = {
+          Bucket: bucket,
+          Key: key,
+          SaveByType: "file",
+        };
+        const down_result = await this.obsClient.getObject(param);
+        if (down_result.CommonMsg.Status < 300 && down_result.InterfaceResult) {
+          const url = down_result.InterfaceResult.Content.SignedUrl;
+          resolve(url);
+        } else {
+          reject(`附件url获取失败: ${down_result.CommonMsg.Code}`);
+        }
+      } catch (error) {
+        reject("获取文件地址失败！");
+      }
+    });
   }
   // 图片加水印（华为云OBS处理方式）
   async addWatermark({ bucket, region, key, watermarkText }) {

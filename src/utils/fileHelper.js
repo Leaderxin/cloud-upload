@@ -159,10 +159,10 @@ class fileHelper {
     let prefix = "";
     if (file.name && file.name != "") {
       prefix = fileHelper.getFileExtension(file);
-    } else if (file.url) {
-      prefix = fileHelper.getFileExtension(file.url);
     } else if (file.key) {
       prefix = fileHelper.getFileExtension(file.key);
+    } else if (file.url) {
+      prefix = fileHelper.getFileExtension(file.url);
     } else {
       return false;
     }
@@ -176,13 +176,13 @@ class fileHelper {
   static getFileName(file) {
     if (file.name) {
       return file.name;
+    } else if (file.key && file.key != "") {
+      return file.key.substring(file.key.lastIndexOf("/") + 1).split("?")[0];
     } else if (file.url && file.url != "") {
       const decodedUrl = decodeURIComponent(file.url);
       return decodedUrl
         .substring(decodedUrl.lastIndexOf("/") + 1)
         .split("?")[0];
-    } else if (file.key && file.key != "") {
-      return file.key.substring(file.key.lastIndexOf("/") + 1).split("?")[0];
     } else {
       return "";
     }
