@@ -615,7 +615,7 @@ export default {
       //   "response-content-disposition=attachment"; // 补充强制下载的参数
       // window.open(downloadUrl);
       this.$message.success("文件开始下载，请稍等！");
-      const name = fileHelper.getFileName(file)
+      const name = fileHelper.getFileName(file);
       fileHelper.downloadFile(file.url, name);
     },
     handleExceed(files, fileList) {
@@ -668,6 +668,17 @@ export default {
         }
       }
     },
+    getFileNames() {
+      for (let i = 0; i < this.fileList.length; i++) {
+        const file = this.fileList[i];
+        if (!file.name || file.name == "") {
+          if (file.key && file.key != "") {
+            const name = fileHelper.getFileName(file);
+            file.name = name;
+          }
+        }
+      }
+    },
   },
   watch: {
     cloudType(val) {
@@ -689,7 +700,10 @@ export default {
           )
         ) {
           await this.checkAndInit(this.cloudConfig);
-          this.getFileUrls();
+          await this.getFileUrls();
+        }
+        if (this.fileList.some((x) => !x.name || x.name == "")) {
+          this.getFileNames();
         }
       },
     },

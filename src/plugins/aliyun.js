@@ -43,14 +43,14 @@ class OssHelper {
       console.error("清理过期断点记录失败:", error);
     }
   }
-  
+
   // 添加等待初始化完成的方法
   static async waitForInitialization() {
     if (this.instance && this.instance.initPromise) {
       await this.instance.initPromise;
     }
   }
-  
+
   // 添加确保初始化完成的方法（兼容之前的代码）
   static async ensureInitialized() {
     await this.waitForInitialization();
@@ -125,7 +125,7 @@ class OssHelper {
           result = await this.ossClient.multipartUpload(cptData.name, file, {
             checkpoint: cpt,
             progress: (p, abortCheckpoint) => {
-              this.setCptData(uniqkey, key ,abortCheckpoint);
+              this.setCptData(uniqkey, key, abortCheckpoint);
               if (onProgress && typeof onProgress === "function") {
                 onProgress(p);
               }
@@ -137,7 +137,7 @@ class OssHelper {
           // 大文件分片上传
           result = await this.ossClient.multipartUpload(key, file, {
             progress: (p, abortCheckpoint) => {
-              this.setCptData(uniqkey,key,abortCheckpoint);
+              this.setCptData(uniqkey, key, abortCheckpoint);
               if (onProgress && typeof onProgress === "function") {
                 onProgress(p);
               }
@@ -182,7 +182,7 @@ class OssHelper {
       return null;
     }
   }
-  setCptData(key,name,cpt) {
+  setCptData(key, name, cpt) {
     let ossCptDatas = [];
     const localData = localStorage.getItem("ossCptDatas");
     if (localData) {
@@ -212,6 +212,17 @@ class OssHelper {
       ossCptDatas.splice(index, 1);
       localStorage.setItem("ossCptDatas", JSON.stringify(ossCptDatas));
     }
+  }
+  // 通过文件key获取地址
+  getFileUrlByKey({ key }) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const url = await this.ossClient.signatureUrl(key, { expires: 7200 });
+        resolve(url);
+      } catch (error) {
+        reject("获取文件地址失败！");
+      }
+    });
   }
   // 图片加水印
   async addWatermark({ bucket, region, key, watermarkText }) {
