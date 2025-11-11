@@ -61,7 +61,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "prepack": "node scripts/generate-changelog.js"
   },
   "keywords": [
     "vue-upload",

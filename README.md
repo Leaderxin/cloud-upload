@@ -399,8 +399,16 @@ export default {
 
 </div>
 
-**Vue Cloud Upload** - 让文件上传变得更简单！
+## 更新说明
+<!-- 自动生成的更新日志开始 -->
+### v1.6.0 (2025-11-11)
 
+- 三大云平台，完成支持v-model只传入文件key回显附件
+
+<!-- 最新版本会在这里自动更新 -->
+<!-- 自动生成的更新日志结束 -->
+
+<p align="center">**Vue Cloud Upload** - 让文件上传变得更简单！</p>
 <p align="center">
   <a href="https://github.com/Leaderxin/cloud-upload" target="_blank">
     <img src="https://img.shields.io/badge/⭐-Star%20This%20Project-blue?style=for-the-badge" alt="Star This Project">
