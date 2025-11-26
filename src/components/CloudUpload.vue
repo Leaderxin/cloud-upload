@@ -206,7 +206,7 @@ export default {
         const params = ["medium", "small", "mini"];
         if (!params.includes(value)) {
           console.error(
-            `listType参数必须是以下值之一: ${params.join(", ")}\n` +
+            `size参数必须是以下值之一: ${params.join(", ")}\n` +
               `当前值: "${value}"将回退到默认值"small"`
           );
           return false;
@@ -238,7 +238,7 @@ export default {
         const params = ["uuid", "name", "uuid+name"];
         if (!params.includes(value)) {
           console.error(
-            `listType参数必须是以下值之一: ${params.join(", ")}\n` +
+            `fileKey参数必须是以下值之一: ${params.join(", ")}\n` +
               `当前值: "${value}"将回退到默认值"uuid+name"`
           );
           return false;
@@ -256,7 +256,7 @@ export default {
         const params = ["tencent", "huawei", "aliyun"];
         if (!params.includes(value)) {
           console.error(
-            `listType参数必须是以下值之一: ${params.join(", ")}\n` +
+            `cloudType参数必须是以下值之一: ${params.join(", ")}\n` +
               `当前值: "${value}"将回退到默认值"tencent"`
           );
           return false;
