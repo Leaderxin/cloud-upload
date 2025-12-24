@@ -4,6 +4,7 @@
       'cloud-upload',
       'cloud-upload-' + size,
       disabled && fileList.length > 0 ? 'cloud-upload-disabled' : '',
+      'cloud-upload-component',
     ]"
   >
     <el-upload
@@ -115,6 +116,7 @@
 
 <script>
 import "@/assets/iconfont/iconfont.css";
+import "@/style/CloudUpload.scss";
 import Vue from "vue";
 import fileHelper from "../utils/fileHelper";
 import { Upload, Loading, Image, Tooltip, Dialog } from "element-ui";
@@ -714,32 +716,8 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.cloud-upload {
-  .default-content {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-
-    span {
-      display: block;
-      line-height: 18px;
-    }
-
-    color: #606266;
-
-    &:hover,
-    &:focus {
-      color: #409eff;
-
-      i {
-        color: #409eff;
-      }
-    }
-  }
-
+/* 使用深度选择器确保样式能够穿透到子组件 */
+.cloud-upload-component {
   ::v-deep .el-upload-dragger {
     width: 100%;
     height: 100%;
@@ -767,7 +745,7 @@ export default {
 
       .el-upload-list__item-actions {
         i:hover {
-          color: #409eff;
+          color: var(--el-color-primary, #409eff);
         }
       }
 
@@ -798,7 +776,7 @@ export default {
   }
 }
 
-.cloud-upload-small {
+.cloud-upload-component.cloud-upload-small {
   ::v-deep .el-upload-list--picture-card {
     .el-upload-list__item {
       width: 118px;
@@ -818,7 +796,7 @@ export default {
   }
 }
 
-.cloud-upload-mini {
+.cloud-upload-component.cloud-upload-mini {
   ::v-deep .el-upload-list--picture-card {
     .el-upload-list__item {
       width: 94px;
@@ -838,7 +816,7 @@ export default {
   }
 }
 
-.cloud-upload-disabled {
+.cloud-upload-component.cloud-upload-disabled {
   ::v-deep .el-upload--picture-card {
     display: none;
   }

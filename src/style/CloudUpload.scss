@@ -1,0 +1,131 @@
+/* CloudUpload 组件样式 */
+.cloud-upload-component.cloud-upload {
+  .default-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    span {
+      display: block;
+      line-height: 18px;
+    }
+
+    color: #606266;
+
+    &:hover,
+    &:focus {
+      color: var(--el-color-primary, #409eff);
+
+      i {
+        color: var(--el-color-primary, #409eff);
+      }
+    }
+  }
+
+  /* 使用更具体的选择器替代 ::v-deep */
+  .el-upload-dragger {
+    width: 100%;
+    height: 100%;
+    border: none;
+
+    .el-icon-upload {
+      font-size: 28px;
+      line-height: 1;
+      margin: 0;
+    }
+  }
+
+  .el-upload-list--picture-card {
+    .el-upload-list__item {
+      overflow: visible;
+
+      .el-upload-list__item-thumbnail {
+        display: block;
+
+        .el-loading-spinner {
+          margin-top: 0px;
+          transform: translateY(-50%);
+        }
+      }
+
+      .el-upload-list__item-actions {
+        i:hover {
+          color: var(--el-color-primary, #409eff);
+        }
+      }
+
+      .previewIcon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .cloud-upload-icon {
+          font-size: 50px;
+        }
+      }
+
+      .file-name {
+        display: inline-block;
+        /* 必须设置为块级或inline-block */
+        max-width: 100%;
+        /* 限制最大宽度 */
+        white-space: nowrap;
+        /* 禁止换行 */
+        overflow: hidden;
+        /* 隐藏溢出内容 */
+        text-overflow: ellipsis;
+        /* 显示省略号 */
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.cloud-upload-component.cloud-upload-small {
+  .el-upload-list--picture-card {
+    .el-upload-list__item {
+      width: 118px;
+      height: 118px;
+
+      .previewIcon {
+        .cloud-upload-icon {
+          font-size: 40px;
+        }
+      }
+    }
+  }
+
+  .el-upload--picture-card {
+    width: 118px;
+    height: 118px;
+  }
+}
+
+.cloud-upload-component.cloud-upload-mini {
+  .el-upload-list--picture-card {
+    .el-upload-list__item {
+      width: 94px;
+      height: 94px;
+
+      .previewIcon {
+        .cloud-upload-icon {
+          font-size: 32px;
+        }
+      }
+    }
+  }
+
+  .el-upload--picture-card {
+    width: 94px;
+    height: 94px;
+  }
+}
+
+.cloud-upload-component.cloud-upload-disabled {
+  .el-upload--picture-card {
+    display: none;
+  }
+}
