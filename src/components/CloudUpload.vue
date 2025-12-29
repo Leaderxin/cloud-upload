@@ -536,8 +536,8 @@ export default {
             throw new Error(`Unsupported cloudType: ${this.cloudType}`);
         }
         onSuccess(result, file);
-        this.$emit("success", result, file);
         this.$emit("input", this.fileList);
+        this.$emit("success", result, file);
       } catch (error) {
         onError(error, file);
         this.$emit("error", error, file);
