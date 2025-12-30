@@ -231,7 +231,7 @@ export default {
     /**
      * 对象存储桶中文件的key配置
      */
-    fileKey: {
+    keyType: {
       type: String,
       default: "uuid+name",
       validator: (value) => {
@@ -245,6 +245,13 @@ export default {
         }
         return true;
       },
+    },
+    /**
+     * 自定义函数生成上传文件key
+     */
+    customKey:{
+      type: Function,
+      required: false
     },
     /**
      * 使用的云平台类型 tencent腾讯云桶
@@ -465,7 +472,7 @@ export default {
     // 自定义上传方法
     async customUpload(options) {
       const { file, onProgress, onSuccess, onError } = options;
-      let key = this.generateKey(file.name);
+      let key = this.generateKey(file);
       const uploadConfig = {
         file,
         key,
@@ -543,9 +550,16 @@ export default {
         this.$emit("error", error, file);
       }
     },
-    generateKey(name) {
+    generateKey(file) {
       let fileKey = "";
-      switch (this.fileKey) {
+      if(this.customKey && typeof(this.customKey)=='function'){
+        fileKey = this.customKey(file)
+        if(fileKey){
+          return `${this.cloudConfig.path}${fileKey}`
+        } 
+      }
+      const name = file.name
+      switch (this.keyType) {
         case "name":
           fileKey = `${this.cloudConfig.path}${name}`;
           break;

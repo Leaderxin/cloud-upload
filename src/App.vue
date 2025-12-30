@@ -121,6 +121,7 @@
           @success="handleSuccess"
           @error="handleError"
           :on-change="handleChange"
+          :custom-key="getKey"
         >
         </CloudUpload>
       </el-form-item>
@@ -233,6 +234,9 @@ export default {
     
   },
   methods: {
+    getKey(file){
+      return '测试文件key自定义.jpg'
+    },
     onBeforeUpload(file) {
       console.log("before-upload", file);
       return false;
