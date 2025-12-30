@@ -404,21 +404,11 @@ export default {
 
 ### v1.7.0 (2025-12-30)
 
-- 更新说明功能已添加
-- 支持自动生成更新日志
-- 优化组件性能和稳定性
+- feat:fileKey参数更名为keyType；增加customKey参数支持自定义函数生成文件key (23ce0b5)
 
 ### v1.6.2 (2025-12-29)
 
 - fix:success事件中v-model值还未更新问题 (7b88147)
-- Revert "feat:高亮颜色改为跟随elementui主题色" (8a62c48)
-- feat:高亮颜色改为跟随elementui主题色 (bff3f58)
-
-### v1.6.2 (2025-12-29)
-
-- fix:success事件中v-model值还未更新问题 (7b88147)
-- Revert "feat:高亮颜色改为跟随elementui主题色" (8a62c48)
-- feat:高亮颜色改为跟随elementui主题色 (bff3f58)
 
 ### v1.6.0 (2025-11-11)
 

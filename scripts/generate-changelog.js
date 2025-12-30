@@ -57,20 +57,6 @@ function updateChangelog() {
   console.log('Latest tag:', latestTag);
   console.log('Commits count:', commits.length);
   
-  // 生成更新日志内容
-  let changelogContent = `### v${currentVersion} (${new Date().toISOString().split('T')[0]})\n\n`;
-  
-  if (commits.length > 0) {
-    changelogContent += commits.map(commit => `- ${commit}`).join('\n') + '\n\n';
-  } else {
-    // 如果没有 Git 提交信息，添加默认的更新内容
-    changelogContent += '- 更新说明功能已添加\n';
-    changelogContent += '- 支持自动生成更新日志\n';
-    changelogContent += '- 优化组件性能和稳定性\n\n';
-  }
-  
-  console.log('Generated changelog content:', changelogContent);
-  
   // 更新 README.md 中的更新说明部分
   const startMarker = '<!-- 自动生成的更新日志开始 -->';
   const endMarker = '<!-- 自动生成的更新日志结束 -->';
@@ -79,11 +65,34 @@ function updateChangelog() {
   const endIndex = readmeContent.indexOf(endMarker);
   
   if (startIndex !== -1 && endIndex !== -1) {
-    const beforeContent = readmeContent.substring(0, startIndex + startMarker.length);
-    const afterContent = readmeContent.substring(endIndex);
-    
     // 查找现有的更新日志内容
     const existingChangelog = readmeContent.substring(startIndex + startMarker.length, endIndex).trim();
+    
+    // 检查当前版本是否已经有更新日志
+    const versionHeader = `### v${currentVersion}`;
+    const versionExists = existingChangelog.includes(versionHeader);
+    
+    if (versionExists) {
+      console.log(`版本 v${currentVersion} 的更新日志已存在，跳过更新`);
+      return;
+    }
+    
+    // 生成更新日志内容
+    let changelogContent = `### v${currentVersion} (${new Date().toISOString().split('T')[0]})\n\n`;
+    
+    if (commits.length > 0) {
+      changelogContent += commits.map(commit => `- ${commit}`).join('\n') + '\n\n';
+    } else {
+      // 如果没有 Git 提交信息，添加默认的更新内容
+      changelogContent += '- 更新说明功能已添加\n';
+      changelogContent += '- 支持自动生成更新日志\n';
+      changelogContent += '- 优化组件性能和稳定性\n\n';
+    }
+    
+    console.log('Generated changelog content:', changelogContent);
+    
+    const beforeContent = readmeContent.substring(0, startIndex + startMarker.length);
+    const afterContent = readmeContent.substring(endIndex);
     
     // 将新的更新日志添加到顶部
     const newChangelog = beforeContent + '\n\n' + changelogContent + existingChangelog + afterContent;
