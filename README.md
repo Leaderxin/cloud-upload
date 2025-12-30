@@ -404,6 +404,7 @@ export default {
 
 ### v1.7.0 (2025-12-30)
 
+- doc:文档更新 (9f4464e)
 - feat:fileKey参数更名为keyType；增加customKey参数支持自定义函数生成文件key (23ce0b5)
 
 ### v1.6.2 (2025-12-29)
