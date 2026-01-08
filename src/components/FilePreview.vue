@@ -212,8 +212,4 @@ export default {
   max-height: calc(100% - 30px);
   max-width: calc(100% - 30px);
 }
-
-.el-dialog__wrapper {
-  overflow: hidden;
-}
 </style>
