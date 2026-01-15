@@ -347,7 +347,8 @@ export default {
 
 ## 使用文档
 
-组件详细使用文档请参考[官方文档](https://github.com/Leaderxin/cloud-upload/wiki)
+组件详细使用文档请参考【腾讯文档】vue-cloud-upload官方文档
+https://docs.qq.com/doc/DT1ZKR2hneG5WdFVT
 
 ## 贡献
 
@@ -361,43 +362,6 @@ export default {
 
 如果您觉得这个组件有帮助，请给它一个 ⭐️ [Star](https://github.com/Leaderxin/cloud-upload) 支持一下！
 
-### ☕ 赞赏支持
-
-如果这个项目对您有帮助，欢迎扫码赞赏支持开发者继续维护和改进！
-
-<p align="center">
-  <img src="https://img.shields.io/badge/支付宝-扫码赞赏-orange?style=for-the-badge&logo=alipay" alt="支付宝赞赏">
-  <img src="https://img.shields.io/badge/微信-扫码赞赏-brightgreen?style=for-the-badge&logo=wechat" alt="微信赞赏">
-</p>
-
-<p align="center">
-  <img src="docs/images/alipay-qrcode.jpg" alt="支付宝收款码" width="200" style="margin: 10px;">
-  <img src="docs/images/wechat-qrcode.png" alt="微信收款码" width="200" style="margin: 10px;">
-</p>
-
-### 🏆 感谢打赏者
-
-感谢以下朋友的慷慨支持！您的赞赏是我持续开发和维护项目的动力！
-
-<div align="center">
-
-### 💎 荣誉殿堂
-
-</div>
-
-<div align="center">
-  
-| 🌟 赞赏者 | 💰 金额 | 📅 日期 | 💬 留言 |
-|:--------:|:------:|:------:|:------:|
-| 🎉 **首批支持者** | - | - | - |
-
-</div>
-
-<div align="center">
-  
-> 💌 **成为荣誉支持者**：打赏后请联系我（通过邮箱 [shazhoulen@outlook.com](mailto:shazhoulen@outlook.com)），告诉我您的昵称和希望显示的留言，我会将您添加到这份荣誉榜单中！
-
-</div>
 
 ## 更新说明
 <!-- 自动生成的更新日志开始 -->
