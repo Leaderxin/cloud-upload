@@ -292,9 +292,7 @@ export default {
      */
     value: {
       type: Array,
-      default: () => {
-        [];
-      },
+      default: () => [],
     },
     /**
      * 上传文件之前的钩子，参数为上传的文件，若返回 false 或者返回 Promise 且被 reject，则停止上传。
@@ -489,8 +487,9 @@ export default {
         sliceSize: this.sliceSize,
         ...this.cloudConfig,
         onProgress: (percent) => {
-          console.log("当前进度:", percent);
-
+          if (process.env.NODE_ENV === 'development') {
+            console.log("当前进度:", percent);
+          }
           onProgress({ percent });
           this.$emit("progress", percent, file);
         },
@@ -503,49 +502,19 @@ export default {
           case "tencent":
             result = await CosHelper.getInstance().uploadFile(uploadConfig);
             if (result.statusCode == 200) {
-              const index = this.$refs.innerUpload.uploadFiles.findIndex(
-                (x) => x.uid == file.uid
-              );
-              let item = this.$refs.innerUpload.uploadFiles[index];
-              const fileresult = Object.assign(item, {
-                url: result.url,
-                key: result.key,
-                result,
-              });
-              this.$refs.innerUpload.uploadFiles.splice(index, 1, fileresult);
-              this.fileList = this.$refs.innerUpload.uploadFiles;
+              this.handleUploadSuccess(result, file);
             }
             break;
           case "huawei":
             result = await ObsHelper.getInstance().uploadFile(uploadConfig);
             if (result.CommonMsg.Status == 200) {
-              const index = this.$refs.innerUpload.uploadFiles.findIndex(
-                (x) => x.uid == file.uid
-              );
-              let item = this.$refs.innerUpload.uploadFiles[index];
-              const fileresult = Object.assign(item, {
-                url: result.url,
-                key: result.key,
-                result,
-              });
-              this.$refs.innerUpload.uploadFiles.splice(index, 1, fileresult);
-              this.fileList = this.$refs.innerUpload.uploadFiles;
+              this.handleUploadSuccess(result, file);
             }
             break;
           case "aliyun":
             result = await OssHelper.getInstance().uploadFile(uploadConfig);
             if (result.url) {
-              const index = this.$refs.innerUpload.uploadFiles.findIndex(
-                (x) => x.uid == file.uid
-              );
-              let item = this.$refs.innerUpload.uploadFiles[index];
-              const fileresult = Object.assign(item, {
-                url: result.url,
-                key: result.key,
-                result,
-              });
-              this.$refs.innerUpload.uploadFiles.splice(index, 1, fileresult);
-              this.fileList = this.$refs.innerUpload.uploadFiles;
+              this.handleUploadSuccess(result, file);
             }
             break;
           default:
@@ -555,19 +524,44 @@ export default {
         this.$emit("input", this.fileList);
         this.$emit("success", result, file);
       } catch (error) {
-        onError(error, file);
-        this.$emit("error", error, file);
+        console.error('上传失败:', error);
+        const enhancedError = {
+          message: error.message || '上传失败',
+          code: error.code,
+          file: file.name,
+          cloudType: this.cloudType
+        };
+        onError(enhancedError, file);
+        this.$emit("error", enhancedError, file);
+      }
+    },
+    /**
+     * 处理上传成功后的文件列表更新
+     */
+    handleUploadSuccess(result, file) {
+      const index = this.$refs.innerUpload.uploadFiles.findIndex(
+        (x) => x.uid == file.uid
+      );
+      if (index >= 0) {
+        let item = this.$refs.innerUpload.uploadFiles[index];
+        const fileresult = Object.assign(item, {
+          url: result.url,
+          key: result.key,
+          result,
+        });
+        this.$refs.innerUpload.uploadFiles.splice(index, 1, fileresult);
+        this.fileList = [...this.$refs.innerUpload.uploadFiles];
       }
     },
     generateKey(file) {
       let fileKey = "";
-      if(this.customKey && typeof(this.customKey)=='function'){
-        fileKey = this.customKey(file)
-        if(fileKey){
-          return `${this.cloudConfig.path}${fileKey}`
-        } 
+      if (typeof this.customKey === 'function') {
+        fileKey = this.customKey(file);
+        if (fileKey) {
+          return `${this.cloudConfig.path}${fileKey}`;
+        }
       }
-      const name = file.name
+      const name = file.name;
       switch (this.keyType) {
         case "name":
           fileKey = `${this.cloudConfig.path}${name}`;
@@ -649,47 +643,50 @@ export default {
       }
     },
     async getFileUrls() {
-      for (let i = 0; i < this.fileList.length; i++) {
-        let file = this.fileList[i];
+      const promises = this.fileList.map(async (file, index) => {
         if (!file.url || file.url == "") {
           if (!file.key || file.key == "") {
             console.error("v-model传入文件key为空，无法获取文件地址！");
             return;
           }
-          switch (this.cloudType) {
-            case "tencent":
-              const url = await CosHelper.getInstance().getFileUrlByKey({
-                key: file.key,
-                ...this.cloudConfig,
-              });
+          try {
+            let url;
+            switch (this.cloudType) {
+              case "tencent":
+                url = await CosHelper.getInstance().getFileUrlByKey({
+                  key: file.key,
+                  ...this.cloudConfig,
+                });
+                break;
+              case "huawei":
+                if (ObsHelper) {
+                  url = await ObsHelper.getInstance().getFileUrlByKey({
+                    key: file.key,
+                    ...this.cloudConfig,
+                  });
+                }
+                break;
+              case "aliyun":
+                if (OssHelper) {
+                  url = await OssHelper.getInstance().getFileUrlByKey({
+                    key: file.key,
+                    ...this.cloudConfig,
+                  });
+                }
+                break;
+              default:
+                break;
+            }
+            if (url) {
               file.url = url;
-              this.fileList.splice(i, 1, file);
-              break;
-            case "huawei":
-              if (ObsHelper) {
-                const url = await ObsHelper.getInstance().getFileUrlByKey({
-                  key: file.key,
-                  ...this.cloudConfig,
-                });
-                file.url = url;
-                this.fileList.splice(i, 1, file);
-              }
-              break;
-            case "aliyun":
-              if (OssHelper) {
-                const url = await OssHelper.getInstance().getFileUrlByKey({
-                  key: file.key,
-                  ...this.cloudConfig,
-                });
-                file.url = url;
-                this.fileList.splice(i, 1, file);
-              }
-              break;
-            default:
-              break;
+              this.$set(this.fileList, index, { ...file });
+            }
+          } catch (error) {
+            console.error(`获取文件URL失败 (${file.key}):`, error);
           }
         }
-      }
+      });
+      await Promise.all(promises);
     },
     getFileNames() {
       for (let i = 0; i < this.fileList.length; i++) {

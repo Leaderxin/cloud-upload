@@ -28,12 +28,14 @@
       ]"
       v-loading="loading"
     >
-      <div v-if="fileType == 'txt'" v-html="formattedText"></div>
+      <div v-if="fileType == 'txt'" v-html="formattedText" class="txt-content"></div>
       <iframe
         class="pdf-container"
         :src="pdfUrl"
         frameborder="0"
         v-if="fileType == 'pdf'"
+        sandbox="allow-scripts allow-same-origin"
+        loading="lazy"
       ></iframe>
       <video
         ref="cloud-upload-video"
@@ -41,6 +43,7 @@
         :src="file.url"
         v-if="fileType == 'video' && currentVisible"
         autoplay
+        muted
         preload="auto"
         crossorigin
       ></video>
@@ -49,6 +52,7 @@
         :src="file.url"
         v-if="fileType == 'audio' && currentVisible"
         autoplay
+        muted
         preload="auto"
         crossorigin
       ></audio>
@@ -89,7 +93,14 @@ export default {
   },
   computed: {
     formattedText() {
-      return this.fileContent.replace(/\n/g, "<br>");
+      // 转义HTML特殊字符以防止XSS攻击
+      const escapeHtml = (text) => {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      };
+      const escapedText = escapeHtml(this.fileContent);
+      return escapedText.replace(/\n/g, "<br>");
     },
     dialogWidth() {
       if (this.fileType == "audio") {
@@ -113,6 +124,10 @@ export default {
       reader.readAsText(this.fileRaw);
     },
     initPdfContent() {
+      // 释放之前的URL
+      if (this.pdfUrl) {
+        URL.revokeObjectURL(this.pdfUrl);
+      }
       this.pdfUrl = URL.createObjectURL(this.fileRaw);
     },
   },
@@ -129,10 +144,15 @@ export default {
       } else if (this.fileType == "txt" || this.fileType == "pdf") {
         try {
           const response = await fetch(val.url);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
           const blob = await response.blob();
           this.fileRaw = blob;
         } catch (error) {
           console.error("文件下载失败：", error);
+          this.$message.error('文件加载失败，请稍后重试');
+          this.loading = false;
           return;
         }
       }
@@ -149,6 +169,13 @@ export default {
       }
       this.loading = false;
     },
+  },
+  beforeDestroy() {
+    // 释放Blob URL以防止内存泄漏
+    if (this.pdfUrl) {
+      URL.revokeObjectURL(this.pdfUrl);
+      this.pdfUrl = "";
+    }
   },
 };
 </script>
@@ -182,6 +209,13 @@ export default {
     video {
       width: 100%;
       height: 99%;
+    }
+    .txt-content {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      padding: 10px;
+      font-family: monospace;
+      line-height: 1.6;
     }
   }
   .preview-audio {
