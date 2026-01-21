@@ -81,13 +81,14 @@
               getPreviewConfig[getFileType(file)] && file.status == 'success'
             "
           >
-            <i class="el-icon-view" @click="() => handlePreview(file)"></i>
+            <i title="点击预览" class="el-icon-view" @click="() => handlePreview(file)"></i>
           </span>
           <span class="el-upload-list__item-delete">
-            <i class="el-icon-download" @click="() => handleDown(file)"></i>
+            <i title="点击下载" class="el-icon-download" @click="() => handleDown(file)"></i>
           </span>
           <span
             v-if="!disabled"
+            title="点击删除"
             class="el-upload-list__item-delete"
             @click="() => handleRemove(file)"
           >
@@ -109,6 +110,7 @@
     <FilePreview
       :visible.sync="previewVisible"
       :file="previewFile"
+      :primary-color="primaryColor"
     ></FilePreview>
   </div>
 </template>
@@ -328,6 +330,13 @@ export default {
     onChange: {
       type: Function,
       required: false,
+    },
+    /**
+     * 主题色，默认为 #409eff
+     */
+    primaryColor: {
+      type: String,
+      default: '#409eff',
     },
   },
   data() {
@@ -746,10 +755,10 @@ export default {
 
     &:hover,
     &:focus {
-      color: #409eff;
+      color: v-bind(primaryColor);
 
       i {
-        color: #409eff;
+        color: v-bind(primaryColor);
       }
     }
   }
@@ -781,7 +790,10 @@ export default {
 
       .el-upload-list__item-actions {
         i:hover {
-          color: #409eff;
+          color: v-bind(primaryColor);
+          background-color: #fff;
+          padding: 3px;
+          border-radius: 50%;
         }
       }
 

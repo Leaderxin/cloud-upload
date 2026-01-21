@@ -122,6 +122,7 @@
           @error="handleError"
           :on-change="handleChange"
           :custom-key="getKey"
+          primary-color="#406A70"
         >
         </CloudUpload>
       </el-form-item>

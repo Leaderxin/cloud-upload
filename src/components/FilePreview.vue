@@ -67,6 +67,13 @@ export default {
       type: Object,
       required: true,
     },
+    /**
+     * 主题色，默认为 #409eff
+     */
+    primaryColor: {
+      type: String,
+      default: '#409eff',
+    },
   },
   data() {
     return {
@@ -159,7 +166,7 @@ export default {
       font-weight: 550;
       cursor: pointer;
       &:hover {
-        color: #409eff;
+        color: v-bind(primaryColor);
       }
     }
   }
