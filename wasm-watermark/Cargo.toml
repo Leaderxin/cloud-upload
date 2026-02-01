@@ -6,14 +6,18 @@ edition = "2021"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+
 [dependencies]
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 js-sys = "0.3"
-image = "0.24"
+# 支持常见图片格式：PNG, JPEG, GIF, WebP, BMP, ICO
+image = { version = "0.24", default-features = false, features = ["png", "jpeg", "gif", "webp", "bmp", "ico"] }
 serde = { version = "1.0", features = ["derive"] }
 serde-wasm-bindgen = "0.6"
-console_error_panic_hook = "0.1"
+console_error_panic_hook = { version = "0.1", optional = true }
 base64 = "0.21"
 
 [dependencies.web-sys]
@@ -27,5 +31,9 @@ features = [
 ]
 
 [profile.release]
-opt-level = "z"
-lto = true
+opt-level = "z"          # 最小化体积
+lto = true              # 链接时优化
+codegen-units = 1       # 更好的优化（但编译更慢）
+panic = "abort"         # 减小 panic 处理体积
+strip = true            # 移除调试符号
+overflow-checks = false # 禁用溢出检查以减小体积

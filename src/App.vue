@@ -218,12 +218,12 @@ export default {
   type: 'text',
   text: '我的水印',
   font: 'Arial',
-  font_size: 30,
-  font_color: '#FFFFFF',  // 白色文字
-  transparency: 0.5,
+  font_size: 40,
+  font_color: '#000000',  // 白色文字
+  transparency: 0.7,
   rotate: 0,
-  x_offset: 10,
-  y_offset: 10,
+  x_offset: 30,
+  y_offset: 30,
   tile: false
 }
 

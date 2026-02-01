@@ -77,7 +77,7 @@
         </template>
         
         <!-- 通用配置 -->
-        <el-form-item label="透明度">
+        <el-form-item label="不透明度">
           <el-slider
             v-model="config.transparency"
             :min="0"
@@ -85,6 +85,7 @@
             :step="0.1"
             show-input
           />
+          <div class="form-tip">范围 0-1，0 为完全透明，1 为完全不透明</div>
         </el-form-item>
         
         <el-form-item label="旋转角度">
@@ -256,6 +257,13 @@ export default {
       border: 1px solid #ddd;
       border-radius: 4px;
     }
+  }
+  
+  .form-tip {
+    font-size: 12px;
+    color: #909399;
+    margin-top: 5px;
+    line-height: 1.5;
   }
   
   pre {

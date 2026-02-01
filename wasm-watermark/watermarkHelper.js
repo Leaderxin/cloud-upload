@@ -57,7 +57,7 @@ async function initWasm() {
 
   try {
     // 动态导入WASM模块
-    const module = await import('../../wasm-watermark/pkg/wasm_watermark.js');
+    const module = await import('./pkg/wasm_watermark.js');
     await module.default();
     wasmModule = module;
     wasmInitialized = true;
@@ -79,8 +79,11 @@ export async function addWatermark(image, config) {
 
   // 将图片转换为ArrayBuffer
   let imageBuffer;
+  let imageType = 'image/png'; // 默认图片类型
   if (image instanceof File || image instanceof Blob) {
     imageBuffer = await image.arrayBuffer();
+    // 获取原始文件的 MIME 类型
+    imageType = image.type || 'image/png';
   } else if (image instanceof ArrayBuffer) {
     imageBuffer = image;
   } else {
@@ -93,8 +96,8 @@ export async function addWatermark(image, config) {
     // 调用WASM函数添加水印
     const result = module.add_watermark(imageData, config);
     
-    // 将结果转换为Blob
-    const blob = new Blob([result], { type: 'image/png' });
+    // 将结果转换为Blob，使用原始图片类型
+    const blob = new Blob([result], { type: imageType });
     return blob;
   } catch (error) {
     console.error('添加水印失败:', error);
@@ -126,7 +129,7 @@ export async function addWatermarkAsync(image, config) {
 
   const imageData = new Uint8Array(imageBuffer);
 
-  // 处理文字水印：自动渲染文字为图片
+  // 处理文字水印水印：自动渲染文字为图片
   let finalConfig = { ...config };
   if (config.type === 'text' && config.text) {
     try {
@@ -139,9 +142,7 @@ export async function addWatermarkAsync(image, config) {
       );
       // 将渲染的文字图片作为 image_data
       finalConfig.image_data = textImageData;
-      if (process.env.NODE_ENV === 'development') {
-        console.log('文字水印已渲染为图片，类型:', imageType);
-      }
+      console.log('文字水印已渲染为图片，类型:', imageType);
     } catch (error) {
       console.error('渲染文字失败:', error);
       throw new Error('渲染文字失败: ' + error.message);
@@ -152,8 +153,8 @@ export async function addWatermarkAsync(image, config) {
     // 调用WASM异步函数添加水印
     const result = await module.add_watermark_async(imageData, finalConfig);
     
-    // 将结果转换为Blob
-    const blob = new Blob([result], { type: 'image/png' });
+    // 将结果转换为Blob，使用原始图片类型
+    const blob = new Blob([result], { type: imageType });
     return blob;
   } catch (error) {
     console.error('添加水印失败:', error);
