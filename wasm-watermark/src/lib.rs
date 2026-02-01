@@ -78,7 +78,92 @@ impl WatermarkError {
     }
 }
 
-// 旋转图片（（优化版本：使用最近邻插值，更快）
+// 参数验证
+fn validate_config(config: &WatermarkConfig) -> Result<(), String> {
+    // 验证水印类型
+    if !matches!(config.watermark_type.as_str(), "text" | "image") {
+        return Err(format!("Invalid watermark type '{}'. Must be 'text' or 'image'", config.watermark_type));
+    }
+    
+    // 验证透明度范围
+    if let Some(transparency) = config.transparency {
+        if transparency < 0.0 || transparency > 1.0 {
+            return Err(format!("Transparency must be between 0.0 and 1.0, got {}", transparency));
+        }
+    }
+    
+    // 验证旋转角度
+    if let Some(rotate) = config.rotate {
+        if rotate < -360.0 || rotate > 360.0 {
+            return Err(format!("Rotation angle must be between -360 and 360 degrees, got {}", rotate));
+        }
+    }
+    
+    // 验证图片数据
+    if config.image_data.is_none() {
+        return Err("image_data parameter is required".to_string());
+    }
+    
+    // 验证尺寸参数
+    if let Some(width) = config.width {
+        if width == 0 {
+            return Err("Width must be greater than 0".to_string());
+        }
+    }
+    
+    if let Some(height) = config.height {
+        if height == 0 {
+            return Err("Height must be greater than 0".to_string());
+        }
+    }
+    
+    Ok(())
+}
+
+// 解码base64图片数据
+fn decode_base64_image(image_data: &str) -> Result<Vec<u8>, String> {
+    let base64_data = image_data.trim_start_matches("data:image/");
+    let base64_data = base64_data.split(',').nth(1).unwrap_or(image_data);
+    
+    if base64_data.is_empty() {
+        return Err("Empty base64 data".to_string());
+    }
+    
+    STANDARD.decode(base64_data)
+        .map_err(|e| format!("Failed to decode base64: {}", e))
+}
+
+// 加载并调整水印图片
+fn load_and_prepare_watermark(
+    config: &WatermarkConfig,
+) -> Result<RgbaImage, String> {
+    let image_data = config.image_data.as_ref()
+        .ok_or("image_data parameter is required")?;
+    
+    // 解码base64图片数据
+    let image_bytes = decode_base64_image(image_data)?;
+    
+    // 加载图片
+    let mut watermark_img = image::load_from_memory(&image_bytes)
+        .map_err(|e| format!("Failed to load watermark image: {}", e))?;
+    
+    // 调整水印图片大小
+    if let Some(width) = config.width {
+        let height = config.height.unwrap_or((watermark_img.height() * width) / watermark_img.width());
+        if watermark_img.width() == 0 {
+            return Err("Watermark image has zero width".to_string());
+        }
+        watermark_img = watermark_img.resize(width, height, image::imageops::FilterType::Lanczos3);
+    }
+    
+    // 旋转图片
+    let rotate = config.rotate.unwrap_or(0.0);
+    watermark_img = rotate_image(&watermark_img, rotate);
+    
+    Ok(watermark_img.to_rgba8())
+}
+
+// 旋转图片（优化版本：使用最近邻插值，更快）
 fn rotate_image(img: &DynamicImage, angle_degrees: f32) -> DynamicImage {
     if angle_degrees == 0.0 {
         return img.clone();
@@ -128,179 +213,6 @@ fn rotate_image(img: &DynamicImage, angle_degrees: f32) -> DynamicImage {
     DynamicImage::ImageRgba8(result)
 }
 
-// 添加文字水印（现在使用客户端渲染的图片）
-fn add_text_watermark(
-    img: &mut DynamicImage,
-    config: &WatermarkConfig,
-) -> Result<(), String> {
-    let image_data = config.image_data.as_ref()
-        .ok_or("Text watermark requires image_data parameter (rendered by client)")?;
-    let transparency = config.transparency.unwrap_or(0.5);
-    let rotate = config.rotate.unwrap_or(0.0);
-    let x_offset = config.x_offset.unwrap_or(10);
-    let y_offset = config.y_offset.unwrap_or(10);
-    let tile = config.tile.unwrap_or(false);
-    
-    // 解码base64图片数据（客户端渲染的文字图片）
-    let base64_data = image_data.trim_start_matches("data:image/");
-    let base64_data = base64_data.split(',').nth(1).unwrap_or(image_data);
-    
-    let image_bytes = STANDARD.decode(base64_data)
-        .map_err(|e| format!("Failed to decode base64: {}", e))?;
-    
-    let mut watermark_img = image::load_from_memory(&image_bytes)
-        .map_err(|e| format!("Failed to load watermark image: {}", e))?;
-    
-    // 调整水印图片大小
-    if let Some(width) = config.width {
-        let height = config.height.unwrap_or((watermark_img.height() * width) / watermark_img.width());
-        watermark_img = watermark_img.resize(width, height, image::imageops::FilterType::Lanczos3);
-    }
-    
-    // 旋转图片
-    watermark_img = rotate_image(&watermark_img, rotate);
-    
-    let (img_width, img_height) = img.dimensions();
-    let (wm_width, wm_height) = watermark_img.dimensions();
-    
-    // 转换为 RGBA8（优化：不再预先应用透明度）
-    let watermark_rgba = watermark_img.to_rgba8();
-    
-    if tile {
-        // 平铺水印 - 优化版本：只转换一次目标图片
-        let spacing_x = wm_width + x_offset.abs() as u32;
-        let spacing_y = wm_height + y_offset.abs() as u32;
-        
-        // 计算起始位置（考虑偏移量）
-        let start_x = if x_offset >= 0 {
-            x_offset as u32
-        } else {
-            0
-        };
-        
-        let start_y = if y_offset >= 0 {
-            y_offset as u32
-        } else {
-            0
-        };
-        
-        // 只转换一次目标图片为 RGBA8
-        let mut target_rgba = img.to_rgba8();
-        
-        for y in (start_y..img_height).step_by(spacing_y as usize) {
-            for x in (start_x..img_width).step_by(spacing_x as usize) {
-                overlay_image_rgba_with_transparency(&mut target_rgba, &watermark_rgba, x, y, transparency);
-            }
-        }
-        
-        // 转换回 DynamicImage
-        *img = DynamicImage::ImageRgba8(target_rgba);
-    } else {
-        // 单个水印
-        let x = if x_offset >= 0 {
-            x_offset as u32
-        } else {
-            (img_width as i32 + x_offset).max(0) as u32
-        };
-        
-        let y = if y_offset >= 0 {
-            y_offset as u32
-        } else {
-            (img_height as i32 + y_offset).max(0) as u32
-        };
-        
-        overlay_image_with_transparency(img, &watermark_rgba, x, y, transparency);
-    }
-    
-    Ok(())
-}
-
-// 添加图片水印
-fn add_image_watermark(
-    img: &mut DynamicImage,
-    config: &WatermarkConfig,
-) -> Result<(), String> {
-    let image_data = config.image_data.as_ref().ok_or("Image watermark requires image_data parameter")?;
-    let transparency = config.transparency.unwrap_or(0.5);
-    let rotate = config.rotate.unwrap_or(0.0);
-    let x_offset = config.x_offset.unwrap_or(10);
-    let y_offset = config.y_offset.unwrap_or(10);
-    let tile = config.tile.unwrap_or(false);
-    
-    // 解码base64图片数据
-    let base64_data = image_data.trim_start_matches("data:image/");
-    let base64_data = base64_data.split(',').nth(1).unwrap_or(image_data);
-    
-    let image_bytes = STANDARD.decode(base64_data)
-        .map_err(|e| format!("Failed to decode base64: {}", e))?;
-    
-    let mut watermark_img = image::load_from_memory(&image_bytes)
-        .map_err(|e| format!("Failed to load watermark image: {}", e))?;
-    
-    // 调整水印图片大小
-    if let Some(width) = config.width {
-        let height = config.height.unwrap_or((watermark_img.height() * width) / watermark_img.width());
-        watermark_img = watermark_img.resize(width, height, image::imageops::FilterType::Lanczos3);
-    }
-    
-    // 旋转图片
-    watermark_img = rotate_image(&watermark_img, rotate);
-    
-    let (img_width, img_height) = img.dimensions();
-    let (wm_width, wm_height) = watermark_img.dimensions();
-    
-    // 转换为 RGBA8（优化：不再预先应用透明度）
-    let watermark_rgba = watermark_img.to_rgba8();
-    
-    if tile {
-        // 平铺水印 - 优化版本：只转换一次目标图片
-        let spacing_x = wm_width + x_offset.abs() as u32;
-        let spacing_y = wm_height + y_offset.abs() as u32;
-        
-        // 计算起始位置（考虑偏移量）
-        let start_x = if x_offset >= 0 {
-            x_offset as u32
-        } else {
-            0
-        };
-        
-        let start_y = if y_offset >= 0 {
-            y_offset as u32
-        } else {
-            0
-        };
-        
-        // 只转换一次目标图片为 RGBA8
-        let mut target_rgba = img.to_rgba8();
-        
-        for y in (start_y..img_height).step_by(spacing_y as usize) {
-            for x in (start_x..img_width).step_by(spacing_x as usize) {
-                overlay_image_rgba_with_transparency(&mut target_rgba, &watermark_rgba, x, y, transparency);
-            }
-        }
-        
-        // 转换回 DynamicImage
-        *img = DynamicImage::ImageRgba8(target_rgba);
-    } else {
-        // 单个水印
-        let x = if x_offset >= 0 {
-            x_offset as u32
-        } else {
-            (img_width as i32 + x_offset).max(0) as u32
-        };
-        
-        let y = if y_offset >= 0 {
-            y_offset as u32
-        } else {
-            (img_height as i32 + y_offset).max(0) as u32
-        };
-        
-        overlay_image_with_transparency(img, &watermark_rgba, x, y, transparency);
-    }
-    
-    Ok(())
-}
-
 // 叠加图片（直接操作 RGBA8，带透明度参数，优化版本）
 fn overlay_image_rgba_with_transparency(
     target: &mut RgbaImage,
@@ -311,6 +223,9 @@ fn overlay_image_rgba_with_transparency(
 ) {
     let (target_width, target_height) = target.dimensions();
     let (overlay_width, overlay_height) = overlay.dimensions();
+    
+    // 预计算透明度因子
+    let transparency_factor = transparency;
     
     for oy in 0..overlay_height {
         for ox in 0..overlay_width {
@@ -325,7 +240,7 @@ fn overlay_image_rgba_with_transparency(
             let target_pixel = target.get_pixel_mut(target_x, target_y);
             
             // 直接应用透明度，避免重复计算
-            let alpha = overlay_pixel[3] as f32 / 255.0 * transparency;
+            let alpha = overlay_pixel[3] as f32 / 255.0 * transparency_factor;
             if alpha > 0.0 {
                 let inv_alpha = 1.0 - alpha;
                 target_pixel[0] = (target_pixel[0] as f32 * inv_alpha + overlay_pixel[0] as f32 * alpha) as u8;
@@ -344,12 +259,107 @@ fn overlay_image_with_transparency(target: &mut DynamicImage, overlay: &RgbaImag
     *target = DynamicImage::ImageRgba8(target_rgba);
 }
 
+// 应用水印（统一的实现，消除重复代码）
+fn apply_watermark(
+    img: &mut DynamicImage,
+    config: &WatermarkConfig,
+) -> Result<(), String> {
+    // 验证配置
+    validate_config(config)?;
+    
+    // 加载并准备水印图片
+    let watermark_rgba = load_and_prepare_watermark(config)?;
+    
+    // 获取参数
+    let transparency = config.transparency.unwrap_or(0.5);
+    let x_offset = config.x_offset.unwrap_or(10);
+    let y_offset = config.y_offset.unwrap_or(10);
+    let tile = config.tile.unwrap_or(false);
+    
+    let (img_width, img_height) = img.dimensions();
+    let (wm_width, wm_height) = watermark_rgba.dimensions();
+    
+    if tile {
+        // 平铺水印 - 优化版本：只转换一次目标图片
+        let spacing_x = wm_width + x_offset.abs() as u32;
+        let spacing_y = wm_height + y_offset.abs() as u32;
+        
+        // 计算起始位置（考虑偏移量）
+        let start_x = if x_offset >= 0 {
+            x_offset as u32
+        } else {
+            0
+        };
+        
+        let start_y = if y_offset >= 0 {
+            y_offset as u32
+        } else {
+            0
+        };
+        
+        // 只转换一次目标图片为 RGBA8
+        let mut target_rgba = img.to_rgba8();
+        
+        for y in (start_y..img_height).step_by(spacing_y as usize) {
+            for x in (start_x..img_width).step_by(spacing_x as usize) {
+                overlay_image_rgba_with_transparency(&mut target_rgba, &watermark_rgba, x, y, transparency);
+            }
+        }
+        
+        // 转换回 DynamicImage
+        *img = DynamicImage::ImageRgba8(target_rgba);
+    } else {
+        // 单个水印
+        let x = if x_offset >= 0 {
+            x_offset as u32
+        } else {
+            (img_width as i32 + x_offset).max(0) as u32
+        };
+        
+        let y = if y_offset >= 0 {
+            y_offset as u32
+        } else {
+            (img_height as i32 + y_offset).max(0) as u32
+        };
+        
+        overlay_image_with_transparency(img, &watermark_rgba, x, y, transparency);
+    }
+    
+    Ok(())
+}
+
+// 添加文字水印（现在使用客户端渲染的图片）
+fn add_text_watermark(
+    img: &mut DynamicImage,
+    config: &WatermarkConfig,
+) -> Result<(), String> {
+    // 检查是否有图片数据（客户端渲染的文字图片）
+    if config.image_data.is_none() {
+        return Err("Text watermark requires image_data parameter (rendered by client)".to_string());
+    }
+    
+    apply_watermark(img, config)
+}
+
+// 添加图片水印
+fn add_image_watermark(
+    img: &mut DynamicImage,
+    config: &WatermarkConfig,
+) -> Result<(), String> {
+    apply_watermark(img, config)
+}
+
 // WASM导出函数：添加水印
 #[wasm_bindgen]
 pub fn add_watermark(
     image_data: &[u8],
     config_js: JsValue,
 ) -> Result<Vec<u8>, JsValue> {
+    // 检查输入数据
+    if image_data.is_empty() {
+        return Err(JsValue::from_str("Image data is empty"));
+    }
+    
     // 解析配置
     let config: WatermarkConfig = serde_wasm_bindgen::from_value(config_js)
         .map_err(|e| JsValue::from_str(&format!("Failed to parse config: {}", e)))?;
@@ -369,7 +379,10 @@ pub fn add_watermark(
                 .map_err(|e| JsValue::from_str(&format!("Failed to add image watermark: {}", e)))?;
         }
         _ => {
-            return Err(JsValue::from_str("Invalid watermark type. Use 'text' or 'image'"));
+            return Err(JsValue::from_str(&format!(
+                "Invalid watermark type '{}'. Use 'text' or 'image'", 
+                config.watermark_type
+            )));
         }
     }
     
@@ -388,6 +401,7 @@ pub async fn add_watermark_async(
     config_js: JsValue,
 ) -> Result<Vec<u8>, JsValue> {
     // 使用wasm-bindgen-futures来支持异步操作
+    // 注意：当前实现仍然是同步的，但提供了异步接口以便未来扩展
     add_watermark(image_data, config_js)
 }
 

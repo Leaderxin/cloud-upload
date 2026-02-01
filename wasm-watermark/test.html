@@ -153,7 +153,7 @@
     </div>
 
     <script type="module">
-        import init, { add_watermark } from './pkg/wasm_watermark.js';
+        import init, { add_watermark, renderTextToImage } from './pkg/watermark.js';
 
         let wasmInitialized = false;
         let originalImageData = null;
@@ -165,40 +165,6 @@
                 wasmInitialized = true;
                 console.log('WASM initialized');
             }
-        }
-
-        // 使用 Canvas 渲染文字为图片
-        function renderTextToImage(text, fontSize, color) {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            // 设置字体
-            ctx.font = `${fontSize}px Arial, sans-serif`;
-            
-            // 测量文字尺寸
-            const metrics = ctx.measureText(text);
-            const textWidth = Math.ceil(metrics.width);
-            
-            // 获取字体的实际高度（使用 fontBoundingBox 更准确）
-            const fontBoundingBoxAscent = metrics.fontBoundingBoxAscent;
-            const fontBoundingBoxDescent = metrics.fontBoundingBoxDescent;
-            const textHeight = Math.ceil(fontBoundingBoxAscent + fontBoundingBoxDescent);
-            
-            // 设置画布大小（增加 padding 确保完整）
-            const padding = 5;
-            canvas.width = textWidth + padding * 2;
-            canvas.height = textHeight + padding * 2;
-            
-            // 重新设置字体（因为改变画布大小会重置上下文）
-            ctx.font = `${fontSize}px Arial, sans-serif`;
-            ctx.fillStyle = color;
-            ctx.textBaseline = 'alphabetic';
-            
-            // 绘制文字（从基线位置开始，考虑 padding）
-            ctx.fillText(text, padding, padding + fontBoundingBoxAscent);
-            
-            // 转换为 base64
-            return canvas.toDataURL('image/png');
         }
 
         // 加载图片
