@@ -122,6 +122,7 @@ import fileHelper from "../utils/fileHelper";
 import { Upload, Loading, Image, Tooltip, Dialog } from "element-ui";
 import FilePreview from "./FilePreview.vue";
 import { nanoid } from "nanoid";
+import { addWatermarkAsync, isImageFile } from "../utils/watermarkHelper";
 let CosHelper = null;
 let ObsHelper = null;
 let OssHelper = null;
@@ -336,6 +337,16 @@ export default {
       type: String,
       default: '#409eff',
     },
+    /**
+     * 图片水印配置
+     * 支持文字水印和图片水印
+     * 配置格式参考腾讯云水印参数：https://cloud.tencent.com/document/product/436/119425
+     */
+    watermarkConfig: {
+      type: Object,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
@@ -479,9 +490,32 @@ export default {
     // 自定义上传方法
     async customUpload(options) {
       const { file, onProgress, onSuccess, onError } = options;
-      let key = this.generateKey(file);
+      
+      // 处理水印
+      let uploadFile = file;
+      if (this.watermarkConfig && isImageFile(file)) {
+        try {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('正在为图片添加水印...');
+          }
+          const watermarkedBlob = await addWatermarkAsync(file, this.watermarkConfig);
+          // 创建新的File对象
+          uploadFile = new File([watermarkedBlob], file.name, {
+            type: 'image/png',
+            lastModified: Date.now()
+          });
+          if (process.env.NODE_ENV === 'development') {
+            console.log('水印添加完成');
+          }
+        } catch (error) {
+          console.error('添加水印失败，将使用原始文件上传:', error);
+          // 水印添加失败，使用原始文件继续上传
+        }
+      }
+      
+      let key = this.generateKey(uploadFile);
       const uploadConfig = {
-        file,
+        file: uploadFile,
         key,
         chunkSize: this.chunkSize,
         sliceSize: this.sliceSize,
@@ -491,7 +525,7 @@ export default {
             console.log("当前进度:", percent);
           }
           onProgress({ percent });
-          this.$emit("progress", percent, file);
+          this.$emit("progress", percent, uploadFile);
         },
       };
 

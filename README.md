@@ -31,10 +31,10 @@
 - ✅ 音视频附件在线播放
 - ✅ 自定义样式支持
 - ✅ 丰富的参数配置和回调事件
+- ✅ 图片水印功能（基于Rust + WASM）
 
 ## 🚧 开发中功能
 
-- 🔄 图片添加水印
 - 🔄 图片无损压缩
 - 🔄 视频首帧截取
 - 🔄 Office 文档在线预览（Word, Excel, PowerPoint）
@@ -344,6 +344,81 @@ export default {
 </script>
 ```
 </details>
+
+## 图片水印功能
+
+组件现已支持基于Rust + WASM的高性能图片水印功能，支持文字水印和图片水印。
+
+### 快速开始
+
+1. **构建WASM模块**（首次使用前必须执行）：
+
+```bash
+cd wasm-watermark
+wasm-pack build --target web --out-dir pkg
+```
+
+> **💡 遇到构建问题？** 如果在安装 `wasm-pack` 或构建过程中遇到错误（如缺少链接器），请查看 [WASM 构建故障排除指南](./docs/WASM_BUILD_TROUBLESHOOTING.md) 获取详细的解决方案。
+
+2. **在组件中使用水印配置**：
+
+```vue
+<template>
+  <CloudUpload
+    v-model="fileList"
+    :cloud-config="cloudConfig"
+    :watermark-config="watermarkConfig"
+  />
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      fileList: [],
+      cloudConfig: {
+        // 云平台配置
+      },
+      // 文字水印配置
+      watermarkConfig: {
+        type: 'text',
+        text: '版权所有',
+        font_size: 30,
+        font_color: '#FFFFFF',
+        transparency: 0.5,
+        tile: true
+      }
+    }
+  }
+}
+</script>
+```
+
+### 水印配置参数
+
+**文字水印**：
+- `type`: `'text'` - 水印类型
+- `text`: 水印文字内容
+- `font_size`: 字体大小（默认30）
+- `font_color`: 字体颜色（默认#FFFFFF）
+- `transparency`: 透明度 0-1（默认0.5）
+- `rotate`: 旋转角度（默认0）
+- `x_offset`: X轴偏移（默认10）
+- `y_offset`: Y轴偏移（默认10）
+- `tile`: 是否平铺（默认false）
+
+**图片水印**：
+- `type`: `'image'` - 水印类型
+- `image_data`: base64编码的图片数据
+- `width`: 水印图片宽度（可选）
+- `height`: 水印图片高度（可选）
+- `transparency`: 透明度 0-1（默认0.5）
+- `rotate`: 旋转角度（默认0）
+- `x_offset`: X轴偏移（默认10）
+- `y_offset`: Y轴偏移（默认10）
+- `tile`: 是否平铺（默认false）
+
+详细使用文档请参考：[图片水印功能使用指南](./WATERMARK_USAGE.md)
 
 ## 使用文档
 

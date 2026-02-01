@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASM 水印测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        .control-group {
+            margin: 10px 0;
+        }
+        label {
+            display: inline-block;
+            width: 120px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"], input[type="color"] {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .preview {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .preview img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WASM 水印测试（客户端渲染文字）</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>选择图片：</label>
+                <input type="file" id="imageInput" accept="image/*">
+            </div>
+            <div class="control-group">
+                <label>水印文字：</label>
+                <input type="text" id="watermarkText" value="我的水印" placeholder="输入水印文字">
+            </div>
+            <div class="control-group">
+                <label>字体大小：</label>
+                <input type="number" id="fontSize" value="48" min="10" max="200">
+            </div>
+            <div class="control-group">
+                <label>字体颜色：</label>
+                <input type="color" id="fontColor" value="#FFFFFF">
+            </div>
+            <div class="control-group">
+                <label>透明度：</label>
+                <input type="number" id="transparency" value="0.7" min="0" max="1" step="0.1">
+            </div>
+            <div class="control-group">
+                <label>X 偏移：</label>
+                <input type="number" id="xOffset" value="50">
+            </div>
+            <div class="control-group">
+                <label>Y 偏移：</label>
+                <input type="number" id="yOffset" value="50">
+            </div>
+            <div class="control-group">
+                <label>平铺水印：</label>
+                <input type="checkbox" id="tileWatermark">
+            </div>
+            <button id="addWatermarkBtn">添加水印</button>
+        </div>
+        
+        <div class="loading" id="loading">正在处理...</div>
+        
+        <div class="preview">
+            <h2>预览</h2>
+            <img id="previewImage" src="" alt="预览图片" style="display: none;">
+        </div>
+    </div>
+
+    <script type="module">
+        import init, { add_watermark } from './pkg/wasm_watermark.js';
+
+        let wasmInitialized = false;
+        let originalImageData = null;
+
+        // 初始化 WASM
+        async function initWasm() {
+            if (!wasmInitialized) {
+                await init();
+                wasmInitialized = true;
+                console.log('WASM initialized');
+            }
+        }
+
+        // 使用 Canvas 渲染文字为图片
+        function renderTextToImage(text, fontSize, color) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 设置字体
+            ctx.font = `${fontSize}px Arial, sans-serif`;
+            
+            // 测量文字尺寸
+            const metrics = ctx.measureText(text);
+            const textWidth = Math.ceil(metrics.width);
+            const textHeight = fontSize;
+            
+            // 设置画布大小
+            canvas.width = textWidth;
+            canvas.height = textHeight;
+            
+            // 重新设置字体（因为改变画布大小会重置上下文）
+            ctx.font = `${fontSize}px Arial, sans-serif`;
+            ctx.fillStyle = color;
+            ctx.textBaseline = 'top';
+            
+            // 绘制文字
+            ctx.fillText(text, 0, 0);
+            
+            // 转换为 base64
+            return canvas.toDataURL('image/png');
+        }
+
+        // 加载图片
+        document.getElementById('imageInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                originalImageData = event.target.result;
+                const previewImage = document.getElementById('previewImage');
+                previewImage.src = originalImageData;
+                previewImage.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // 添加水印
+        document.getElementById('addWatermarkBtn').addEventListener('click', async () => {
+            if (!originalImageData) {
+                alert('请先选择图片');
+                return;
+            }
+
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+
+            try {
+                await initWasm();
+
+                // 获取图片数据
+                const response = await fetch(originalImageData);
+                const imageBuffer = await response.arrayBuffer();
+                const imageBytes = new Uint8Array(imageBuffer);
+
+                // 获取配置
+                const text = document.getElementById('watermarkText').value;
+                const fontSize = parseInt(document.getElementById('fontSize').value);
+                const fontColor = document.getElementById('fontColor').value;
+                
+                // 使用客户端 Canvas 渲染文字
+                const textImageData = renderTextToImage(text, fontSize, fontColor);
+                
+                const config = {
+                    type: 'text',
+                    text: text,
+                    image_data: textImageData, // 使用客户端渲染的文字图片
+                    font_size: fontSize,
+                    font_color: fontColor,
+                    transparency: parseFloat(document.getElementById('transparency').value),
+                    x_offset: parseInt(document.getElementById('xOffset').value),
+                    y_offset: parseInt(document.getElementById('yOffset').value),
+                    tile: document.getElementById('tileWatermark').checked
+                };
+
+                // 调用 WASM 函数
+                const result = add_watermark(imageBytes, config);
+                
+                // 显示结果
+                const blob = new Blob([result], { type: 'image/png' });
+                const url = URL.createObjectURL(blob);
+                const previewImage = document.getElementById('previewImage');
+                previewImage.src = url;
+                previewImage.style.display = 'block';
+
+                console.log('水印添加成功');
+            } catch (error) {
+                console.error('错误:', error);
+                alert('添加水印失败: ' + error.message);
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

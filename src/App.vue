@@ -117,12 +117,11 @@
           :cloudConfig="currentConfig"
           v-model="fileList"
           v-bind="propObj"
+          :watermark-config="watermarkConfig"
           @remove="handleRemove"
           @success="handleSuccess"
           @error="handleError"
           :on-change="handleChange"
-          :custom-key="getKey"
-          primary-color="#406A70"
         >
         </CloudUpload>
       </el-form-item>
@@ -215,6 +214,19 @@ export default {
       activeName: "",
       sliceMb: 10,
       chunkMb: 5,
+      watermarkConfig: {
+  type: 'text',
+  text: '我的水印',
+  font: 'Arial',
+  font_size: 30,
+  font_color: '#FFFFFF',  // 白色文字
+  transparency: 0.5,
+  rotate: 0,
+  x_offset: 10,
+  y_offset: 10,
+  tile: false
+}
+
     };
   },
   computed: {

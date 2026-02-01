@@ -8,5 +8,11 @@ node_modules/
 dist/
 npm-debug.log
 yarn-error.log
+# Rust / WebAssembly 构建产物
+wasm-watermark/target/
+*.rlib
+
+# Rust 特定文件
+Cargo.lock  # 可选：如果是库项目建议提交，如果是应用项目建议忽略
 
 # End of https://www.toptal.com/developers/gitignore/api/vuejs
