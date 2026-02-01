@@ -15,15 +15,7 @@ pub struct WatermarkConfig {
     #[serde(rename = "type")]
     pub watermark_type: String,
     
-    // 文字水印参数（现在由客户端渲染）
-    #[serde(default)]
-    pub text: Option<String>,
-    #[serde(default)]
-    pub font: Option<String>,
-    #[serde(default)]
-    pub font_size: Option<u32>,
-    #[serde(default)]
-    pub font_color: Option<String>,
+    // 水印布局和效果参数
     #[serde(default)]
     pub transparency: Option<f32>,
     #[serde(default)]
@@ -48,10 +40,6 @@ impl Default for WatermarkConfig {
     fn default() -> Self {
         Self {
             watermark_type: "text".to_string(),
-            text: None,
-            font: None,
-            font_size: Some(30),
-            font_color: Some("#FFFFFF".to_string()),
             transparency: Some(0.5),
             rotate: Some(0.0),
             x_offset: Some(10),
