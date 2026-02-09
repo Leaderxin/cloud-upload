@@ -224,25 +224,6 @@ class OssHelper {
       }
     });
   }
-  // 图片加水印
-  async addWatermark({ bucket, region, key, watermarkText }) {
-    try {
-      // 阿里云OSS图片处理通过签名URL添加参数实现
-      const processedUrl = this.ossClient.signatureUrl(key, {
-        expires: 3600, // 1小时有效期
-        process: `image/watermark,text_${encodeURIComponent(
-          watermarkText
-        )},fill_ I0ZGRkZGRg,size_20,g_se,x_20,y_20`, // 水印参数
-      });
-
-      return {
-        processedUrl: processedUrl,
-        originalKey: key,
-      };
-    } catch (error) {
-      throw new Error(`添加水印失败: ${error.message}`);
-    }
-  }
 }
 
 export default OssHelper;

@@ -193,9 +193,7 @@ export default {
         getTempCredential: this.getOssCredential,
         refreshSTSTokenInterval: 85000,
       },
-      fileList: [
-        
-      ],
+      fileList: [],
       ifUpload: true,
       propObj: {
         multiple: false,
@@ -215,18 +213,16 @@ export default {
       sliceMb: 10,
       chunkMb: 5,
       watermarkConfig: {
-  type: 'text',
-  text: '我的水印',
-  font: 'Arial',
-  font_size: 40,
-  font_color: '#000000',  // 白色文字
-  transparency: 0.7,
-  rotate: 0,
-  x_offset: 30,
-  y_offset: 30,
-  tile: false
-}
-
+        type: "text",
+        text: "我的水印",
+        font_size: 20,
+        font_color: "#ffffff", 
+        transparency: 0.7,
+        rotate: 0,
+        x_offset: 30,
+        y_offset: 30,
+        tile: true,
+      },
     };
   },
   computed: {
@@ -243,12 +239,10 @@ export default {
       }
     },
   },
-  mounted(){
-    
-  },
+  mounted() {},
   methods: {
-    getKey(file){
-      return '测试文件key自定义.jpg'
+    getKey(file) {
+      return "测试文件key自定义.jpg";
     },
     onBeforeUpload(file) {
       console.log("before-upload", file);

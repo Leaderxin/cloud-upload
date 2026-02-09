@@ -353,27 +353,6 @@ class ObsHelper {
       }
     });
   }
-  // 图片加水印（华为云OBS处理方式）
-  async addWatermark({ bucket, region, key, watermarkText }) {
-    try {
-      // 确保使用有效的凭证
-      // 注意：这里可能需要重新获取配置信息，但在当前上下文中可能无法获取
-      // 如果需要支持临时凭证的水印功能，可能需要调整调用方式
-
-      // 华为云OBS的图片处理需要通过单独的图片处理服务
-      // 这里返回带水印参数的URL
-      const watermarkUrl = `https://${bucket}.obs.${region}.myhuaweicloud.com/${key}?x-image-process=image/watermark,text_${encodeURIComponent(
-        watermarkText
-      )},color_FFFFFF,size_20,g_se,x_20,y_20`;
-
-      return {
-        processedUrl: watermarkUrl,
-        originalKey: key,
-      };
-    } catch (error) {
-      throw new Error(`添加水印失败: ${error.message}`);
-    }
-  }
 }
 
 export default ObsHelper;

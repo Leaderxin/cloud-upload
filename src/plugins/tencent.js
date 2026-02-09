@@ -271,33 +271,6 @@ class CosHelper {
       localStorage.setItem("cosCacheDatas", JSON.stringify(cosCacheDatas));
     }
   }
-  // 图片加水印
-  async addWatermark({ bucket, region, key, watermarkText }) {
-    const params = {
-      Bucket: bucket,
-      Region: region,
-      Key: key,
-      PicOperations: JSON.stringify({
-        is_pic_info: 1,
-        rules: [
-          {
-            fileid: `watermark_${key}`,
-            rule: `watermark/2/text/${encodeURIComponent(
-              watermarkText
-            )}/fill/IzAwMDAwMA/fontsize/20/dissolve/50/gravity/southeast/dx/20/dy/20`,
-          },
-        ],
-      }),
-    };
-
-    return new Promise((resolve, reject) => {
-      this.cosClient.ciPutObjectFromLocalFile(params, (err, data) => {
-        if (err) reject(err);
-        else resolve(data);
-      });
-    });
-  }
-
   // 获取存储桶ACL（访问控制列表）
   async getBucketAcl({ bucket, region }) {
     return new Promise((resolve, reject) => {

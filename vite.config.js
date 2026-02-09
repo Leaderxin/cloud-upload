@@ -34,6 +34,7 @@ export default defineConfig({
         "cos-js-sdk-v5",
         "esdk-obs-browserjs",
         "ali-oss",
+        "fast-watermark",
       ],
       output: {
         // 在 UMD 构建模式下为这些外部化的依赖提供一个全局变量
@@ -60,4 +61,9 @@ export default defineConfig({
       "@": resolve(__dirname, "src"), // 设置别名，方便引用源文件
     },
   },
+  // 配置 WASM 文件处理
+  assetsInclude: ['**/*.wasm'],
+  optimizeDeps: {
+    exclude: ['fast-watermark']
+  }
 });
