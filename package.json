@@ -27,7 +27,7 @@
     "*.css"
   ],
   "dependencies": {
-    "fast-watermark": "^1.0.1",
+    "fast-watermark": "^1.0.4",
     "nanoid": "^5.1.6"
   },
   "peerDependencies": {

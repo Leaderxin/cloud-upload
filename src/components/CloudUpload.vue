@@ -112,8 +112,6 @@
       :file="previewFile"
       :primary-color="primaryColor"
     ></FilePreview>
-
-    <el-image :src="waterSrc"></el-image>
   </div>
 </template>
 
@@ -362,7 +360,6 @@ export default {
       previewUrl: "",
       previewVisible: false,
       previewFile: {},
-      waterSrc: "",
     };
   },
   computed: {
@@ -499,7 +496,6 @@ export default {
     // 自定义上传方法
     async customUpload(options) {
       const { file, onProgress, onSuccess, onError } = options;
-      
       // 处理水印
       let uploadFile = file;
       if (this.watermarkConfig && isImageFile(file)) {
@@ -512,22 +508,15 @@ export default {
             config = createImageWatermarkConfig(this.watermarkConfig)
           }
           const watermarkedBlob = await addWatermarkAsync(uploadFile, config);
-          this.waterSrc = URL.createObjectURL(watermarkedBlob);
           // 创建新的File对象
           uploadFile = new File([watermarkedBlob], file.name, {
-            type: 'image/png',
+            type: file.type,
             lastModified: Date.now()
           });
-          if (process.env.NODE_ENV === 'development') {
-            console.log('水印添加完成');
-          }
         } catch (error) {
-          console.error('添加水印失败，将使用原始文件上传:', error);
-          console.error('错误详情:', error.message);
-          // 水印添加失败，使用原始文件继续上传
+
         }
       }
-      
       let key = this.generateKey(uploadFile);
       const uploadConfig = {
         file: uploadFile,
