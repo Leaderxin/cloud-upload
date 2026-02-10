@@ -122,7 +122,6 @@ import fileHelper from "../utils/fileHelper";
 import { Upload, Loading, Image, Tooltip, Dialog } from "element-ui";
 import FilePreview from "./FilePreview.vue";
 import { nanoid } from "nanoid";
-import { addWatermarkAsync, isImageFile } from "../utils/watermarkHelper";
 let CosHelper = null;
 let ObsHelper = null;
 let OssHelper = null;
@@ -386,6 +385,9 @@ export default {
   created() {
     this.checkAndInit(this.cloudConfig);
   },
+  mounted() {
+    this.updatePrimaryColor();
+  },
   beforeDestroy() {
     if (CosHelper) CosHelper.destroyInstance();
     if (ObsHelper) ObsHelper.destroyInstance();
@@ -490,32 +492,9 @@ export default {
     // 自定义上传方法
     async customUpload(options) {
       const { file, onProgress, onSuccess, onError } = options;
-      
-      // 处理水印
-      let uploadFile = file;
-      if (this.watermarkConfig && isImageFile(file)) {
-        try {
-          if (process.env.NODE_ENV === 'development') {
-            console.log('正在为图片添加水印...');
-          }
-          const watermarkedBlob = await addWatermarkAsync(file, this.watermarkConfig);
-          // 创建新的File对象
-          uploadFile = new File([watermarkedBlob], file.name, {
-            type: 'image/png',
-            lastModified: Date.now()
-          });
-          if (process.env.NODE_ENV === 'development') {
-            console.log('水印添加完成');
-          }
-        } catch (error) {
-          console.error('添加水印失败，将使用原始文件上传:', error);
-          // 水印添加失败，使用原始文件继续上传
-        }
-      }
-      
-      let key = this.generateKey(uploadFile);
+      let key = this.generateKey(file);
       const uploadConfig = {
-        file: uploadFile,
+        file: file,
         key,
         chunkSize: this.chunkSize,
         sliceSize: this.sliceSize,
@@ -525,7 +504,7 @@ export default {
             console.log("当前进度:", percent);
           }
           onProgress({ percent });
-          this.$emit("progress", percent, uploadFile);
+          this.$emit("progress", percent, file);
         },
       };
 
@@ -733,10 +712,21 @@ export default {
         }
       }
     },
+    updatePrimaryColor() {
+      if (this.$el) {
+        this.$el.style.setProperty('--vue-cloud-upload-primary-color', this.primaryColor);
+      }
+    },
   },
   watch: {
     cloudType(val) {
       this.checkAndInit(this.cloudConfig);
+    },
+    primaryColor: {
+      immediate: true,
+      handler(val) {
+        this.updatePrimaryColor();
+      },
     },
     cloudConfig: {
       deep: true,
@@ -769,6 +759,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 .cloud-upload {
+  --vue-cloud-upload-primary-color: #409eff;
+  
   .default-content {
     width: 100%;
     height: 100%;
@@ -786,10 +778,10 @@ export default {
 
     &:hover,
     &:focus {
-      color: v-bind(primaryColor);
+      color: var(--vue-cloud-upload-primary-color);
 
       i {
-        color: v-bind(primaryColor);
+        color: var(--vue-cloud-upload-primary-color);
       }
     }
   }
@@ -821,7 +813,7 @@ export default {
 
       .el-upload-list__item-actions {
         i:hover {
-          color: v-bind(primaryColor);
+          color: var(--vue-cloud-upload-primary-color);
           background-color: #fff;
           padding: 3px;
           border-radius: 50%;
