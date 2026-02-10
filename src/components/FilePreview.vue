@@ -34,7 +34,6 @@
         :src="pdfUrl"
         frameborder="0"
         v-if="fileType == 'pdf'"
-        sandbox="allow-scripts allow-same-origin"
         loading="lazy"
       ></iframe>
       <video
@@ -125,10 +124,16 @@ export default {
     },
     initPdfContent() {
       // 释放之前的URL
-      if (this.pdfUrl) {
+      if (this.pdfUrl && this.pdfUrl.startsWith('blob:')) {
         URL.revokeObjectURL(this.pdfUrl);
       }
-      this.pdfUrl = URL.createObjectURL(this.fileRaw);
+      // 优先使用原始 URL，避免 Edge 对 Blob URL 的限制
+      // 只有当文件是本地上传的 File 对象时才使用 Blob URL
+      if (this.file.raw && this.file.raw instanceof File) {
+        this.pdfUrl = URL.createObjectURL(this.fileRaw);
+      } else {
+        this.pdfUrl = this.file.url;
+      }
     },
   },
   watch: {
