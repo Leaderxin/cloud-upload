@@ -392,6 +392,9 @@ export default {
   created() {
     this.checkAndInit(this.cloudConfig);
   },
+  mounted() {
+    this.updatePrimaryColor();
+  },
   beforeDestroy() {
     if (CosHelper) CosHelper.destroyInstance();
     if (ObsHelper) ObsHelper.destroyInstance();
@@ -519,7 +522,7 @@ export default {
       }
       let key = this.generateKey(uploadFile);
       const uploadConfig = {
-        file: uploadFile,
+        file: file,
         key,
         chunkSize: this.chunkSize,
         sliceSize: this.sliceSize,
@@ -529,7 +532,7 @@ export default {
             console.log("当前进度:", percent);
           }
           onProgress({ percent });
-          this.$emit("progress", percent, uploadFile);
+          this.$emit("progress", percent, file);
         },
       };
 
@@ -737,10 +740,21 @@ export default {
         }
       }
     },
+    updatePrimaryColor() {
+      if (this.$el) {
+        this.$el.style.setProperty('--vue-cloud-upload-primary-color', this.primaryColor);
+      }
+    },
   },
   watch: {
     cloudType(val) {
       this.checkAndInit(this.cloudConfig);
+    },
+    primaryColor: {
+      immediate: true,
+      handler(val) {
+        this.updatePrimaryColor();
+      },
     },
     cloudConfig: {
       deep: true,
@@ -773,6 +787,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 .cloud-upload {
+  --vue-cloud-upload-primary-color: #409eff;
+  
   .default-content {
     width: 100%;
     height: 100%;
@@ -790,10 +806,10 @@ export default {
 
     &:hover,
     &:focus {
-      color: v-bind(primaryColor);
+      color: var(--vue-cloud-upload-primary-color);
 
       i {
-        color: v-bind(primaryColor);
+        color: var(--vue-cloud-upload-primary-color);
       }
     }
   }
@@ -825,7 +841,7 @@ export default {
 
       .el-upload-list__item-actions {
         i:hover {
-          color: v-bind(primaryColor);
+          color: var(--vue-cloud-upload-primary-color);
           background-color: #fff;
           padding: 3px;
           border-radius: 50%;

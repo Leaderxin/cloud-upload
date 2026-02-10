@@ -433,6 +433,12 @@ https://docs.qq.com/doc/DT1ZKR2hneG5WdFVT
 ## 更新说明
 <!-- 自动生成的更新日志开始 -->
 
+### v1.7.4 (2026-02-10)
+
+- fix:iframe预览pdf被edge浏览器阻止问题 (9291909)
+- fix:primaryColor主题色设置不生效问题
+- fix:预览时全屏高度未自动适应问题
+
 ### v1.7.2 (2026-01-15)
 
 - doc:官方文档地址更新 (5b39445)

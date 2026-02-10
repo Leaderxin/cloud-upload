@@ -112,6 +112,7 @@ export default {
   methods: {
     handleOpen() {},
     handleClose() {
+      this.fullscreen = false;
       this.$emit("update:visible", false);
     },
     initTxtContent() {
@@ -135,10 +136,21 @@ export default {
         this.pdfUrl = this.file.url;
       }
     },
+    updatePrimaryColor() {
+      if (this.$el) {
+        this.$el.style.setProperty('--vue-cloud-upload-primary-color', this.primaryColor);
+      }
+    },
   },
   watch: {
     visible(val) {
       this.currentVisible = val;
+    },
+    primaryColor: {
+      immediate: true,
+      handler(val) {
+        this.updatePrimaryColor();
+      },
     },
     file: async function (val) {
       this.loading = true;
@@ -175,6 +187,9 @@ export default {
       this.loading = false;
     },
   },
+  mounted() {
+    this.updatePrimaryColor();
+  },
   beforeDestroy() {
     // 释放Blob URL以防止内存泄漏
     if (this.pdfUrl) {
@@ -187,7 +202,10 @@ export default {
 
 <style lang="scss" scoped>
 .file-preview-dialog {
+  --vue-cloud-upload-primary-color: #409eff;
+  
   .dialog-header {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -198,7 +216,7 @@ export default {
       font-weight: 550;
       cursor: pointer;
       &:hover {
-        color: v-bind(primaryColor);
+        color: var(--vue-cloud-upload-primary-color);
       }
     }
   }
@@ -257,5 +275,16 @@ export default {
   transform: translate(-50%, -50%);
   max-height: calc(100% - 30px);
   max-width: calc(100% - 30px);
+}
+
+/* 全屏状态下的样式调整 */
+.file-preview-dialog.is-fullscreen .file-preview-content {
+  height: calc(100vh - 100px)
+}
+.file-preview-dialog.is-fullscreen .file-preview-content .pdf-container {
+  height: 99%;
+}
+.file-preview-dialog.is-fullscreen .file-preview-content video {
+  height: 99%;
 }
 </style>
