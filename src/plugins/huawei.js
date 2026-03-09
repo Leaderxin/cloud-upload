@@ -1,6 +1,7 @@
 class ObsHelper {
   static instance = null;
   static externalOBS = null; // 外部传入的OBS对象
+  static refCount = 0; // 引用计数
   obsClient = null;
   tempCredential = null;
   accessKeyId = null;
@@ -25,32 +26,40 @@ class ObsHelper {
       )
         this.instance = new ObsHelper(config);
     }
+    // 增加引用计数
+    this.refCount++;
     return this.instance;
   }
 
   static destroyInstance() {
-    this.instance = null;
-    this.obsClient = null;
-    this.tempCredential = null;
-    localStorage.removeItem("obsCredential");
-    // 清理超过10天的断点记录
-    try {
-      const localData = localStorage.getItem("obsCpDatas");
-      if (localData) {
-        let obsCpDatas = JSON.parse(localData);
-        const tenDaysAgo = Date.now() - 10 * 24 * 60 * 60 * 1000; // 10天前的时间戳
-        obsCpDatas = obsCpDatas.filter((item) => {
-          // 如果没有创建时间，则认为是旧记录，需要清理
-          if (!item.createTime) {
-            return false;
-          }
-          // 保留创建时间在10天内的记录
-          return item.createTime > tenDaysAgo;
-        });
-        localStorage.setItem("obsCpDatas", JSON.stringify(obsCpDatas));
+    // 减少引用计数
+    this.refCount--;
+    // 只有当引用计数为0时才真正销毁实例
+    if (this.refCount <= 0) {
+      this.instance = null;
+      this.obsClient = null;
+      this.tempCredential = null;
+      this.refCount = 0; // 重置引用计数
+      localStorage.removeItem("obsCredential");
+      // 清理超过10天的断点记录
+      try {
+        const localData = localStorage.getItem("obsCpDatas");
+        if (localData) {
+          let obsCpDatas = JSON.parse(localData);
+          const tenDaysAgo = Date.now() - 10 * 24 * 60 * 60 * 1000; // 10天前的时间戳
+          obsCpDatas = obsCpDatas.filter((item) => {
+            // 如果没有创建时间，则认为是旧记录，需要清理
+            if (!item.createTime) {
+              return false;
+            }
+            // 保留创建时间在10天内的记录
+            return item.createTime > tenDaysAgo;
+          });
+          localStorage.setItem("obsCpDatas", JSON.stringify(obsCpDatas));
+        }
+      } catch (error) {
+        console.error("清理过期断点记录失败:", error);
       }
-    } catch (error) {
-      console.error("清理过期断点记录失败:", error);
     }
   }
 
