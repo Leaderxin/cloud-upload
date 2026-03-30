@@ -1,11 +1,11 @@
 {
   "name": "vue3-cloud-upload",
-  "version": "2.0.0",
+  "version": "1.0.3",
   "description": "基于Vue3+Element Plus+TypeScript的通用云上传组件，无缝衔接腾讯云，华为云，阿里云等对象存储平台，开箱即用",
   "private": false,
   "type": "module",
-  "main": "./dist/cloud-upload.umd.js",
-  "module": "./dist/cloud-upload.es.js",
+  "main": "./dist/vue3-cloud-upload.umd.js",
+  "module": "./dist/vue3-cloud-upload.es.js",
   "homepage": "https://github.com/Leaderxin/cloud-upload",
   "repository": {
     "type": "git",
@@ -13,14 +13,19 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/cloud-upload.es.js",
-      "require": "./dist/cloud-upload.umd.js"
-    }
+      "import": "./dist/vue3-cloud-upload.es.js",
+      "require": "./dist/vue3-cloud-upload.umd.js"
+    },
+    "./dist/vue3-cloud-upload.css": {
+      "import": "./dist/vue3-cloud-upload.css",
+      "require": "./dist/vue3-cloud-upload.css"
+    },
+    "./style": "./dist/vue3-cloud-upload.css"
   },
   "files": [
     "dist",
     "README.md",
-    "*.scss"
+    "style"
   ],
   "sideEffects": [
     "*.scss",

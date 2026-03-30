@@ -16,10 +16,32 @@
 ## 安装
 
 ```bash
+# 安装组件
 npm install vue3-cloud-upload
+
+# 根据需要安装对应的云SDK
+npm install cos-js-sdk-v5      # 腾讯云COS
+npm install ali-oss            # 阿里云OSS
+npm install esdk-obs-browserjs # 华为云OBS
 ```
 
 ## 使用
+
+### 导入外部SDK
+
+在使用组件之前，需要先导入并设置外部SDK对象：
+
+```typescript
+import { setExternalCOS, setExternalOSS, setExternalOBS } from 'vue3-cloud-upload';
+import COS from 'cos-js-sdk-v5';
+import OSS from 'ali-oss';
+import ObsClient from 'esdk-obs-browserjs';
+
+// 设置外部SDK（根据需要设置）
+setExternalCOS(COS);      // 腾讯云COS
+setExternalOSS(OSS);      // 阿里云OSS
+setExternalOBS(ObsClient); // 华为云OBS
+```
 
 ### 基础用法
 
@@ -34,7 +56,12 @@ npm install vue3-cloud-upload
 
 <script setup>
 import { ref } from 'vue'
-import CloudUpload from 'vue-cloud-upload-v3'
+import CloudUpload from 'vue3-cloud-upload'
+import { setExternalCOS } from 'vue3-cloud-upload'
+import COS from 'cos-js-sdk-v5'
+
+// 设置外部SDK（必须在使用组件前设置）
+setExternalCOS(COS)
 
 const fileList = ref([])
 const cloudConfig = ref({
@@ -48,6 +75,89 @@ const cloudConfig = ref({
 })
 </script>
 ```
+
+### 完整示例（包含所有云平台）
+
+```vue
+<template>
+  <div>
+    <h3>腾讯云COS上传</h3>
+    <cloud-upload
+      v-model="tencentFiles"
+      :cloud-config="tencentConfig"
+      cloud-type="tencent"
+    />
+    
+    <h3>阿里云OSS上传</h3>
+    <cloud-upload
+      v-model="aliyunFiles"
+      :cloud-config="aliyunConfig"
+      cloud-type="aliyun"
+    />
+    
+    <h3>华为云OBS上传</h3>
+    <cloud-upload
+      v-model="huaweiFiles"
+      :cloud-config="huaweiConfig"
+      cloud-type="huawei"
+    />
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import CloudUpload from 'vue3-cloud-upload'
+import { setExternalCOS, setExternalOSS, setExternalOBS } from 'vue3-cloud-upload'
+import COS from 'cos-js-sdk-v5'
+import OSS from 'ali-oss'
+import ObsClient from 'esdk-obs-browserjs'
+
+// 设置外部SDK（必须在使用组件前设置）
+setExternalCOS(COS)
+setExternalOSS(OSS)
+setExternalOBS(ObsClient)
+
+const tencentFiles = ref([])
+const tencentConfig = ref({
+  bucket: 'your-tencent-bucket',
+  region: 'ap-guangzhou',
+  getTempCredential: async () => {
+    const response = await fetch('/api/get-cos-credential')
+    return await response.json()
+  }
+})
+
+const aliyunFiles = ref([])
+const aliyunConfig = ref({
+  bucket: 'your-aliyun-bucket',
+  region: 'oss-cn-hangzhou',
+  getTempCredential: async () => {
+    const response = await fetch('/api/get-oss-credential')
+    return await response.json()
+  }
+})
+
+const huaweiFiles = ref([])
+const huaweiConfig = ref({
+  bucket: 'your-huawei-bucket',
+  region: 'cn-north-4',
+  server: 'https://obs.cn-north-4.myhuaweicloud.com',
+  getTempCredential: async () => {
+    const response = await fetch('/api/get-obs-credential')
+    return await response.json()
+  }
+})
+</script>
+```
+
+## 为什么需要外部导入SDK？
+
+为了减小组件包体积，本组件不直接打包云SDK。使用时需要手动导入并设置对应的SDK对象，这样可以：
+
+1. **减小包体积**：避免将多个云SDK打包到组件中
+2. **按需加载**：只加载实际使用的云平台SDK
+3. **版本灵活**：可以使用项目中的特定SDK版本
+4. **Tree Shaking**：配合打包工具进行更好的优化
 
 ### 腾讯云COS配置
 

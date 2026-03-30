@@ -58,7 +58,7 @@
         <el-image
           v-if="getIfImage(file)"
           :preview-src-list="getPreviewList"
-          :ref="(el) => setImageRef(getImgRef(file), el)"
+          :ref="(el: any) => setImageRef(getImgRef(file), el)"
           fit="contain"
           class="el-upload-list__item-thumbnail"
           v-loading="getFileLoading(file)"
@@ -342,9 +342,7 @@ const customUpload = async (options: any) => {
     sliceSize: props.sliceSize,
     ...props.cloudConfig,
     onProgress: (percent: number) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log("当前进度:", percent);
-      }
+      console.log("当前进度:", percent);
       onProgress({ percent });
       emit('progress', percent, file);
     },

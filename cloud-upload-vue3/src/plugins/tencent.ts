@@ -152,7 +152,7 @@ class CosHelper {
       await this.getTempCredential(getToken);
       
       this.cosClient = new COS({
-        getAuthorization: async (options: any, callback: any) => {
+        getAuthorization: async (_options: any, callback: any) => {
           try {
             if (!this.tempCredential || this.isCredentialExpired()) {
               await this.getTempCredential(getToken);

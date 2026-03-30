@@ -273,7 +273,7 @@ class ObsHelper {
                 onProgress(transferredAmount / totalAmount);
               }
             },
-            EventCallback: function (eventType: string, eventParam: any, eventResult: any) {
+            EventCallback: function (eventType: string, eventParam: any, _eventResult: any) {
               if (eventType === 'uploadPartSucceed') {
                 const index = obsCpDatas.findIndex((x) => x.key === uniqkey);
                 const partIndex = cp.parts.findIndex((x: any) => x.partNumber === eventParam.partNumber);
@@ -294,7 +294,7 @@ class ObsHelper {
                 onProgress(transferredAmount / totalAmount);
               }
             },
-            ResumeCallback: function (resumeHook: any, uploadCheckpoint: any) {
+            ResumeCallback: function (_resumeHook: any, uploadCheckpoint: any) {
               cp = uploadCheckpoint;
               if (ifExist) {
                 obsCpDatas[index].cp = cp;
@@ -307,7 +307,7 @@ class ObsHelper {
                 localStorage.setItem('obsCpDatas', JSON.stringify(obsCpDatas));
               }
             },
-            EventCallback: function (eventType: string, eventParam: any, eventResult: any) {
+            EventCallback: function (eventType: string, eventParam: any, _eventResult: any) {
               if (eventType === 'uploadPartSucceed') {
                 const index = obsCpDatas.findIndex((x) => x.key === uniqkey);
                 const partIndex = cp.parts.findIndex((x: any) => x.partNumber === eventParam.partNumber);
