@@ -1,0 +1,73 @@
+@font-face {
+  font-family: "cloud-upload-icon"; /* Project id 5018793 */
+  /* Color fonts */
+  src: 
+       url('iconfont.woff2?t=1758203708514') format('woff2'),
+       url('iconfont.woff?t=1758203708514') format('woff'),
+       url('iconfont.ttf?t=1758203708514') format('truetype');
+}
+
+.cloud-upload-icon {
+  font-family: "cloud-upload-icon" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-quxiaoquanping_o:before {
+  content: "\eb98";
+}
+
+.icon-quanping_o:before {
+  content: "\eb99";
+}
+
+.icon-fujian1:before {
+  content: "\e86a";
+}
+
+.icon-yunshangchuan_o:before {
+  content: "\ebb3";
+}
+
+.icon-txt:before {
+  content: "\e6a5";
+}
+
+.icon-audio:before {
+  content: "\e604";
+}
+
+.icon-ppt:before {
+  content: "\e650";
+}
+
+.icon-Pdf:before {
+  content: "\e733";
+}
+
+.icon-yasuobao:before {
+  content: "\e632";
+}
+
+.icon-fujian:before {
+  content: "\e85a";
+}
+
+.icon-video:before {
+  content: "\e663";
+}
+
+.icon-MP4:before {
+  content: "\e679";
+}
+
+.icon-EXCEL:before {
+  content: "\e6a2";
+}
+
+.icon-WORD:before {
+  content: "\e6a4";
+}
+

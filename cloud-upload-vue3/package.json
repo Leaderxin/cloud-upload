@@ -1,0 +1,85 @@
+{
+  "name": "vue3-cloud-upload",
+  "version": "2.0.0",
+  "description": "基于Vue3+Element Plus+TypeScript的通用云上传组件，无缝衔接腾讯云，华为云，阿里云等对象存储平台，开箱即用",
+  "private": false,
+  "type": "module",
+  "main": "./dist/cloud-upload.umd.js",
+  "module": "./dist/cloud-upload.es.js",
+  "homepage": "https://github.com/Leaderxin/cloud-upload",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Leaderxin/cloud-upload.git"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/cloud-upload.es.js",
+      "require": "./dist/cloud-upload.umd.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "*.scss"
+  ],
+  "sideEffects": [
+    "*.scss",
+    "*.css"
+  ],
+  "dependencies": {
+    "nanoid": "^5.1.6"
+  },
+  "peerDependencies": {
+    "ali-oss": "^6.23.0",
+    "cos-js-sdk-v5": "^1.10.1",
+    "element-plus": "^2.0.0",
+    "esdk-obs-browserjs": "^3.25.6",
+    "vue": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "cos-js-sdk-v5": {
+      "optional": true
+    },
+    "esdk-obs-browserjs": {
+      "optional": true
+    },
+    "ali-oss": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "element-plus": "^2.8.0",
+    "rollup-plugin-visualizer": "^6.0.3",
+    "sass": "^1.92.1",
+    "typescript": "^5.0.0",
+    "vite": "^6.0.0",
+    "vue": "^3.4.0",
+    "vue-tsc": "^2.0.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "prepublishOnly": "npm run build",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "keywords": [
+    "vue3-upload",
+    "cloud-upload",
+    "vue-upload-component",
+    "upload",
+    "cos-upload",
+    "obs-upload",
+    "oss-upload",
+    "cos-js-sdk-v5",
+    "esdk-obs-browserjs",
+    "ali-oss",
+    "element-plus",
+    "typescript"
+  ],
+  "author": "Leaderxin",
+  "license": "Apache-2.0",
+  "volta": {
+    "node": "20.19.4"
+  }
+}
