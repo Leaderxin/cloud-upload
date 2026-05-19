@@ -4,6 +4,7 @@
       'cloud-upload',
       'cloud-upload-' + size,
       disabled && fileList.length > 0 ? 'cloud-upload-disabled' : '',
+      getIfOverlimit?'cloud-upload-over-limit':''
     ]"
   >
     <el-upload
@@ -381,6 +382,9 @@ export default {
         this.previewConfig
       );
     },
+    getIfOverlimit(){
+      return this.fileList.length>=this.limit
+    }
   },
   created() {
     this.checkAndInit(this.cloudConfig);
@@ -565,6 +569,8 @@ export default {
         this.$refs.innerUpload.uploadFiles.splice(index, 1, fileresult);
         this.fileList = [...this.$refs.innerUpload.uploadFiles];
       }
+      console.log('getIfOverlimit:',this.getIfOverlimit);
+      
     },
     generateKey(file) {
       let fileKey = "";
@@ -886,8 +892,14 @@ export default {
     height: 94px;
   }
 }
-
+//禁用时不显示点击上传默认占位
 .cloud-upload-disabled {
+  ::v-deep .el-upload--picture-card {
+    display: none;
+  }
+}
+//附件达到上限时不显示点击上传默认占位
+.cloud-upload-over-limit{
   ::v-deep .el-upload--picture-card {
     display: none;
   }
