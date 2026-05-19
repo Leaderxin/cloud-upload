@@ -16,6 +16,13 @@ export function setExternalOBS(OBS) {
   });
 }
 
+export function setExternalOSS(OSS) {
+  // 延迟加载并设置
+  import("./plugins/aliyun").then(module => {
+    module.default.setExternalOSS(OSS);
+  });
+}
+
 // 定义 install 函数，用于 Vue.use() 注册
 CloudUpload.install = function (Vue) {
   Vue.component(CloudUpload.name, CloudUpload);
