@@ -354,6 +354,8 @@ export default {
       previewUrl: "",
       previewVisible: false,
       previewFile: {},
+      _cloudKey: null, // 当前持有的云平台
+      _initPromise: null, // 初始化去重
     };
   },
   computed: {
@@ -393,9 +395,7 @@ export default {
     this.updatePrimaryColor();
   },
   beforeDestroy() {
-    if (CosHelper) CosHelper.destroyInstance();
-    if (ObsHelper) ObsHelper.destroyInstance();
-    if (OssHelper) OssHelper.destroyInstance();
+    if (this._cloudKey) this._releaseCloud(this._cloudKey);
   },
   methods: {
     /**
@@ -406,27 +406,71 @@ export default {
       const typeList = ["tencent", "huawei", "aliyun"];
       if (!this.cloudType) {
         console.warn("未设置云平台类型cloudType!");
-      } else if (!typeList.includes(this.cloudType)) {
-        console.warn(`云平台类型cloudType设置错误，应为${typeList.join("/")}`);
+        return;
       }
-      switch (this.cloudType) {
+      if (!typeList.includes(this.cloudType)) {
+        console.warn(`云平台类型cloudType设置错误，应为${typeList.join("/")}`);
+        return;
+      }
+      // 已持有目标平台，幂等跳过
+      if (this._cloudKey === this.cloudType) return;
+      // 并发去重（value watcher immediate 与 created 可能同时触发）
+      if (this._initPromise) return this._initPromise;
+      const initPromise = this._doInitCloud(cloudConfig);
+      this._initPromise = initPromise;
+      try {
+        await initPromise;
+      } finally {
+        this._initPromise = null;
+      }
+    },
+    /**
+     * 初始化指定云平台的客户端（持有/释放精确配对）
+     */
+    async _doInitCloud(cloudConfig) {
+      const target = this.cloudType;
+      const oldKey = this._cloudKey;
+      switch (target) {
         case "tencent":
           CosHelper = (await import("../plugins/tencent")).default;
-          CosHelper.getInstance(cloudConfig);
+          if (!CosHelper.getInstance(cloudConfig)) return;
           // 等待腾讯云初始化完成
           await CosHelper.waitForInitialization();
           break;
         case "huawei":
           ObsHelper = (await import("../plugins/huawei")).default;
-          ObsHelper.getInstance(cloudConfig);
+          if (!ObsHelper.getInstance(cloudConfig)) return;
           // 等待华为云初始化完成
           await ObsHelper.waitForInitialization();
           break;
         case "aliyun":
           OssHelper = (await import("../plugins/aliyun")).default;
-          OssHelper.getInstance(cloudConfig);
+          if (!OssHelper.getInstance(cloudConfig)) return;
           // 等待阿里云初始化完成
           await OssHelper.waitForInitialization();
+          break;
+        default:
+          return;
+      }
+      // 新平台就绪后，释放旧平台（保证 refCount 配对）
+      if (oldKey && oldKey !== target) {
+        this._releaseCloud(oldKey);
+      }
+      this._cloudKey = target;
+    },
+    /**
+     * 释放指定平台的单例引用
+     */
+    _releaseCloud(key) {
+      switch (key) {
+        case "tencent":
+          if (CosHelper) CosHelper.destroyInstance();
+          break;
+        case "huawei":
+          if (ObsHelper) ObsHelper.destroyInstance();
+          break;
+        case "aliyun":
+          if (OssHelper) OssHelper.destroyInstance();
           break;
         default:
           break;
@@ -516,24 +560,33 @@ export default {
         let result;
         // 根据云平台类型选择上传方法
         switch (this.cloudType) {
-          case "tencent":
-            result = await CosHelper.getInstance().uploadFile(uploadConfig);
+          case "tencent": {
+            const helper = CosHelper.getInstance();
+            if (!helper) throw new Error("腾讯云客户端未初始化");
+            result = await helper.uploadFile(uploadConfig);
             if (result.statusCode == 200) {
               this.handleUploadSuccess(result, file);
             }
             break;
-          case "huawei":
-            result = await ObsHelper.getInstance().uploadFile(uploadConfig);
+          }
+          case "huawei": {
+            const helper = ObsHelper.getInstance();
+            if (!helper) throw new Error("华为云客户端未初始化");
+            result = await helper.uploadFile(uploadConfig);
             if (result.CommonMsg.Status == 200) {
               this.handleUploadSuccess(result, file);
             }
             break;
-          case "aliyun":
-            result = await OssHelper.getInstance().uploadFile(uploadConfig);
+          }
+          case "aliyun": {
+            const helper = OssHelper.getInstance();
+            if (!helper) throw new Error("阿里云客户端未初始化");
+            result = await helper.uploadFile(uploadConfig);
             if (result.url) {
               this.handleUploadSuccess(result, file);
             }
             break;
+          }
           default:
             throw new Error(`Unsupported cloudType: ${this.cloudType}`);
         }
@@ -672,13 +725,15 @@ export default {
             let url;
             switch (this.cloudType) {
               case "tencent":
-                url = await CosHelper.getInstance().getFileUrlByKey({
-                  key: file.key,
-                  ...this.cloudConfig,
-                });
+                if (CosHelper && CosHelper.getInstance()) {
+                  url = await CosHelper.getInstance().getFileUrlByKey({
+                    key: file.key,
+                    ...this.cloudConfig,
+                  });
+                }
                 break;
               case "huawei":
-                if (ObsHelper) {
+                if (ObsHelper && ObsHelper.getInstance()) {
                   url = await ObsHelper.getInstance().getFileUrlByKey({
                     key: file.key,
                     ...this.cloudConfig,
@@ -686,7 +741,7 @@ export default {
                 }
                 break;
               case "aliyun":
-                if (OssHelper) {
+                if (OssHelper && OssHelper.getInstance()) {
                   url = await OssHelper.getInstance().getFileUrlByKey({
                     key: file.key,
                     ...this.cloudConfig,

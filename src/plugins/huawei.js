@@ -26,6 +26,10 @@ class ObsHelper {
       )
         this.instance = new ObsHelper(config);
     }
+    if (!this.instance) {
+      console.error("华为云OBS初始化失败：缺少永久密钥或getTempCredential函数");
+      return null;
+    }
     // 增加引用计数
     this.refCount++;
     return this.instance;
@@ -36,9 +40,11 @@ class ObsHelper {
     this.refCount--;
     // 只有当引用计数为0时才真正销毁实例
     if (this.refCount <= 0) {
+      if (this.instance) {
+        this.instance.obsClient = null;
+        this.instance.tempCredential = null;
+      }
       this.instance = null;
-      this.obsClient = null;
-      this.tempCredential = null;
       this.refCount = 0; // 重置引用计数
       localStorage.removeItem("obsCredential");
       // 清理超过10天的断点记录

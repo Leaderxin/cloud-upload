@@ -18,6 +18,10 @@ class OssHelper {
       )
         this.instance = new OssHelper(config);
     }
+    if (!this.instance) {
+      console.error("阿里云OSS初始化失败：缺少getTempCredential函数");
+      return null;
+    }
     // 增加引用计数
     this.refCount++;
     return this.instance;
@@ -28,8 +32,10 @@ class OssHelper {
     this.refCount--;
     // 只有当引用计数为0时才真正销毁实例
     if (this.refCount <= 0) {
+      if (this.instance) {
+        this.instance.ossClient = null;
+      }
       this.instance = null;
-      this.ossClient = null;
       this.refCount = 0; // 重置引用计数
       // 清理超过10天的断点记录
       try {
