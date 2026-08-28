@@ -433,6 +433,14 @@ https://docs.qq.com/doc/DT1ZKR2hneG5WdFVT
 ## 更新说明
 <!-- 自动生成的更新日志开始 -->
 
+### v1.7.6 (2026-05-19)
+
+- feat:picture-card模式下附件达到上限隐藏默认占位内容 (88fb0b7)
+- fix:包导出方法中丢失了oss注册方法 (341a154)
+- fix:优化组件多实例且动态切换场景下的资源释放逻辑 (cc9d4da)
+- 问题修复 (fb61257)
+- fix:iframe预览pdf被edge浏览器阻止问题 (9291909)
+
 ### v1.7.4 (2026-02-10)
 
 - fix:iframe预览pdf被edge浏览器阻止问题 (9291909)
