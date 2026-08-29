@@ -873,11 +873,21 @@ export default {
       }
 
       .el-upload-list__item-actions {
-        i:hover {
-          color: var(--vue-cloud-upload-primary-color);
-          background-color: #fff;
-          padding: 3px;
+        i {
+          // 固定尺寸圆形高亮：hover 只切换颜色，不改变尺寸、不产生外扩阴影，
+          // 既避免回流引起闪烁，也避免 box-shadow 产生的白色边缘残影
+          display: inline-block;
+          width: 20px;
+          height: 20px;
+          line-height: 20px;
+          text-align: center;
           border-radius: 50%;
+          transition: color 0.2s, background-color 0.2s;
+          padding: 2px;
+          &:hover {
+            color: var(--vue-cloud-upload-primary-color);
+            background-color: #fff;
+          }
         }
       }
 
@@ -933,6 +943,13 @@ export default {
     .el-upload-list__item {
       width: 94px;
       height: 94px;
+
+      .el-upload-list__item-actions {
+        // 94px 容器下减小操作图标间距，避免左右图标贴边
+        span + span {
+          margin-left: 8px;
+        }
+      }
 
       .previewIcon {
         .cloud-upload-icon {
