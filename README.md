@@ -31,7 +31,6 @@
 - ✅ 音视频附件在线播放
 - ✅ 自定义样式支持
 - ✅ 丰富的参数配置和回调事件
-- ✅ 图片添加水印功能（基于Rust + WASM）
 
 ## 🚧 开发中功能
 
@@ -345,73 +344,6 @@ export default {
 ```
 </details>
 
-## 图片水印功能
-
-组件现已支持基于Rust + WASM的高性能图片水印功能，支持文字水印和图片水印。
-
-### **在组件中使用水印配置**：
-
-```vue
-<template>
-  <CloudUpload
-    v-model="fileList"
-    :cloud-config="cloudConfig"
-    :watermark-config="watermarkConfig"
-  />
-</template>
-
-<script>
-export default {
-  data() {
-    return {
-      fileList: [],
-      cloudConfig: {
-        // 云平台配置
-      },
-      // 文字水印配置
-      watermarkConfig: {
-        type: 'text',
-        text: '版权所有',
-        font_size: 30,
-        font_color: '#000000',
-        transparency: 0.5, //不透明度
-        rotate: 0, //旋转角度
-        x_offset: 10, //X轴偏移
-        y_offset: 10, //Y轴偏移
-        tile: true //是否循环平铺
-      }
-    }
-  }
-}
-</script>
-```
-
-### 水印配置参数
-
-**文字水印**：
-- `type`: `'text'` - 水印类型
-- `text`: 水印文字内容
-- `font_size`: 字体大小（默认30）
-- `font_color`: 字体颜色（默认#FFFFFF）
-- `transparency`: 不透明度 0-1（默认0.5）
-- `rotate`: 旋转角度（默认0）
-- `x_offset`: X轴偏移（默认10）
-- `y_offset`: Y轴偏移（默认10）
-- `tile`: 是否平铺（默认false）
-
-**图片水印**：
-- `type`: `'image'` - 水印类型
-- `image_data`: base64编码的图片数据
-- `width`: 水印图片宽度（可选）
-- `height`: 水印图片高度（可选）
-- `transparency`: 不透明度 0-1（默认0.5）
-- `rotate`: 旋转角度（默认0）
-- `x_offset`: X轴偏移（默认10）
-- `y_offset`: Y轴偏移（默认10）
-- `tile`: 是否平铺（默认false）
-
-详细使用文档请参考：[图片水印功能使用指南](./WATERMARK_USAGE.md)
-
 ## 使用文档
 
 组件详细使用文档请参考【腾讯文档】vue-cloud-upload官方文档
@@ -432,6 +364,14 @@ https://docs.qq.com/doc/DT1ZKR2hneG5WdFVT
 
 ## 更新说明
 <!-- 自动生成的更新日志开始 -->
+
+### v1.7.7 (2026-08-29)
+
+- chore:升级element-ui至2.15.14 (d73ca44)
+- fix:修复size=mini时图片操作图标hover闪烁、贴边及白色残影问题 (0bb1449)
+- docs:新增CLAUDE.md项目说明文档 (783ca1a)
+- fix:修复单例生命周期引用计数不对称等4个高危bug并新增vitest单测 (8d52e3c)
+- 版本说明提交 (7e01f09)
 
 ### v1.7.6 (2026-05-19)
 
@@ -476,3 +416,16 @@ https://docs.qq.com/doc/DT1ZKR2hneG5WdFVT
     <img src="https://img.shields.io/badge/⭐-Star%20This%20Project-blue?style=for-the-badge" alt="Star This Project">
   </a>
 </p>
+
+---
+
+## 🤝 相关项目推荐
+
+[**QuantDesktop**](https://github.com/Leaderxin/quant-desktop) —— 由同一作者开发的开源 **A 股实时看盘桌面工具**，基于 Tauri 2 + Rust + Vue 3 构建，支持 Windows / macOS / Linux，免费、无需注册、开箱即用。
+
+- 🖥️ **实时行情**：自选股批量刷新 + 七大指数同步，交易时段 2 秒极速更新
+- 📈 **专业图表**：分时图、K 线图（1/5 分钟 · 日/周/月）、五档盘口、MACD / BOLL 指标
+- 📌 **零打扰看盘**：可拖拽浮动行情条 + 系统托盘常驻，工作时余光一扫即可掌握行情
+- 🆓 **免费开源**：安装包仅几 MB，无广告、无捆绑
+
+如果你也是 A 股投资者，欢迎去 [QuantDesktop](https://github.com/Leaderxin/quant-desktop) 看看，觉得好用就给个 ⭐️ Star 支持一下！
